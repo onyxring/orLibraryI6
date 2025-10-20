@@ -1,0 +1,42 @@
+!% +include_path=./inform6/lib,./orLibraryI6/_extras/unitTests,./orLibraryI6
+!% -E1												!--Microsoft Style Error Msgs, needed so VisualStudio and IFIDE can jump to error
+!% -v5												!--version to compile to: v5, v8, G, etc...
+!% -SD												!--debug (don't leave in final release)
+!---------------------------------------------------------------------------------------------------
+! utSuite01.inf
+! A unit test suite to test several orLibrary extensions.  These unit tests are, themselves, 
+! formatted as extensions, so they are included in the "Include orLibrary Extensions" section.
+!---------------------------------------------------------------------------------------------------
+! Created by Jim Fisher
+!---------------------------------------------------------------------------------------------------
+! 2024.05.04	Initial revision
+!---------------------------------------------------------------------------------------------------
+Constant Story				"orLibrary UnitTest Suite 1";
+Constant Headline			"^Copyright (c) 2024: Jim Fisher^";
+Release 1;
+!---------------------------------------------------------------------------------------------------
+! Include orLibrary Extensions here
+!---------------------------------------------------------------------------------------------------
+! #include "utAdjective";
+! #include "utBetterChoice";
+! #include "utPrefixSuffix";
+! #include "utDistinctMeSelf";
+#include "utRecogName";
+!#include "utDoor";
+!#include "utNameable";
+!#include "utParentChildRelationship";
+!#include "orTest";
+!#include "utReferByContents";
+!---------------------------------------------------------------------------------------------------
+#include "#Parser";
+!---------------------------------------------------------------------------------------------------
+#include "#Verblib"; 
+
+object startObj "orLib Test Suite" has light with description "The orLibrary Test Suite.";
+[Initialise; 
+  orTestManager.briefMode=true;
+  location = startObj; 
+]; 
+!---------------------------------------------------------------------------------------------------
+#Include "#Grammar"; 
+end;
