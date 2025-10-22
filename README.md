@@ -1,2 +1,4 @@
-# orLibrary 2
-The OnyxRing Library of extensions for I6.
+# orLibrary for I6 
+
+### Full documentation
+    is contained in the _extras subfolder: orLUG.pdf
