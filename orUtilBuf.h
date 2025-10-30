@@ -91,9 +91,11 @@ default        orUtilBuf_STAGE  0;
 				stringVal.print_to_array(buf, len); !check
 				self.setLength(buf,self.getLength(buf)); !--pointless, but this keeps length setting in one place, helping with things like profiling and consistency checks
 			]
-		,	setFromBuffer[buf stringVal;
-				self.copy(buf, stringVal, self.getLength(stringVal),0,0);
-				self.setLength(buf,self.getLength(stringVal));
+		,	setFromBuffer[buf stringVal
+					svlen; 
+				svlen=self.getLength(stringVal);
+				self.copy(buf, stringVal, svlen,0,0);
+				self.setLength(buf,svlen);
 			]
 		,	getSize[buf;
 				if(self.isSized(buf)==false) return -1;
@@ -147,17 +149,26 @@ default        orUtilBuf_STAGE  0;
 		,	print[buf len
 					i c;
 				if(len<=0) len=self.getLength(buf);
-				for(i=0:i<len:i++) {
-					c=self.getChar(buf,i);
-					if(c==0) break; !--Shouldn't normally happen, but if theres been some sizing issues, its better to just finish on an embedded zero
-					print (char)c;
-				}
+
+				self.indexOf(buf, "$");
+				
+				#ifdef TARGET_GLULX;
+					glk_put_buffer(buf+WORDSIZE, len); 
+				#ifnot;
+					for(i=0:i<len:i++) {
+						c=self.getChar(buf,i);
+						if(c==0) break; !--Shouldn't normally happen, but if theres been some sizing issues, its better to just finish on an embedded zero
+						print (char)c;
+					}
+				#endif;
+				
 				return buf;
 			]
         ,	equals[buf1 buf2 caseInsensitive
-                    t;
-				if(self.getLength(buf1)~=self.getLength(buf2)) rfalse; ! different sizes, so not equal
-                for(t=WORDSIZE: t< self.getLength(buf1)+WORDSIZE :t++){
+                    t buf1len;
+				buf1len=self.getLength(buf1);
+				if(buf1len~=self.getLength(buf2)) rfalse; ! different sizes, so not equal
+                for(t=WORDSIZE: t< buf1len+WORDSIZE :t++){
 					if(caseInsensitive<= 0){
                         if(buf1->(t)~=buf2->(t)) {
 							rfalse;
@@ -239,21 +250,19 @@ default        orUtilBuf_STAGE  0;
 				if(charCount<=0) charCount=self.getLength(fromBuf);
 				len=self.getLength(toBuf);
 				!--expand the target buffer to make room
-				! for(i=self.getLength(toBuf):i>=toPos:i--){
+				self.copy(toBuf, toBuf, len-toPos, toPos+charCount, toPos);
+				! for(i=len:i>=toPos:i--){
 				! 	toBuf->(WORDSIZE+i+charCount)=toBuf->(WORDSIZE+i);
 				! }
 				
-
-				self.copy(toBuf, toBuf, len-toPos, toPos+charCount, toPos);
-				
 				! !--now fill in the inserted space
+				self.copy(toBuf, fromBuf, charCount, toPos);
 				! for(i=0:i<charCount:i++){
 				! 	if(fromBuf==0)
 				! 		toBuf->(WORDSIZE+i+toPos)=' ';
 				! 	else
 				! 		toBuf->(WORDSIZE+i+toPos)=fromBuf->(WORDSIZE+i);
 				! }
-				self.copy(toBuf, fromBuf, charCount, toPos);
 				self.setLength(toBuf, len+charCount);
 				return toBuf;
 			]
@@ -292,56 +301,66 @@ default        orUtilBuf_STAGE  0;
 				return buf;
 			]
 		,	indexOf[buf searchTextBuf startingIndex
-					o i;
-				for(o=startingIndex: o<self.getLength(buf):o++){
-					for(i=0: i<self.getLength(searchTextBuf):i++){
+					o i stblen blen;
+				
+				stblen=self.getLength(searchTextBuf); 	!optimization
+				blen=self.getLength(buf);				!optimization
+
+				for(o=startingIndex: o<blen:o++){
+					for(i=0: i<stblen:i++){
 						if(buf->(o+i+WORDSIZE)~=searchTextBuf->(i+WORDSIZE)) break;
 					}
-					if(i==self.getLength(searchTextBuf)) return o;
+					if(i==stblen) return o;
 				}
 				return -1;
 			]
 		,	indexOfFirstTrue[buf routine startingIndex
-					o c;
-				for(o=startingIndex: o<self.getLength(buf):o++){
+					o c buflen;
+				buflen=self.getLength(buf);
+				for(o=startingIndex: o<buflen:o++){
 					c = buf->(o+WORDSIZE);
 					if(routine(c)==true) return o;
 				}
 				return -1;
 			]
 		,	indexOfFirstFalse[buf routine startingIndex
-					o c;
+					o c buflen;
+				buflen=self.getLength(buf);
 				if(startingIndex<0) startingIndex=0;
-				if(startingIndex>self.getLength(buf)) return -1;
-				for(o=startingIndex: o<self.getLength(buf):o++){
+				if(startingIndex>buflen) return -1;
+				for(o=startingIndex: o<buflen:o++){
 					c = buf->(o+WORDSIZE);
 					if(routine(c)==false) return o;
 				}
 				return -1;
 			]
 		,	toUpper[buf
-					t;
-				for(t=WORDSIZE:t<=self.getLength(buf)+WORDSIZE:t++){
+					t buflen;
+				buflen=self.getLength(buf);
+				for(t=WORDSIZE:t<=buflen+WORDSIZE:t++){
 					buf->t=util.orChar.toUpper(buf->t);
 				}
 				return buf;
 			]
 		,	toLower[buf
-					t;
-				for(t=WORDSIZE:t<self.getLength(buf)+WORDSIZE:t++){
+					t buflen;
+				buflen=self.getLength(buf);
+				for(t=WORDSIZE:t<buflen+WORDSIZE:t++){
 					buf->t=util.orChar.toLower(buf->t);
 				}
 				return buf;
 			]
 		,	reverse[buf !--With this approach, we do this without using another buffer
-					t c;
-				for(t=0:t<self.getLength(buf)/2:t++){
+					t c buflen;
+				buflen=self.getLength(buf);
+				for(t=0:t<buflen/2:t++){
 					c=buf->(WORDSIZE+t);
-					buf->(WORDSIZE+t)=buf->(WORDSIZE+self.getLength(buf)-t-1);
-					buf->(WORDSIZE+self.getLength(buf)-t-1)=c;
+					buf->(WORDSIZE+t)=buf->(WORDSIZE+buflen-t-1);
+					buf->(WORDSIZE+buflen-t-1)=c;
 				}
 				return buf;
 			]
+			!if ever there is a need, this could be optimized.  Instead of deleting one character at a time, we could count up the characters and do a single operation.
 		,	trimLeft[buf;
 				while(self.getLength(buf)>0 && self.getChar(buf,0)==' ') self.delete(0);
 				return buf;
