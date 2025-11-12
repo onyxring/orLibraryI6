@@ -18,7 +18,7 @@
 !		unique name.
 !	4)	Add the name to the orLibrary's _orExtensionRegistry.h file which registers it
 !       with the framework.
-!  5) #Include any dependent extensions, registered with the framework, in the
+!  5) #Include any requisite extensions, registered with the framework, in the
 !        "INCLUDE DEPENDENCIES" section.
 !  6)  Add your code to the appropriate placeholder sections, allocated with regard to
 !       the standard library's inclusion.
@@ -65,3 +65,4 @@ default        <REPLACEWITHNAME>_STAGE  0;
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE
 #endif; !--ndef _STAGE
+
