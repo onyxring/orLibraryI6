@@ -22,7 +22,7 @@
 !        "INCLUDE DEPENDENCIES" section.
 !  6)  Add your code to the appropriate placeholder sections, allocated with regard to
 !       the standard library's inclusion.
-!	7)	Replace this text with a description of the what the extension does and how to
+!	7)	Replace this text with a description of what your extension does and how to
 !        use it.
 !--------------------------------------------------------------------------------------
 ! Revision History
@@ -65,4 +65,5 @@ default        <REPLACEWITHNAME>_STAGE  0;
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE
 #endif; !--ndef _STAGE
+
 
