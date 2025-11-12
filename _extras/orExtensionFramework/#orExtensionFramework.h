@@ -5,7 +5,7 @@
 ! Created by Jim Fisher
 ! This work is public domain.
 !--------------------------------------------------------------------------------------
-! This is the extension framework contains the plumbing to ensure extensions are
+! This extension framework contains the plumbing to ensure extensions are
 ! automatically added in the right places, the right number of times, and that
 ! dependencies are included appropriately.
 !
@@ -48,16 +48,16 @@ default orXFErrorInclude "ERROR: orExtensionFramework extensions must only be #I
     #endif;
 #ifnot; !-- included after parser, at least
     #ifndef LIBRARY_STAGE; !--misconfig detect.
-        message "WARNING: orExtensionFramework was included multiple times before parser. You typically do not need to include #orExtensionFramework yourself.  Using the #parser, #verblib, and #grammar wrappers typically takes care of this for you.  Ignoring.";
+        message "WARNING: orExtensionFramework was included multiple times before parser. You typically do not need to include #orExtensionFramework yourself.  Using the #parser, #verblib, and #grammar wrappers takes care of this for you.  Ignoring.";
     #ifnot;
             #iftrue(LIBRARY_STAGE == AFTER_PARSER); !--throw some warnings if we are using earlier versions of the standard library or comipler
                 #Iftrue (LIBRARY_VERSION < 612); message "WARNING: orExtensionFramework was developed against the Inform 6 standard library version 6.12. Although it might work with some previous versions, this has not been tested."; #endif;
             #endif;
             #iftrue (orExtensionFramework_STAGE == LIBRARY_STAGE); !--misconfig detected
-            message "WARNING:The orExtensionFramework has been included more than once between standard library inclusions.  You typically do not need to include #orExtensionFramework yourself.  Using the #parser, #verblib, and #grammar wrappers typically takes care of this for you.  Ignoring.";
+            message "WARNING:The orExtensionFramework has been included more than once between standard library inclusions.  You typically do not need to include #orExtensionFramework yourself.  Using the #parser, #verblib, and #grammar wrappers takes care of this for you.  Ignoring.";
         #ifnot; !-- Confirmed that we are not trying to include orExtensionFramework multiple times in the same place
             #iffalse (orExtensionFramework_STAGE == LIBRARY_STAGE -10); !--misconfig detected
-                message fatalerror "ERROR: Missing inclusion detected.  The orExtensionFramework must be included four times: 1. before parser, 2. after parser; 3. after verblib; 4. after grammar.  Using the #parser, #verblib, and #grammar wrappers typically takes care of this for you.";
+                message fatalerror "ERROR: Missing inclusion detected.  The orExtensionFramework must be included four times: 1. before parser, 2. after parser; 3. after verblib; 4. after grammar.  Using the #parser, #verblib, and #grammar wrappers takes care of this for you.";
             #ifnot; !--Confirmed that sequencing is all good
                 !--We're good to go...
                 #ifndef orExtensionFrameworkBrief;
