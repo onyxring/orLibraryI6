@@ -3,8 +3,7 @@
 ! The central component of the OnyxRing Extension Framework.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
-! This work is licensed under the Creative Commons Attribution-ShareAlike License
-! (http://creativecommons.org/licenses/by-sa/1.0/).
+! This work is public domain.
 !--------------------------------------------------------------------------------------
 ! This is the extension framework contains the plumbing to ensure extensions are
 ! automatically added in the right places, the right number of times, and that
