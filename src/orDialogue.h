@@ -165,9 +165,9 @@ default        orDialogue_STAGE  0;
 																			! syntax, then we ignore commas, so phrases like: "say red, blue balloon"
 																			! will be treated as "say red blue balloon"
 
-			for(t=2: t<=(a_buf->1)+2: t++) {
+			for(t=WORDSIZE: t<=(a_buf-->1)+WORDSIZE: t++) {
 				if(a_buf->t==0) break;
-				if(a_buf->t==34 or 33 or 63) { !--convert quotes, exclamation points and question marks to spaces so we ignore them
+				if(a_buf->t==34 or 33 or 63 or 13) { !--convert quotes, exclamation points and question marks to spaces so we ignore them (also carriage returns, in the case where input comes from a source which captures those)
 					a_buf->t=32;
 					triggerComma=true; !--incidentally, if any of these are found, also start removing commas, e.g.: say "hello, how are you?" turns into: say hello how are you
 				}
@@ -398,8 +398,8 @@ default        orDialogue_STAGE  0;
 
 		!--we aren't having a conversation with someone already, so lets make an arbitrary decision on who we should talk to...
 		if(currentOnly==false){
-			objectloop(o in  location && o~=actor){ !-- o in location probably isnt' right
-				if(o~=0 && o has animate or talkable) return o; !return first possible
+			objectloop(o in  location && o~=actor){
+				if(o~=0 && o has animate or talkable) return o; !arbitrarily return first possible
 			}
 		}
 
@@ -412,7 +412,7 @@ default        orDialogue_STAGE  0;
 		if(talkingTo){
 			second=noun;
 			noun=talkingTo;
-			print "(Asking ",(the)talkingTo,")^";
+			if(no_infer_message == false) print "(Asking ",(the)talkingTo,")^";
 			<<askTopic noun second>>;
 		}
 	];
@@ -423,7 +423,7 @@ default        orDialogue_STAGE  0;
 		if(talkingTo){
 			second=noun;
 			noun=talkingTo;
-			print "(Telling ",(the)talkingTo,")^";
+			if(no_infer_message == false) print "(Telling ",(the)talkingTo,")^";
 			<<tellTopic noun second>>;
 		}
 	];
@@ -434,7 +434,7 @@ default        orDialogue_STAGE  0;
 		talkingTo=vagueError(ResolveActorTalkingTo());
 
 		if(talkingTo){
-			print "(Speaking with ",(the)talkingTo,")^";
+			if(no_infer_message == false) print "(Speaking with ",(the)talkingTo,")^";
 			<<sayTopic noun talkingTo>>;
 		}
 	];

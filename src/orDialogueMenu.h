@@ -33,7 +33,7 @@ default        orDialogueMenu_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-
+   property individual commandText;
 #endif;
 !======================================================================================
 ! AFTER PARSER
@@ -43,12 +43,13 @@ default        orDialogueMenu_STAGE  0;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
-   #ifndef orTempBuffer ;array orTempBuffer buffer 2400; #endif; !orTempBuffer is used thoughout the library
-
-   class orDialogueMenu
+   [sayTopic act top talkingTo;
+      print "say ",(name)top, " to ",(name)talkingTo;
+   ];
+   object orDialogueMenu
       class orMenu
       with childMenuItems 0 0 0 0 0 0 0 0 0 0 0 0
-      ,  init[
+      ,  initForDisplay[
                t o;
             self.clear();
             for(t=0:t<util.orArray.getLength(playerDialoguePool):t++){
@@ -57,7 +58,7 @@ default        orDialogueMenu_STAGE  0;
             return util.orArray.getLength(self,childMenuItems);
          ]
       , clear[; util.orArray.clear(self,childMenuItems);]
-      , add[o; util.orArray.insert(self,childMenuItems,o);]
+      , add[o; util.orArray.append(self,childMenuItems,o); ]
    ;
 
    [printAskTellAction act
@@ -66,14 +67,20 @@ default        orDialogueMenu_STAGE  0;
       talkingTo=act.getNoun();
       top=act.getSecond();
 
-      if(top.isKnownBy(player))
-         print "tell ";
-      else
-         print "ask ";
+      if(top provides commandText) {
+         util.orRef.resolvePrint(top, commandText, act, top, talkingTo);
+      }
+      else{      
+         if(top.isKnownBy(player))
+            print "tell ";
+         else
+            print "ask ";
 
-      if(talkingTo>0) print (name)talkingTo, " ";
+         if(talkingTo>0) print (name)talkingTo, " ";
 
-      print "about ", (name)top;
+         print "about ", (name)top;
+      }
+      !new_line;
    ];
    orInfExt with ext_handleMenuResult[selected talkingTo;
 
@@ -81,17 +88,16 @@ default        orDialogueMenu_STAGE  0;
 
    		if(selected ofclass orTopic){
 
-            talkingTo = resolveActorTalkingTo(player);
-
+            talkingTo = resolveActorTalkingTo(); 
             if(talkingTo>0){
                if(selected.isKnownBy(player)) {
                   !<tellTopic talkingTo selected>;
-                  playerCommands.pushAction(##tellTopic, talkingTo, selected, printAskTellAction); !, buf);
+                  playerCommands.pushAction(##tellTopic, talkingTo, selected, printAskTellAction); 
                }else{
                   !<askTopic talkingTo selected>;
-                  playerCommands.pushAction(##askTopic, talkingTo, selected, printAskTellAction);!, buf);
+                  playerCommands.pushAction(##askTopic, talkingTo, selected, printAskTellAction); 
                }
-            }else{ !the below wont do anything except print error messages, since we know we wont be able to resolve who we are talking to
+            }else{ !the below wont do anything except print error messages, since we've established that we can't resolve who we are talking to
                if(selected.isKnownBy(player))
                   <vagueTellTopic selected>;
                else

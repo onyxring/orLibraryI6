@@ -40,6 +40,7 @@ default        orPlayerCommandQueue_STAGE  0;
 #include "_orInfExt";
 #include "orUtilBuf";
 #include "_orHookKeyboard";
+#include "_orHookVerbs";
 !--------------------------------------------------------------------------------------
 #ifnot;
 #ifndef        orPlayerCommandQueue_STAGE; message fatalerror orXFErrorInclude; #endif;

@@ -67,8 +67,7 @@ object _orRef
 			}
 			return obj; !value
 		]
-	,	resolvePrint[obj prop
-				parm1 parm2 parm3 parm4;
+	,	resolvePrint[obj prop parm1 parm2 parm3 parm4;
 			if(obj==0 or -1) rfalse;
 			if (util.orRef.isRoutine(obj)) return obj(prop, parm1, parm2, parm3, parm4);
 			if (obj provides prop){

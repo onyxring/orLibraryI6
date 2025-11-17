@@ -78,7 +78,7 @@ default        orMenu_STAGE  0;
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
 	constant _orMenuFullScreenStatusHeight 2;
 	constant orMenuFullScreen	0;
-	!constant orMenuTopOnly		1; !todo - implement this!
+	constant orMenuTopOnly		1; !todo - implement this!
 	!constant ORMENU_BOTTOM	-1;
 	property individual childMenuItems;
 	property individual menuDisplay;
@@ -104,7 +104,7 @@ default        orMenu_STAGE  0;
 		,	_render[currentMenu;
 				self._currentHighlight=0; !position at the top of the list
 				!--this is a last-child item...
-				if(self.init(currentMenu)==0) { !--if no children to display...
+				if(self.initForDisplay(currentMenu)==0) { !--if no children to display...
 					if(self.displayStyle==orMenuFullScreen && (currentMenu provides description|| currentMenu provides rawDescription)){  !we only render the text in full screen mode
 						util.orUI.setStatusHeight(_orMenuFullScreenStatusHeight);  !restore the status line size
 						util.orUI.eraseScreen();
@@ -223,7 +223,6 @@ default        orMenu_STAGE  0;
 			!---actually write out the name of the given object
 		,	_drawItem[obj isSelected pos
 					str;
-
 				if(obj==0) return;
 				str=util.orStr.new();
 
@@ -240,9 +239,11 @@ default        orMenu_STAGE  0;
 
 				printOr(isSelected>0, self.prefixHighlight,self.prefixNormal);
 
+
 				if(util.orRef.isString(obj))
 					print (string)obj;
 				else {
+
 					if(obj provides menuDisplay)
 						printOrRun(obj, menuDisplay, true);
 					else
@@ -282,24 +283,12 @@ default        orMenu_STAGE  0;
 				rfalse;
 			]
 		,	_inputLoop[currentMenu ch win; win=win;
-	!#ifndef TARGET_GLULX;
 				while(true){
 					util.orUI.hideCursor();
 					ch=util.orUI.getChar();
 					if(self.getNumberOfVisibleChildren(currentMenu)==0) return;
 					if(self._handleInput(ch, currentMenu)==true) return;
 				}
-	! #ifnot;
-	! 			ch=false;
-	! 			while(ch==false){
-	! 				win=gg_menuwin; !--recalculate window, because can be different if selection was chosen, and then exited from
-	! 				if(win==0)win=gg_mainwin;
-	! 				glk_request_char_event(win);
-	! 				glk_select(gg_event); ! select
-	! 				if(gg_event-->0==evtype_CharInput) ch=self._handleInput(gg_event-->2);
-	! 				HandleGlkEvent(gg_event, 1);
-	! 			}
-	!#endif;
 			]
 		with displayStyle orMenuFullScreen
 		,	prefixHighlight "> "
@@ -310,7 +299,7 @@ default        orMenu_STAGE  0;
 		,	getNumberOfVisibleChildren[currentMenu
 					count o;
 				if(self._isListMenu(currentMenu)) {
-					return util.orArray.getSize(currentMenu, childMenuItems);
+					return util.orArray.getLength(currentMenu, childMenuItems);
 				}
 				objectloop(o in currentMenu && o ofclass orMenu && valueorrun(o, canDisplay)) count++;
 				return count;
@@ -333,12 +322,10 @@ default        orMenu_STAGE  0;
 				}
 				return self.result;
 			]
-		,	init[currentMenu o count; !--get this menu ready to display
+		,	initForDisplay[currentMenu o count; !--get this menu ready to display
 				count=0;
-				if(currentMenu provides init) return currentMenu.init();
-
+				if(currentMenu provides initForDisplay) return currentMenu.initForDisplay();
 				if(self._isListMenu(currentMenu)) return util.orArray.getSize(currentMenu,childMenuItems);
-
 				objectloop(o in currentMenu && o ofclass orMenu) {
 					if(valueorrun(o, canDisplay)){
 						o.number=count; !--assign each child menu a sequence number...

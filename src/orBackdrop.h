@@ -59,7 +59,7 @@ Constant bdDescr	1;
 	property individual backdrops3;
 
 	!--an ever present object, which interjects itself if the player is referencing dictionary words listed in the location's backdrops property
-	object orBackDropEngine has scenery proper talkable
+	object orBackDropEngine has scenery proper !talkable
 		private _getEndPos[obj
 					i;
 				i=self._usedPos;
