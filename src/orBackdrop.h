@@ -59,7 +59,7 @@ Constant bdDescr	1;
 	property individual backdrops3;
 
 	!--an ever present object, which interjects itself if the player is referencing dictionary words listed in the location's backdrops property
-	object orBackDropEngine has scenery proper !talkable
+	object orBackdropEngine has scenery proper !talkable
 		private _getEndPos[obj
 					i;
 				i=self._usedPos;
@@ -158,8 +158,8 @@ Constant bdDescr	1;
 	!  want to create floating backdrops which span multiple rooms, or if you exceed the maximum size of the property array (32 for Z5)
 	class orBackdrop has scenery
 		with chooseobject[; return -1;],
-		description[; return orBackDropEngine._sayDescription(self); ],
-		before[; return orBackDropEngine.before(self);]
+		description[; return orBackdropEngine._sayDescription(self); ],
+		before[; return orBackdropEngine.before(self);]
 	;
 
 	orInfExt !--contains hooks
@@ -217,25 +217,25 @@ Constant bdDescr	1;
 		with _foundList 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 		,	_seedList  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 !a list used to capture possible matches
 	 	,	ext_beforePrompt[;
-				orBackDropEngine._usedProperty=0;
-				orBackDropEngine._usedPos=0;
-				orBackDropEngine._usedObject=0;
+				orBackdropEngine._usedProperty=0;
+				orBackdropEngine._usedPos=0;
+				orBackdropEngine._usedObject=0;
 			]
 		,	ext_adjudicate[ !--when a reference to a backdrop also matches a real object
-					i o retval backDropsConsidered nonBackDropsConsidered;
+					i o retval backdropsConsidered nonBackdropsConsidered;
 				!--count up backdrops and real objects
 				for(i=0: i<number_matched:i++) {
 					o = match_list-->i;
 					if(o == orBackdropEngine || o ofclass orBackdrop)
-						backDropsConsidered++;
+						backdropsConsidered++;
 					else{
-						nonBackDropsConsidered++;
+						nonBackdropsConsidered++;
 						retval=o; !we save this off, just in case we end up with only one
 					}
 				}
-				if(backDropsConsidered==0 || nonBackDropsConsidered==0) return false; !--we are dealing exclusively in either backdrops or objects, so nothing for this code to adjudicate
+				if(backdropsConsidered==0 || nonBackdropsConsidered==0) return false; !--we are dealing exclusively in either backdrops or objects, so nothing for this code to adjudicate
 
-				if(nonBackDropsConsidered==1) {
+				if(nonBackdropsConsidered==1) {
 					no_infer_message=true;
 					return retval; !--we are left with a single non-backdrop object, so let's choose that one
 				}
@@ -248,12 +248,12 @@ Constant bdDescr	1;
 			]
 		,	ext_parsenoun [ obj wrd
 				i f retval saveWn; !--pull the prop handlers into scope if referencing something by prop words
-            if(obj~=orBackDropEngine && (obj ofclass orBackdrop)==false) return -1; !--we aren't considering a backdrop, so decline to answer
-			if(obj==orBackDropEngine) obj=parent(obj);
+            if(obj~=orBackdropEngine && (obj ofclass orBackdrop)==false) return -1; !--we aren't considering a backdrop, so decline to answer
+			if(obj==orBackdropEngine) obj=parent(obj);
  			saveWn=wn;
 			wrd=NextWord(); !get the first word we are matching
 
-			!find all occurances of wrd, across all backDrop properties, placing the matches in _seedList, exiting if none
+			!find all occurances of wrd, across all backdrop properties, placing the matches in _seedList, exiting if none
 			if(self._findMatches(obj, wrd, _seedList)==0) return 0;
 			!at this point, _seedList contains a list of all the entries across all the backdrop properties, which contain the first word.  Now we'll go through each additional word and reduce our list of possibilities
 			wrd=NextWord();
@@ -275,13 +275,13 @@ Constant bdDescr	1;
 			retval=util.orArray.get(self,_seedList,0); !note: it is possible that more than one match was returned; just ignore these and return the first match since its as good as any of the others.
 
 			switch(retval/100){
-				1:	orBackDropEngine._usedProperty=backdrops;
-				2:	orBackDropEngine._usedProperty=backdrops1;
-				3:	orBackDropEngine._usedProperty=backdrops2;
-				4:	orBackDropEngine._usedProperty=backdrops3;
+				1:	orBackdropEngine._usedProperty=backdrops;
+				2:	orBackdropEngine._usedProperty=backdrops1;
+				3:	orBackdropEngine._usedProperty=backdrops2;
+				4:	orBackdropEngine._usedProperty=backdrops3;
 			}
-			orBackDropEngine._usedPos=retval % 100;
-			orBackDropEngine._usedObject = obj;
+			orBackdropEngine._usedPos=retval % 100;
+			orBackdropEngine._usedObject = obj;
 
 			return wn-saveWn-1;
  		]
