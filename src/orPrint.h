@@ -292,6 +292,8 @@ default        orPrint_STAGE  0 ;
 					if(self.patternName.equals("name")) {print (name)self.contextObject;rtrue;}
 					if(self.patternName.equals("numb")) {print self.contextObject;rtrue;}
 					if(self.patternName.equals("numbText")) {print (LanguageNumber)self.contextObject;rtrue;}
+					if(self.patternName.equals("s")) {if(self.contextObject~=1) print "s"; rtrue;}
+					if(self.patternName.equals("es")) {if(self.contextObject~=1) print "es"; rtrue;}
 				}
 
 				if(self.numParams()>0){

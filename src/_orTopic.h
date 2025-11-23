@@ -95,7 +95,7 @@ default        orTopic_STAGE  0;
 				rfalse;
 			]
 		,	isTellable[;
-				if(self.quip==0) rfalse; !--if quip is not defined, then it is not tellable.
+				if(util.orArray.getSize(self,quip)==0) rfalse; !--if quip is not defined, then it is not tellable.
 				if(self hasnt responseOnly) rtrue;
 
 				rfalse;

@@ -193,12 +193,6 @@ default        orMenu_STAGE  0;
 				util.orUI.setStatusHeight(self._startingStatusHeight);
 				util.orUI.eraseStatus();
 				util.orUI.activateMain();
-	! #ifdef TARGET_GLULX;
-	! 			if(gg_menuwin~=0){
-	! 				glk_window_close(gg_menuwin,gg_arguments);
-	! 				gg_menuwin=0;
-	! 			}
-	! #endif;
 		]
 
 		,	_highlightItemByIndex[currentMenu num
@@ -236,9 +230,7 @@ default        orMenu_STAGE  0;
 				util.orUI.position(0,pos);
 
 				str.capture();
-
 				printOr(isSelected>0, self.prefixHighlight,self.prefixNormal);
-
 
 				if(util.orRef.isString(obj))
 					print (string)obj;
@@ -257,7 +249,7 @@ default        orMenu_STAGE  0;
 				str.free();
 			]
 			!---handle user input
-		,	_handleInput[ch currentMenu i count;
+		,	_handleInput[ch currentMenu i count t;
 				count=self.getNumberOfVisibleChildren(currentMenu);
 				if(count==0) rtrue;
 				switch(ch){
@@ -275,8 +267,8 @@ default        orMenu_STAGE  0;
 										self._currentHighlight=i.number; !make sure to return the selection to the same place in case the user is checking out each item one at a time
 										self._renderFullScreenHeader(currentMenu);
 										self._renderItems(currentMenu);
-									}
-					'`','~','q','Q',133,'x','X', 27:
+									} 
+					'`','~','q','Q',133,'x','X', 27, -8:
 						self.result=0;
 						rtrue;
 				}

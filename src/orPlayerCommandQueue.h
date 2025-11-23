@@ -66,27 +66,6 @@ default        orPlayerCommandQueue_STAGE  0;
         rtrue;
     ];
 
-	orInfExt with ext_messages[;
-				Miscellany:switch(lm_n){
-							99: print "[Queued actions interrupted by an event.]^";
-							98: print "[Queued actions are no longer possible.]^";
-						   }
-			]
-		,	ext_keyboardPrimitive[ a_buffer a_table;
-				if(doQueuedAction(a_buffer)){
-					Tokenise__(a_buffer,a_table); !TODO does this do anything?
-					return true;
-				}
-				rfalse;
-			]
-		,	ext_beforePrompt[;
-				orActionFlags=0;
-				!if(playerCommands.getLength()>0 && playerCommands.get(0).keepSilent==true) rtrue;
-				if(playerCommands.getLength()>0) rtrue; !--the queued action processor will print its own prompt
-				rfalse;
-			]
-		;
-
 	orActionQueue playerCommands;
 
 	[doQueuedAction inputBuffer
@@ -122,8 +101,9 @@ default        orPlayerCommandQueue_STAGE  0;
 			 a.print();
 		util.orBuf.release(); !--since we print to it as though it were a normal array, buffer starts with a WORD-sized length (the MSB will be zero unless we printed too much).
 
-		!for(t=WORDSIZE:t<INPUT_BUFFER_LEN - WORDSIZE:t++) if(inputBuffer->t==13) inputBuffer->t=32; !remove returns, since these are not possible via input but may show up from the print statment
-		for(t=WORDSIZE:t<INPUT_BUFFER_LEN:t++) if(inputBuffer->t==13) inputBuffer->t=32; !remove returns, since these are not possible via input but may show up from the print statment
+		for(t=WORDSIZE:t<INPUT_BUFFER_LEN:t++) {
+			if(inputBuffer->t==13 or 10) inputBuffer->t=32; !remove returns, since these are not possible via input but may show up from the print statment
+		}
 
 		util.orBuf.toLower(inputBuffer); !all the text in the input buffer must be lower case or the parser won't recognize it
 
@@ -154,6 +134,29 @@ default        orPlayerCommandQueue_STAGE  0;
 	];
 default  orQueuedActionPrompt "^>>";
 #endif; !--After VERBLIB
+
+#iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
+	object _pcq LibraryExtensions with ext_messages[;
+				Miscellany:switch(lm_n){
+							99: print "[Queued actions interrupted by an event.]^";
+							98: print "[Queued actions are no longer possible.]^";
+						   }
+			]
+		,	ext_keyboardPrimitive[ a_buffer a_table;
+				if(doQueuedAction(a_buffer)){
+					Tokenise__(a_buffer,a_table); !TODO does this do anything?
+					return true;
+				}
+				rfalse;
+			]
+		,	ext_beforePrompt[;
+				orActionFlags=0;
+				!if(playerCommands.getLength()>0 && playerCommands.get(0).keepSilent==true) rtrue;
+				if(playerCommands.getLength()>0) rtrue; !--the queued action processor will print its own prompt
+				rfalse;
+			]
+		;
+#endif; 
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE
 #endif; !--ndef _STAGE

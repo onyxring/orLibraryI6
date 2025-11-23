@@ -30,11 +30,13 @@ default        orTopicPool_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
+	Constant allTopics 1;
 	default  orMaxTopicPoolSize 20;
 	Array 	 playerDialoguePool table orMaxTopicPoolSize;
 
 	property individual dialoguePool;
 	property individual relatedTopics;
+	property individual excludedTopics;
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER PARSER
@@ -73,37 +75,51 @@ default        orTopicPool_STAGE  0;
 			}
 		}
 	];
+	
 	orInfExt
 	 with ext_topicAsk[top act talkingTo;
 
 		]
 	,	ext_topicAsked[top act talkingTo;
-
+			removeExcludedTopics(top, act, talkingTo);
 			imprintRelatedTopics(top, act, talkingTo);
-
-			if(act==player){
-				util.orArray.removeValue(playerDialoguePool, top);
-			}else{
-				if(act provides dialoguePool) util.orArray.removeValue(act, dialoguePool, top);
-			}
-
 			rfalse;
 		]
    ,	ext_topicTell[top act talkingTo;
 
 		]
 	,	ext_topicTold[top act talkingTo;
-
+			removeExcludedTopics(top, act, talkingTo);
 			imprintRelatedTopics(top, act, talkingTo);
-			if(act==player){
-				util.orArray.removeValue(playerDialoguePool, top);
-			}else{
-				if(act provides dialoguePool) util.orArray.removeValue(act, dialoguePool, top);
-			}
 			rfalse;
 		]
 	;
 
+	[removeExcludedTopics top act talkingTo
+			t relTop;
+
+		util.orArray.removeValue(playerDialoguePool, top);
+		if(act provides dialoguePool) util.orArray.removeValue(act, dialoguePool, top);			
+		if(talkingTo provides dialoguePool) util.orArray.removeValue(talkingTo, dialoguePool, top);			
+
+		if(top provides excludedTopics){
+			for(t=0:t<util.orArray.getLength(top,excludedTopics):t++){
+				relTop=util.orArray.get(top,excludedTopics,t);
+				if(relTop==allTopics){
+					if(act==player) util.orArray.clear(playerDialoguePool);
+					if(act provides dialoguePool) util.orArray.clear(act,dialoguePool,relTop);	
+					break;
+				}
+				
+				if(act==player) util.orArray.remove(playerDialoguePool,relTop);
+				if(act provides dialoguePool) util.orArray.remove(act,dialoguePool,relTop);
+				
+				if(talkingTo==player) util.orArray.remove(playerDialoguePool,relTop);
+				if(talkingTo provides dialoguePool) util.orArray.remove(talkingTo,dialoguePool,relTop);
+				
+			}
+		}
+	];
 #endif; !--After Parser
 !======================================================================================
 ! AFTER VERBLIB

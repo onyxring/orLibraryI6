@@ -252,8 +252,7 @@ default        orDialogue_STAGE  0;
 		};
 
 		if (RunLife(actor,##askTopic)~=0) return;
-
-		if(second==0 || (second provides quip)==false || second.quip==0) {
+		if(second==0 || util.orArray.getSize(second,quip)==0) { !--getsize also returns 0 if property is not defined
 			print "You'll need to be more specific. What do you want to ask?^";
 			!L__M(##Tell, 2); !TODO, is this correct?
  			return;
@@ -311,8 +310,7 @@ default        orDialogue_STAGE  0;
 		};
 
 		if (RunLife(actor,##tellTopic)~=0) return;
-
-		if(second==0 || (second provides quip)==false || second.quip==0) {
+		if(second==0 || util.orArray.getSize(second,quip)==0) { !--getsize also returns 0 if property is not defined
 			print "You'll need to be more specific. What do you want to say?^";
 			!L__M(##Tell, 2); !TODO, is this correct?
  			return;

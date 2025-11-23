@@ -4,38 +4,34 @@
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !--------------------------------------------------------------------------------------
-! License:
+! License: Public Domain.
 !--------------------------------------------------------------------------------------
-! orCenter() is a function that works similar to  print except that text is centered
-! on the screen.  Wordwrap also occurs as it does with print, but for centered text, it
-! is generally more attractive to limit the width of a line.  This can be accomplished
-! by specifying an additional value representing the maximum width of a line.  If the
-! width is either not specified or is specified to be larger than the screen, then the
-! screen width is used instead.
+! orCenter() centers text on the screen, applying wordwrap as appropriate.  By default,
+! The interpreter's current screen width is used for calculations; however, this can 
+! be overriden by specifying the maxwidth parameter.  The following example centers 
+! the specified text on the screen, breaking it up into lines which are no greater 
+! than 20 characters in length:
 !
-! It should also be noted that Center takes line breaks into account. For example:
+!	orCenter("Fore score and seven years ago our forefathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.",20);
+!
+! orCenter also considers line breaks. For example:
 !
 !	orCenter("I wandered lonely as a cloud,^That floats on high o'er vales
 !		   and hills,^When all at once I saw a crowd,^A host of golden
 !		   daffodils,^Beside the lake, beneath the trees,^Fluttering and
 !		   dancing in the breeze^^--William Wordsworth");
 !
-! Will acurately center eight lines of text (including the blank line).
+! Will center eight lines of text (including the blank line).
 !
-! For less poetic centering, the second parameter, width, can be specified:
+! The highlight parameter indicates the centered text should appear in reverse font,
+! and how.  A value of HIGHLIGHT_TEXT_ONLY indicates the text should be highlighted,  
+! a value of HIGHLIGHT_ALL indicates the text and its preceeding spaces should appear
+! in reverse font.
 !
-!	orCenter("Fore score and seven years ago our forefathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.",20);
+! The leftAlign parameter, if true, produces a centered block of left-justified text.
 !
-! Will center the specified text on the screen, breaking it up in intervals that
-! are no greater than 20 characters in length.
-!
-! The final parameter is highlight.  Pass this parameter as a one to get the centered
-! text to appear in reverse font.  Pass a two to this parameter to get the text AND ITS
-! PRECEEDING SPACES to appear in reverse font.
-!
-! orInset() is a wrapper to the orCenter function which centers a block of text, but not
-! left aligns the text within the block itself.  It takes the text, plus the max width
-! of the text block.
+! orInset() is a wrapper to the orCenter function which indents left-justified text, 
+! offset with a specified margin on either side of the screen.
 !--------------------------------------------------------------------------------------
 ! Revision History
 ! 2000.08.03	Initial Creation (before OrLib)
@@ -50,10 +46,9 @@
 default        orCenter_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-!TODO: orStyleHint for GLULX
 	#include "orUtilUi";
 	#include "orUtilBuf";
-!TODO: use the orUI tools and perhaps orBuf tool for this code.
+	!TODO: use the orUI tools and perhaps orBuf for this code.
 !--------------------------------------------------------------------------------------
 #ifnot;
 #ifndef        orCenter_STAGE; message fatalerror orXFErrorInclude; #endif;
@@ -104,7 +99,6 @@ default        orCenter_STAGE  0;
 					if(text()) maxwidth=width;
 				object:
 #ifdef orString;
-
 					if(text ofclass orString)
 						text.print();
 					else
@@ -162,23 +156,6 @@ default        orCenter_STAGE  0;
 		if(highlight>NO_HIGHLIGHT) style roman; !-- if we highlighted the text, turn it off
 		font on; !restore variable-width font
 	];
-! #ifdef NTARGET_GLULX;
-! 	default style_Center		style_User1;
-! 	default style_CenterRvrs	style_User2;
-
-! 	ORStyleHint	with user_num style_Center
-! 		,	windows wintype_TextBuffer
-! 		,	hints stylehint_Proportional stylehint_Justification
-! 		,	values 0 stylehint_just_Centered
-! 	;
-! 	ORStyleHint	with user_num style_CenterRvrs
-! 		,	windows wintype_TextBuffer
-! 		,	hints stylehint_ReverseColor stylehint_Proportional stylehint_Justification
-! 		,	values 1 0 stylehint_just_Centered
-! 	;
-! 	[set_centered; glk_set_style(style_Center);];
-! 	[set_highlight_centered; glk_set_style(style_CenterRvrs);];
-!#endif;!GLULX
 #endif; !--After VERBLIB
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE

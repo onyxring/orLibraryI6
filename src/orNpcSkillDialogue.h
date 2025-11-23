@@ -55,11 +55,16 @@ default        orNPCSkillDialogue_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
    orNpcSkill _orNPCSkillDialogue
       with doesApplyToCharacter[npc; if(npc ofclass orNPCSkillDialogue) rtrue; rfalse;]
-		,  canPerform[npc;
-            !TODO: make this return false, when none of the elements in the dialogPool work with the character being spoken to
-            return (util.orArray.getLength(npc, dialoguePool)>0);
+		,  canPerform[npc
+               i count;
+            for(i=0:i<util.orArray.getLength(npc, dialoguePool):i++){
+               if(util.orArray.get(npc, dialoguePool).isAppropriateFor(npc, player)) 
+                  count++;
+            }
+            return (count>0);
          ]
-      ,  perform[npc i r;
+      ,  perform[npc 
+               r;
 
             r=util.orArray.get(npc, dialoguePool,random(util.orArray.getLength(npc, dialoguePool))-1);
             util.orArray.removeValue(npc, dialoguePool,r);
