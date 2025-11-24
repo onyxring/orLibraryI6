@@ -148,10 +148,9 @@ default        orUtilBuf_STAGE  0;
 		  	]
 		,	print[buf len
 					i c;
+				
 				if(len<=0) len=self.getLength(buf);
 
-				self.indexOf(buf, "$");
-				
 				#ifdef TARGET_GLULX;
 					glk_put_buffer(buf+WORDSIZE, len); 
 				#ifnot;
