@@ -36,20 +36,82 @@ default        orPrintPatterns_English_STAGE  0 ;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
+	[ orPrintConjugate ptrn isPerfectTense !--TODO: handle isPerfectTense
+			didPrintIrregular obj vrb lookupForm;
+		if(ptrn.parametersString.isEmpty()) return;
+		
+		print " ";
+		if(printIrregularVerbConjugation(ptrn)) return;
+		
+		obj=ptrn.contextObject;
+		vrb=ptrn.getParamEphemeral(0);
+		if(isPerfectTense){
+			lookupForm=ptrn.getParamEphemeral(3);
+			if(lookupForm==0) lookupForm=ptrn.getParamEphemeral(2);
+			if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
+			return vrb.append("ed").print();
+		}
+		!--past tense
+		else if(player provides narrative_tense && player.narrative_tense == PAST_TENSE){
+			lookupForm=ptrn.getParamEphemeral(2);
+			if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
+			return vrb.append("ed").print();
+		}
+		else{ !--present tense
+			!--plural
+			if ((self.contextObject==player && player provides narrative_voice && player.narrative_voice == 3 && player hasnt pluralname) || !we are narrating the player's actions in 3rd person singular, or
+					(self.contextObject~=player && self.contextObject hasnt pluralname)){ !we are conjugating a verb with a singular non-player object
+				
+				lookupForm=ptrn.getParamEphemeral(1);
+				if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm;
+
+				vrb.lock();
+				if(vrb.right(1).equals("s")) {
+					vrb.free();
+					return vrb.append("es").print();
+				}
+				else{
+					vrb.free();
+					return vrb.append("s").print();
+				}
+			}
+			!--singular
+			else{
+				lookupForm=ptrn.getParamEphemeral(0);
+				if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
+
+				vrb.print(); 
+				return;
+
+			}
+		}
+	 ];
+
 	 orPrintPattern _oprEnglish
-		with doNounVerb[pronounRoutine;
-				self.doNoun(pronounRoutine);
-				return self.doVerb();
+		with
+			printNounVerb[pronounRoutine;
+				self.printNoun(pronounRoutine);
+				return self.printVerb();
 			]
-		,	doNoun[pronounRoutine;
+		,	printNoun[pronounRoutine;
 				pronounRoutine(self.contextObject);
 				if(self.objSpecifiedFirst==false) print " ",(name) self.contextObject;
 				rtrue;
 			]
-		,	doVerb[pronounRoutine;
+		,	printVerb[pronounRoutine 
+					vrb conj;
 				if(pronounRoutine) pronounRoutine(self.contextObject);
-				!contextObject
-				rtrue;
+				self.conjugate();
+
+				! if((vrb=self.getParamEphemeral(0))==0) rtrue;
+				! if(self.contextObject==0) rtrue;
+				
+				! vrb.lock();
+				! print " "; getConjugationEphemeral(self.contextObject, vrb).print();
+				! vrb.free();
+				 
+				! rtrue;
+				
 			]
 		,	runRule[ pat obj; pat=self.patternName; obj=self.contextObject;
 
@@ -62,19 +124,30 @@ default        orPrintPatterns_English_STAGE  0 ;
 				if(pat.equalsOneOf("self", "myselfYourselfItself")) {Myself(obj); rtrue;}
 				if(pat.equalsOneOf("Self", "MyselfYourselfItself")) {CMyself(obj); rtrue;}
 
-				!possessive pronouns.  Pronoun + noun, no verb.
-				if(pat.equalsOneOf("my","myYourIts")) return self.doNoun(My);
-				if(pat.equalsOneOf("My","MyYourIts")) return self.doNoun(CMy);
+				!possessive pronouns only.  No noun, no verb. 
+				if(pat.equalsOneOf("my","myYourIts")) { My(obj); rtrue; }
+				if(pat.equalsOneOf("My","MyYourIts")) { CMy(obj); rtrue; }
+
+				! if(pat.equalsOneOf("my","myYourIts")) return self.doNoun(My);
+				! if(pat.equalsOneOf("My","MyYourIts")) return self.doNoun(CMy);
 
 				!pronoun + verb, dont print the noun.
-				if(pat.equalsOneOf("i","iYouIt","nom","subj")) return self.doVerb(I);
-				if(pat.equalsOneOf("I","IYouIt","Nom", "Subj")) return self.doVerb(CI);
+				if(pat.equalsOneOf("i","iYouIt","nom","subj")) {
+					print (I)obj;
+					self.conjugate();
+					rtrue;
+				}
+				if(pat.equalsOneOf("I","IYouIt","Nom", "Subj")) {
+					print (CI)obj;
+					self.conjugate();
+					rtrue;
+				}
 
 				!qualifying pronouns.  Pronoun + Noun + verb.
-				if(pat.equals("that")) return self.doNounVerb(ThatOrThose);
-				if(pat.equals("That")) return self.doNounVerb(CThatOrThose);
-				if(pat.equals("this")) return self.doNounVerb(ThisOrThese);
-				if(pat.equals("This")) return self.doNounVerb(CThisOrThese);
+				if(pat.equals("that")) return self.printNounVerb(ThatOrThose);
+				if(pat.equals("That")) return self.printNounVerb(CThatOrThose);
+				if(pat.equals("this")) return self.printNounVerb(ThisOrThese);
+				if(pat.equals("This")) return self.printNounVerb(CThisOrThese);
 
 
 				! token = util.orStr.new();
@@ -134,8 +207,15 @@ default        orPrintPatterns_English_STAGE  0 ;
 		}
 		print "This";
 	];
-
 #endif; !--After VERBLIB
+!======================================================================================
+! AFTER GRAMMAR
+#iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
+	#ifndef printIrregularVerbConjugation;
+	! Unless the author opts-in, we don't try to conjugate irregular verbs
+	[ printIrregularVerbConjugation; return false;];
+	#endif; 
+#endif;
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE
 #endif; !--ndef _STAGE

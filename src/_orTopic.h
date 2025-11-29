@@ -34,8 +34,7 @@ default        orTopic_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 	system_file;
 
-	attribute responseOnly;
-
+	Constant ORDIA_RESPONSE_ONLY=-1;
 	property individual knownBy;
 	property individual context;
 
@@ -96,9 +95,8 @@ default        orTopic_STAGE  0;
 			]
 		,	isTellable[;
 				if(util.orArray.getSize(self,quip)==0) rfalse; !--if quip is not defined, then it is not tellable.
-				if(self hasnt responseOnly) rtrue;
-
-				rfalse;
+				if(util.orArray.getSize(self,quip)>1 && util.orArray.getSize(self,quip,1)==ORDIA_RESPONSE_ONLY) rfalse;
+				rtrue;
 			]
 		,	chooseobject[code;
 				if(code<2) return -1;

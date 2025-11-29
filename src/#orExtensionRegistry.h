@@ -45,6 +45,7 @@
 #ifdef orPlayerCommandQueue_STAGE; #include "orPlayerCommandQueue"; #endif;
 #ifdef orPrefixSuffix_STAGE; #include "orPrefixSuffix"; #endif;
 #ifdef orPrint_STAGE; #include "orPrint"; #endif;
+#ifdef orPrintWithIrregularVerbs_STAGE; #include "orPrintWithIrregularVerbs"; #endif;
 #ifdef orPrintPatterns_English_STAGE; #include "_orPrintPatterns_English"; #endif;
 #ifdef orPronoun_English_STAGE; #include "_orPronoun_English"; #endif;
 #ifdef orRecogName_STAGE; #include "orRecogName"; #endif;

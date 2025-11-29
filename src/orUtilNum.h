@@ -43,8 +43,8 @@ system_file;
 		with
 			uIsGreaterThan[v1 v2; return (UnsignedCompare(v1, v2) == 1); ]
 		,	uIsGreaterThanOrEqualTo[v1 v2; return (UnsignedCompare(v1, v2) == 1 or 0); ]
-		,	isLessThan[v1 v2;  return (UnsignedCompare(v1, v2) == -1); ]
-		,	isLessThanOrEqualTo[v1 v2;  return (UnsignedCompare(v1, v2) == -1 or 0); ]
+		,	uIsLessThan[v1 v2;  return (UnsignedCompare(v1, v2) == -1); ]
+		,	uIsLessThanOrEqualTo[v1 v2;  return (UnsignedCompare(v1, v2) == -1 or 0); ]
 		,	isBetween[v v1 v2 s;
 				if(v<v2) {
 					s=v1;
@@ -60,7 +60,7 @@ system_file;
 					v1=v2;
 					v2=s;
 				}
-				if (self.uIsGreaterThanOrEqualTo(v, v1) && self.isLessThanOrEqualTo(v,v2)) rtrue;
+				if (self.uIsGreaterThanOrEqualTo(v, v1) && self.uIsLessThanOrEqualTo(v,v2)) rtrue;
 				rfalse;
 			]
 		,	pow[a b
@@ -72,11 +72,28 @@ system_file;
 		,	getBit[val bit; return (val & util.orNum.pow(2,bit))~=0; ]
 		,	setBitOn[val bit; return val | util.orNum.pow(2,bit); ]
 		,	setBitOff[val bit; return val & (util.orNum.uMaxWord - util.orNum.pow(2,bit)); ]
-		,	invertBits[val
+		,	orBits[val1 val2
 					p retval;
 				for(p=wordsize*8-1: p>=0: p--){
 					retval=retval*2; !shift bits left
-					if(util.orNum.getBit(val,p)==false) retval=retval+1;
+					if(util.orNum.getBit(val1,p)==true || util.orNum.getBit(val2,p)==true) retval=retval+1;
+				}
+				return retval;
+			]
+		,	xorBits[val1 val2
+					p retval;
+				for(p=wordsize*8-1: p>=0: p--){
+					retval=retval*2; !shift bits left
+					if((util.orNum.getBit(val1,p) + util.orNum.getBit(val2,p))==1) retval=retval+1;
+				}
+				return retval;
+			]
+		,	andBits[val1 val2
+					p retval;
+				for(p=wordsize*8-1: p>=0: p--){
+					retval=retval*2; !shift bits left
+					!print 
+					if(util.orNum.getBit(val1,p)==true && util.orNum.getBit(val2,p)==true) retval=retval+1;
 				}
 				return retval;
 			]
@@ -101,10 +118,10 @@ system_file;
 			]
 		,	umax[val1 val2 val3 val4 val5
 					retval;
-				retval=val1; if(self.isLessThan(retval,val2)) retval=val2;
-				if(self.isLessThan(retval,val3)) retval=val3;
-				if(self.isLessThan(retval,val4)) retval=val4;
-				if(self.isLessThan(retval,val5)) retval=val5;
+				retval=val1; if(self.uIsLessThan(retval,val2)) retval=val2;
+				if(self.uIsLessThan(retval,val3)) retval=val3;
+				if(self.uIsLessThan(retval,val4)) retval=val4;
+				if(self.uIsLessThan(retval,val5)) retval=val5;
 				return retval;
 			]
 		,	umin[val1 val2 val3 val4 val5

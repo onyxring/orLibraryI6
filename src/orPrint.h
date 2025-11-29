@@ -4,7 +4,7 @@
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-! License:
+! License: Public Domain
 !--------------------------------------------------------------------------------------
 ! Revision History
 ! 2024.04.17	Initial Creation
@@ -15,6 +15,7 @@ default        orPrint_STAGE  0 ;
 !--------------------------------------------------------------------------------------
 ! INCLUDED DEPENDENCIES
 #include "orString";
+#include "orUtilNum";
 !--------------------------------------------------------------------------------------
 #ifnot;
 #ifndef        orPrint_STAGE	; message fatalerror orXFErrorInclude; #endif;
@@ -27,6 +28,7 @@ default        orPrint_STAGE  0 ;
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
 	!replace PrintOrRun;
+	!property individual ext_orPrintConjugate;
 #endif; !BEFORE PARSER
 !======================================================================================
 ! AFTER PARSER
@@ -159,7 +161,7 @@ default        orPrint_STAGE  0 ;
 		,	parsePattern[pattern
 					tmpTokenString  ptr;
 
-				self.parametersString.set(self.getParameterString(pattern)); !keep the the parameter string for later
+				self.parametersString.set(self.getParameterStringEphemeral(pattern)); !keep the the parameter string for later
 
 				tmpTokenString=self.getTokenString(pattern).lock(); !we parse the token string for more immediately interesting things
 
@@ -197,7 +199,7 @@ default        orPrint_STAGE  0 ;
 				if(sp==-1)  return pattern.clone().free(); !clone().free()... this routine is expected to produce an ephemeral which the calling process may or may not lock, then subsequently free.  If we returned pattern alone, which is locked, the process might unlock it in err
 				return pattern.left(sp); !this is ephemeral
 			]
-		,	getParameterString[pattern
+		,	getParameterStringEphemeral[pattern
 					sp ep;
 
 				sp=pattern.indexOf("(");
@@ -238,8 +240,8 @@ default        orPrint_STAGE  0 ;
 	,	parametersString 0
 	,	contextObject 0
 	,	objSpecifiedFirst 0
-	,	getParam[n;
-			if(self.numParams()<=n) return 0;
+	,	getParamEphemeral[n;
+			if(self.numParams()<=n) return -1;
 			return self._getTokenFromString(n, orPrintEngine.parametersString);
 		]
 	,	numParams[;
@@ -259,7 +261,9 @@ default        orPrint_STAGE  0 ;
 			}
 
 			return list.mid(pos+1, posEnd-pos);
-		];
+		]
+	,	conjugate[; orPrintConjugate(self); ]
+	;
 
 	 orPrintPattern _oprDefault
 		with runRule[;
@@ -285,13 +289,31 @@ default        orPrint_STAGE  0 ;
 				if(self.contextObject~=0){
 					if(self.patternName.equals("default")) {orPrintEngine.printDefaultRule(self.contextObject); rtrue;}
 
-					if(self.patternName.equals("the")) {print (the)self.contextObject;rtrue;}
-					if(self.patternName.equals("The")) {print (The)self.contextObject;rtrue;}
-					if(self.patternName.equals("a")) {print (a)self.contextObject;rtrue;}
-					if(self.patternName.equals("A")) {print (A)self.contextObject;rtrue;}
+					if(self.patternName.equals("the")) {
+						print (the)self.contextObject;
+						self.conjugate();
+						rtrue;
+					}
+					if(self.patternName.equals("The")) {
+						print (The)self.contextObject;
+						self.conjugate();
+						rtrue;
+					}
+					if(self.patternName.equals("a")) {
+						print (a)self.contextObject;
+						self.conjugate();
+						rtrue;
+					}
+					if(self.patternName.equals("A")) {
+						print (A)self.contextObject;
+						self.conjugate();
+						rtrue;
+					}
 					if(self.patternName.equals("name")) {print (name)self.contextObject;rtrue;}
 					if(self.patternName.equals("numb")) {print self.contextObject;rtrue;}
 					if(self.patternName.equals("numbText")) {print (LanguageNumber)self.contextObject;rtrue;}
+					if(self.patternName.equals("hex")) { print (hex)self.contextObject; rtrue;}
+					if(self.patternName.equals("str")) { print (string)self.contextObject; rtrue;}
 					if(self.patternName.equals("s")) {if(self.contextObject~=1) print "s"; rtrue;}
 					if(self.patternName.equals("es")) {if(self.contextObject~=1) print "es"; rtrue;}
 				}
@@ -299,7 +321,6 @@ default        orPrint_STAGE  0 ;
 				if(self.numParams()>0){
 					if(self.patternName.equalsOneOf("upper","up")) { self.parametersString.upper().print(); rtrue;}
 					if(self.patternName.equalsOneOf("lower","lo")) { self.parametersString.lower().print(); rtrue;}
-
 				}
 
 				rfalse; !we could satisfy no rules
@@ -333,6 +354,20 @@ default        orPrint_STAGE  0 ;
 ! 			];
 
 #endif; !--After PARSER
+!======================================================================================
+! AFTER VERBLIB 
+#iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
+	#ifndef orPrintConjugate;
+	!if we don't have a conjugation pattern in place, then use this fallback which 
+	!	prints the first element in the parameters string.  This shouldn't be reached 
+	!	unless we are using a language other than English, and a default conjugation 
+	!	rule hasn't been implemented.
+	[ orPrintConjugate ptrn;
+		if(ptrn.parametersString.isEmpty()) return;
+		print " "; ptrn.getParamEphemeral(0).print(); 
+	];
+	#endif; 
+#endif; !AFTER_GRAMMAR
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE
 #endif; !--ndef _STAGE
