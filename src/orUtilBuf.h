@@ -147,7 +147,7 @@ default        orUtilBuf_STAGE  0;
 		  		(buf-->0)=newLength;
 		  	]
 		,	print[buf len
-					i c;
+					i c; i=c; !suppress warning for Z-machine
 				
 				if(len<=0) len=self.getLength(buf);
 

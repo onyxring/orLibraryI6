@@ -72,31 +72,7 @@ system_file;
 		,	getBit[val bit; return (val & util.orNum.pow(2,bit))~=0; ]
 		,	setBitOn[val bit; return val | util.orNum.pow(2,bit); ]
 		,	setBitOff[val bit; return val & (util.orNum.uMaxWord - util.orNum.pow(2,bit)); ]
-		,	orBits[val1 val2
-					p retval;
-				for(p=wordsize*8-1: p>=0: p--){
-					retval=retval*2; !shift bits left
-					if(util.orNum.getBit(val1,p)==true || util.orNum.getBit(val2,p)==true) retval=retval+1;
-				}
-				return retval;
-			]
-		,	xorBits[val1 val2
-					p retval;
-				for(p=wordsize*8-1: p>=0: p--){
-					retval=retval*2; !shift bits left
-					if((util.orNum.getBit(val1,p) + util.orNum.getBit(val2,p))==1) retval=retval+1;
-				}
-				return retval;
-			]
-		,	andBits[val1 val2
-					p retval;
-				for(p=wordsize*8-1: p>=0: p--){
-					retval=retval*2; !shift bits left
-					!print 
-					if(util.orNum.getBit(val1,p)==true && util.orNum.getBit(val2,p)==true) retval=retval+1;
-				}
-				return retval;
-			]
+		,	xor[val1 val2; return (val1 | val2) & (~(val1 & val2)); ]
 		,	max[val1 val2 val3 val4 val5
 					retval;
 				retval=val1; if(retval<val2) retval=val2;

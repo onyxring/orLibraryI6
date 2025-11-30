@@ -7,17 +7,17 @@
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 ! License: Public Domain
 !--------------------------------------------------------------------------------------
-! 2024 Note: This module is included only for compatibility purposes.  Subsequent interations
-! of the standard library implement versions of these pronoun helpers, although they
-! are named differently and have differing signatures. I've included this module primarily
+! 2025 Note: orPronoun is included primarily for compatibility purposes.  Since this
+! was first rolled out, the Standard Library has implemented its own version of 
+! pronoun helpers, with differen names and signatures. I've keep this extension for now
 ! because it is a dependency of other orLib extensions.  In the future, I may rework those
-! references to eliminate this extension entirely.
+! references to eliminate this one entirely.
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 ! 2004 original description:
 !
 ! Things to remember about this implementation.
 ! Functions, such as civerb() and iverb() return a value after they have
-! printed.  When using these the (ig) printrule should be used.
+! printed.  When printing these the (ig) printrule should be used.
 !
 ! PrintRules:
 !
@@ -32,26 +32,8 @@
 !--------------------------------------------------------------------------------------
 ! Revision History
 ! 2001.05.05	Initial Creation
-! 2001.09.09	?
-! 2002.02.09	modified (AM) print rule.
-! 2002.02.20	Added GLULX Support
-! 2002.02.26	Fit to new template.
-! 2002.03.07	Made modifications to support Third person text.
-! 2002.03.08	Revised above modification form GLULX compatibility.
-! 2002.03.11	Fixed blow up from vrb when object passed in is -1 (which is legal and should force a plural)
-! 2002.05.18	Added additional defines to ensure that there is no requirement to use OREnglish
-! 2002.07.15	Added additional TheVerb and CTheVerb routines to allow subject-noun agreement without pronouns
-! 2003.01.05	Fixed bug with TheMy and TheMine (and caps versions too) concerning apostrophy "s"'s
-! 2004.01.19	Added constants SINGULAR_OBJ and PLURAL_OBJ to pass to the vrb routine instead of -1 or 0.
-! 2004.01.22	eliminated warning of unreferenced plural_obj constant; also fixed issue with actor and player
-!				not being equal if player is assigned in initialise.
-! 2004.02.22	Removed the code added on 2004.01.22 to handle pre-move actor state if
-!				player is assigned in initialise; this has been fixed in the 6.11
-!				standard library final release.
-! 2024.04.02	Updated the extension stucture to use features of the the 6/12 library;
-!				Also combined the common pronoun code functionality into a single function
-!				since the limit to parameters has been raised to 15 instead of 7; also replaced
-!				the embarrassingly incorrect "their selves" text with "themselves"
+! [snipped history from original ORLibrary]
+! 2024.04.02	Updated the extension stucture to use features of the the 6/12 library
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
@@ -95,11 +77,20 @@ default        orPronoun_English_STAGE  0;
 	Default SECOND_PERSON 2;
 	Default THIRD_PERSON 3;
 	Default PAST_TENSE 1;
-	Default PRESENT_TENSE 2;
+	!Default PRESENT_TENSE 2;
+	Default PRESENT_TENSE 0; !Standard Library introduced this constant with a different value...
 	Default FUTURE_TENSE 3;
 
-	Default NarativePerson SECOND_PERSON;
-	Default NarativeTense PRESENT_TENSE;
+	[getNarrativeTense; 
+		if(player provides narrative_tense) 
+			return player.narrative_tense;
+		return PRESENT_TENSE;
+	];
+	[getNarrativePerson; 
+		if(player provides narrative_voice) 
+			return player.narrative_voice;
+		return SECOND_PERSON;
+	];
 
 	! [ PSN__ o;
 	! 	if (o==0) { print (string) NOTHING__TX; rtrue; }
@@ -108,7 +99,7 @@ default        orPronoun_English_STAGE  0;
 	! 		String:  print "<string ~", (string) o, "~>"; rtrue;
 	! 		nothing: print "<illegal object number ", o, ">"; rtrue;
 	! 	}
-	! 	if (o==player && NarativePerson~=THIRD_PERSON) { print (string) YOURSELF__TX; rtrue; }
+	! 	if (o==player && NarrativePerson~=THIRD_PERSON) { print (string) YOURSELF__TX; rtrue; }
 	! 	#ifdef LanguagePrintShortName;
 	! 	if (LanguagePrintShortName(o)) rtrue;
 	! 	#endif;
@@ -125,18 +116,18 @@ default        orPronoun_English_STAGE  0;
 	!----------------------------------------------------------------------
 	#ifndef ig; [ig o;o=null;]; #endif; !ignore print rule
 	!----------------------------------------------------------------------
-	! All common code in the pronoun print routines is contined here
+	! All common code in the pronoun print routines is contined here.
+	! These are broken up into two routines because a single routine would
+	! have too parameters for the Z-Machine.
 	!----------------------------------------------------------------------
 	[CommonPronounCode12 obj i we you allofyou;
-		if(obj==player && NarativePerson~=THIRD_PERSON)	!if we are talking about the player
+		if(obj==player && getNarrativePerson()~=THIRD_PERSON) 
 		{
-			if(NarativePerson==1) !first person?
-			{
+			if(getNarrativePerson()==FIRST_PERSON) {
 				if(obj hasnt pluralname) print(string)i;
 				else print (string)we;
 			}
-			else
-			{
+			else { !--must be SECOND_PERSON then
 				if(obj hasnt pluralname) print (string)you;
 				else print (string)allofyou;
 			}
@@ -145,16 +136,14 @@ default        orPronoun_English_STAGE  0;
 		return false; !otherwise return false so that the other handler can be called
 	];
 	[CommonPronounCode3 obj they it she he;
-		if(obj~=player || (obj==player && NarativePerson==THIRD_PERSON))	!if we are NOT talking about the player
+		if(obj~=player || (obj==player && getNarrativePerson()==THIRD_PERSON))
 		{
 			if(obj has pluralname)
 				print (string)they;
-			else ! is singular
-			{
+			else{ ! is singular
 				if (obj has neuter || obj hasnt animate)
 					print (string)it;
-				else
-				{
+				else{
 					if (obj has female)  print (string)she;
 					else print (string)he;
 				}
@@ -192,12 +181,12 @@ default        orPronoun_English_STAGE  0;
 			else
 				checkobj=MPronounObj;
 		}
-		if(obj==checkobj || (obj==player && NarativePerson~=THIRD_PERSON))  return false; !--if they are the same, then return false, nothing output
+		if(obj==checkobj || (obj==player && getNarrativePerson()~=THIRD_PERSON))  return false; !--if they are the same, then return false, nothing output
 		if(cap)
 			print (The)obj;
 		else
 			print (the)obj;
-		if(checkobj==NULL && (obj~=player || NarativePerson==THIRD_PERSON)) !save the object for a later test
+		if(checkobj==NULL && (obj~=player || getNarrativePerson()==THIRD_PERSON)) !save the object for a later test
 		{
 			if(obj hasnt animate || obj has neuter)
 				NPronounObj=obj;
@@ -238,12 +227,12 @@ default        orPronoun_English_STAGE  0;
 	!----------------------------------------------------------
 	[Vrb obj pastverb vrb altverb futverb; !if no object, then obj can equal SINGULAR_OBJ or PLURAL_OBJ
 		!-- if(3rdPerson/PresentTense/Singular) then "runs" else "run"
-		if(NarativeTense==PRESENT_TENSE && (obj~=player || NarativePerson==THIRD_PERSON) && (obj==SINGULAR_OBJ || (metaclass(obj)==object && obj hasnt pluralname))){
+		if(getNarrativeTense()==PRESENT_TENSE && (obj~=player || getNarrativePerson()==THIRD_PERSON) && (obj==SINGULAR_OBJ || (metaclass(obj)==object && obj hasnt pluralname))){
 			if(altverb) print (string)altverb;
 			else print (string)vrb,"s";
 		}
 		else {
-			switch(NarativeTense){
+			switch(getNarrativeTense()){
 				PAST_TENSE: print (string) pastverb;
 				PRESENT_TENSE: print(string)vrb;
 				FUTURE_TENSE: if(futverb)print_ret (string)futverb;
@@ -271,9 +260,9 @@ default        orPronoun_English_STAGE  0;
 	!----------------------------------------------------------
 	! pass false for generic singular object or true for generic plural object, otherwise pass in the object itself
 	[Am obj; !was/am/will/were/are/is
-		if(obj==player && NarativePerson~=THIRD_PERSON) !first or second person
+		if(obj==player && getNarrativePerson()~=THIRD_PERSON) !first or second person
 		{
-			switch(NarativePerson)
+			switch(getNarrativePerson())
 			{
 			FIRST_PERSON: print (ig) ppf("was","am","will");
 			SECOND_PERSON: print (ig) ppf("were","are","will");
@@ -289,7 +278,7 @@ default        orPronoun_English_STAGE  0;
 	[CIAm obj; print (CTheI)obj," ",(Am)obj;];
 	[Have obj; !had/have/will have
 		!--for present tense always use "have" except when speaking in singular third person
-		if(obj hasnt pluralname && (obj~=player || (obj==player && NarativePerson==THIRD_PERSON))) {
+		if(obj hasnt pluralname && (obj~=player || (obj==player && getNarrativePerson()==THIRD_PERSON))) {
 			print (ig) ppf("had","has","will have had");
 			return;
 		}

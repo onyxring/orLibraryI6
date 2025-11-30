@@ -48,6 +48,7 @@ default        orString_STAGE  	0;
 			]
 		!-- information about the string routines
 		,	getChar[pos; return self.getBuf()->(pos+WORDSIZE); ]
+		,	getCharFromRight[pos; return self.getChar(self.getLength()-(pos+1)); ]
 		,	isEmpty[;return util.orBuf.getLength(self.getBuf())==0;]
 
 		!-- memory management routines

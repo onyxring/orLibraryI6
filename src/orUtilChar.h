@@ -31,6 +31,12 @@ default        orUtilChar_STAGE  0;
    #ifndef orExtensionFrameworkBrief; message "   orUtilChar...";#endif;
 
 !======================================================================================
+! BEFORE PARSER
+!--------------------------------------------------------------------------------------
+#iftrue (LIBRARY_STAGE == BEFORE_PARSER);
+	array __vowels string "aeiou";
+#endif;
+!======================================================================================
 ! AFTER VERBLIB
 !--------------------------------------------------------------------------------------
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
@@ -48,6 +54,16 @@ default        orUtilChar_STAGE  0;
 				if(self.isAlpha(c)==true) rtrue;
 				if(self.isNumeric(c)==true) rtrue;
 				rfalse;
+			]
+		,	isVowel[c
+					t;
+				for(t=1:t<=__vowels->0:t++) if(c==__vowels->t) rtrue;
+				rfalse;
+			]
+		,	isConsonant[c;
+				if(self.isVowel(c)==true) rfalse;
+				if(self.isAlpha(c)==false) rfalse;
+				rtrue;
 			]
 		,	isLower[c;
 				if(c>='a' && c<='z') rtrue; rfalse;

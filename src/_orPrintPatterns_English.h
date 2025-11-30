@@ -14,8 +14,7 @@
 default        orPrintPatterns_English_STAGE  0 ;
 !--------------------------------------------------------------------------------------
 ! INCLUDED DEPENDENCIES
-#include "orPrint";
-#include "_orPronoun_English";
+
 !--------------------------------------------------------------------------------------
 #ifnot;
 #ifndef        orPrintPatterns_English_STAGE	; message fatalerror orXFErrorInclude; #endif;
@@ -36,56 +35,6 @@ default        orPrintPatterns_English_STAGE  0 ;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
-	[ orPrintConjugate ptrn isPerfectTense !--TODO: handle isPerfectTense
-			didPrintIrregular obj vrb lookupForm;
-		if(ptrn.parametersString.isEmpty()) return;
-		
-		print " ";
-		if(printIrregularVerbConjugation(ptrn)) return;
-		
-		obj=ptrn.contextObject;
-		vrb=ptrn.getParamEphemeral(0);
-		if(isPerfectTense){
-			lookupForm=ptrn.getParamEphemeral(3);
-			if(lookupForm==0) lookupForm=ptrn.getParamEphemeral(2);
-			if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
-			return vrb.append("ed").print();
-		}
-		!--past tense
-		else if(player provides narrative_tense && player.narrative_tense == PAST_TENSE){
-			lookupForm=ptrn.getParamEphemeral(2);
-			if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
-			return vrb.append("ed").print();
-		}
-		else{ !--present tense
-			!--plural
-			if ((self.contextObject==player && player provides narrative_voice && player.narrative_voice == 3 && player hasnt pluralname) || !we are narrating the player's actions in 3rd person singular, or
-					(self.contextObject~=player && self.contextObject hasnt pluralname)){ !we are conjugating a verb with a singular non-player object
-				
-				lookupForm=ptrn.getParamEphemeral(1);
-				if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm;
-
-				vrb.lock();
-				if(vrb.right(1).equals("s")) {
-					vrb.free();
-					return vrb.append("es").print();
-				}
-				else{
-					vrb.free();
-					return vrb.append("s").print();
-				}
-			}
-			!--singular
-			else{
-				lookupForm=ptrn.getParamEphemeral(0);
-				if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
-
-				vrb.print(); 
-				return;
-
-			}
-		}
-	 ];
 
 	 orPrintPattern _oprEnglish
 		with
@@ -98,20 +47,9 @@ default        orPrintPatterns_English_STAGE  0 ;
 				if(self.objSpecifiedFirst==false) print " ",(name) self.contextObject;
 				rtrue;
 			]
-		,	printVerb[pronounRoutine 
-					vrb conj;
+		,	printVerb[pronounRoutine;
 				if(pronounRoutine) pronounRoutine(self.contextObject);
-				self.conjugate();
-
-				! if((vrb=self.getParamEphemeral(0))==0) rtrue;
-				! if(self.contextObject==0) rtrue;
-				
-				! vrb.lock();
-				! print " "; getConjugationEphemeral(self.contextObject, vrb).print();
-				! vrb.free();
-				 
-				! rtrue;
-				
+				self.conjugate();				
 			]
 		,	runRule[ pat obj; pat=self.patternName; obj=self.contextObject;
 
@@ -211,10 +149,7 @@ default        orPrintPatterns_English_STAGE  0 ;
 !======================================================================================
 ! AFTER GRAMMAR
 #iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
-	#ifndef printIrregularVerbConjugation;
-	! Unless the author opts-in, we don't try to conjugate irregular verbs
-	[ printIrregularVerbConjugation; return false;];
-	#endif; 
+
 #endif;
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE
