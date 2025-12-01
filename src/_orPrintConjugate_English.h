@@ -102,13 +102,12 @@ constant entrySize 5;
 	 ];
 ! A simple FNV-0 hashing implementation, used to speed lookups.
 [hashString str i hsh;
-   str=util.orStr.new(str); 
+   str=util.orStr.new(str).free(); !--no reason to keep this locked
    for(i=0:i<str.getLength():i++){
       hsh=hsh*$1b3;
       hsh=util.orNum.xor(hsh,util.orChar.toLower(str.getChar(i)));
    }
    hsh=hsh & $ffff;
-   str.free();
    return hsh;
 ];
 

@@ -75,7 +75,7 @@ default        orPrint_STAGE  0 ;
 
 				!new_line;orStringPool.displaySummary();
 				fullText.set(self.encodeEscapedCharacters(fullText));
-
+		
 				!new_line;orStringPool.displaySummary();
 
 				!assign the userdefined parameters so they can be accessed in rules
@@ -98,7 +98,7 @@ default        orPrint_STAGE  0 ;
 					if(fullText.getChar(startPtr)==';') startPtr++; !if the pattern ends with the "dont-print character, a semicolon, then skip past it..."
 					endPtr=fullText.indexOf("$",startPtr); !find the next token start
 				}
-
+			
 				self.decodeEscapedCharacters(fullText.mid(startPtr, orSTRING_END)).print();  !print everything after the last token
 
 				!cleanUp
@@ -137,7 +137,6 @@ default        orPrint_STAGE  0 ;
 			]
 		,	printPattern[pattern
 					pr retval;
-
 				self.parsePattern(pattern);
 				objectloop(pr ofclass orPrintPattern && pr ~= _oprDefault && retval==false){
 					!note:we are just asigning these references; since these are safe strings, the printRule versions will be safe as well
@@ -145,8 +144,10 @@ default        orPrint_STAGE  0 ;
 					pr.contextObject=self.contextObject;
 					pr.objSpecifiedFirst=self.objSpecifiedFirst;
 					pr.parametersString=self.parametersString;
+
 					retval=pr.runRule();
 				}
+				
 				if(retval==false) {
 					_oprDefault.patternName=self.patternName;
 					_oprDefault.contextObject=self.contextObject;
@@ -160,7 +161,6 @@ default        orPrint_STAGE  0 ;
 			]
 		,	parsePattern[pattern
 					tmpTokenString  ptr;
-
 				self.parametersString.set(self.getParameterStringEphemeral(pattern)); !keep the the parameter string for later
 
 				tmpTokenString=self.getTokenString(pattern).lock(); !we parse the token string for more immediately interesting things
@@ -200,14 +200,10 @@ default        orPrint_STAGE  0 ;
 				return pattern.left(sp); !this is ephemeral
 			]
 		,	getParameterStringEphemeral[pattern
-					sp ep;
-
+					sp;
 				sp=pattern.indexOf("(");
-
-				if(sp==-1) return util.orStr.new("").free();
-				ep=pattern.indexOf(")");
-
-				return pattern.mid(sp,ep-sp).replaceAll("(","").replaceAll(")","");
+				if(sp==-1 || pattern.getCharFromRight(0)~=')') return util.orStr.new("").free(); !no parameterString
+				return pattern.mid(sp+1,pattern.getLength()-sp-2); 
 			]
 
 		,	tokenToObject[txt
@@ -267,7 +263,6 @@ default        orPrint_STAGE  0 ;
 
 	 orPrintPattern _oprDefault
 		with runRule[;
-
 			if(self.patternName.equalsOneOf("bold", "b")) {
 						style bold;
 					rtrue;

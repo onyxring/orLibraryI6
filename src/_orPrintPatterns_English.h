@@ -40,7 +40,8 @@ default        orPrintPatterns_English_STAGE  0 ;
 		with
 			printNounVerb[pronounRoutine;
 				self.printNoun(pronounRoutine);
-				return self.printVerb();
+				self.printVerb();
+				rtrue;
 			]
 		,	printNoun[pronounRoutine;
 				pronounRoutine(self.contextObject);
@@ -80,10 +81,33 @@ default        orPrintPatterns_English_STAGE  0 ;
 					self.conjugate();
 					rtrue;
 				}
-
+				if(pat.equalsOneOf("iAm", "iAmYouAreItIs")) {
+					print (IAm)obj;
+					rtrue;
+				}
+				if(pat.equalsOneOf("IAm", "IAmYouAreItIs")) {
+					print (CIAm)obj;
+					rtrue;
+				}
+				if(pat.equalsOneOf("im", "imYoureIts")) {
+					print (Im)obj;
+					rtrue;
+				}
+				if(pat.equalsOneOf("Im", "ImYoureIts")) {
+					print (CIm)obj;
+					rtrue;
+				}
+				if(pat.equalsOneOf("imNot", "imNotYouArentItIsnt")) {
+					print (ImNot)obj;
+					rtrue;
+				}
+				if(pat.equalsOneOf("ImNot", "ImNotYouArentItIsnt")) {
+					print (CImNot)obj;
+					rtrue;
+				}
 				!qualifying pronouns.  Pronoun + Noun + verb.
-				if(pat.equals("that")) return self.printNounVerb(ThatOrThose);
-				if(pat.equals("That")) return self.printNounVerb(CThatOrThose);
+				if(pat.equals("that")) return self.printNounVerb(__ThatOrThose);
+				if(pat.equals("That")) return self.printNounVerb(__CThatOrThose);
 				if(pat.equals("this")) return self.printNounVerb(ThisOrThese);
 				if(pat.equals("This")) return self.printNounVerb(CThisOrThese);
 
@@ -114,36 +138,29 @@ default        orPrintPatterns_English_STAGE  0 ;
 				!rtrue;
 
 			];
+	[ __ThatOrThose obj;
+		if (obj has pluralname)	
+			print "those"; 
+		else
+			print "that";
+	];
+	[ __CThatOrThose obj;
+		if (obj has pluralname)	
+			print "Those"; 
+		else
+			print "That";
+	];
 	[ ThisOrThese obj;
-		if (obj == player) {
-		if (player provides narrative_voice) {
-			if (player.narrative_voice == 1) { print "me"; return; }
-			if (player.narrative_voice == 3) { CDefart(player); return; }
-		}
-		print "you";
-		return;
-		}
-		if (obj has pluralname)       { print "these"; return; }
-		if (obj has female)           { print "her"; return; }
-		if (obj has male or animate)
-			if (obj hasnt neuter)     { print "him"; return; }
-		print "this";
+		if (obj has pluralname)	
+			print "these"; 
+		else
+			print "this";
 	];
 	[ CThisOrThese obj;
-		if (obj == player) {
-		if (player provides narrative_voice) {
-			if (player.narrative_voice == 1) { print "I"; return; }
-			if (player.narrative_voice == 3) { CDefart(player); return; }
-		}
-		print "You";
-		return;
-		}
-		if (obj has pluralname)		{ print "These"; return; }
-		if (obj has female)			{ print "She"; return; }
-		if (obj has male or animate) {
-			if (obj hasnt neuter)		{ print "He"; return; }
-		}
-		print "This";
+		if (obj has pluralname)	
+			print "These"; 
+		else
+			print "This";
 	];
 #endif; !--After VERBLIB
 !======================================================================================

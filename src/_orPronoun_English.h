@@ -274,8 +274,16 @@ default        orPronoun_English_STAGE  0;
 		else
 			print (ig) ppf("was","is","will");
 	];
-	[IAm obj; print (TheI)obj," ",(Am)obj;];
-	[CIAm obj; print (CTheI)obj," ",(Am)obj;];
+	[TheIAm obj; print (TheI)obj," ",(Am)obj;];
+	[CTheIAm obj; print (CTheI)obj," ",(Am)obj;];
+	[IAm obj; print (I)obj," ",(Am)obj;];
+	[CIAm obj; print (CI)obj," ",(Am)obj;];
+	
+	[Im obj; if(CommonPronounCode12(obj, "I'm", "we're","you're","you're")==false) CommonPronounCode3(obj,"they're","it's","she's","he's");];
+	[CIm obj; if(CommonPronounCode12(obj, "I'm", "We're","You're","You're")==false) CommonPronounCode3(obj,"They're","It's","She's","He's");];
+	[ImNot obj; if(CommonPronounCode12(obj, "I'm not", "we aren't","you aren't","you aren't")==false) CommonPronounCode3(obj,"they aren't","it isn't","she isn't","he isn't");];
+	[CImNot obj; if(CommonPronounCode12(obj, "I'm not", "We aren't","You aren't","You aren't")==false) CommonPronounCode3(obj,"They aren't","It isn't","She isn't","He isn't");];
+	
 	[Have obj; !had/have/will have
 		!--for present tense always use "have" except when speaking in singular third person
 		if(obj hasnt pluralname && (obj~=player || (obj==player && getNarrativePerson()==THIRD_PERSON))) {

@@ -3,8 +3,7 @@
 !!!	The Extension Management Framework for orLibrary.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
-! This work is licensed under the Creative Commons Attribution-ShareAlike License
-! (http://creativecommons.org/licenses/by-sa/1.0/).
+! License: Public Domain
 !--------------------------------------------------------------------------------------
 ! This extension framework is the foundation upon which the orLibrary is built.  It
 ! contains the plumbing used by all orLibrary extensions to ensure extensions are
