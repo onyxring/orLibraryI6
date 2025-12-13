@@ -68,12 +68,20 @@ default        orUtilBuf_STAGE  0;
    Constant    orUtilBuf_STAGE  LIBRARY_STAGE;
    #ifdef      orUtilBuf_STAGE  ; #endif;
    #ifndef orExtensionFrameworkBrief; message "   orUtilBuf...";#endif;
+
+#iftrue (LIBRARY_STAGE == BEFORE_PARSER);
+	#ifdef TARGET_ZCODE;
+		constant orSizedBufferOffset 6;
+	#ifnot;
+		constant orSizedBufferOffset 10;
+	endif;
+#endif;
 !======================================================================================
 ! AFTER VERBLIB
 !--------------------------------------------------------------------------------------
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
 	constant orBUF_END -1;
-	default orStringDefaultSize 500;
+		default orStringDefaultSize 500;
 	!TODO: we've setup the concept of "sizedBuffers"; however we are not actually using these to enforce size, only to distinguish bufs from literals.  Need to add size enforcement to all of these.
 	object _orBuf
 	 private	_captureStreamValue
@@ -169,21 +177,65 @@ default        orUtilBuf_STAGE  0;
 				if(buf1len~=self.getLength(buf2)) rfalse; ! different sizes, so not equal
                 for(t=WORDSIZE: t< buf1len+WORDSIZE :t++){
 					if(caseInsensitive<= 0){
-                        if(buf1->(t)~=buf2->(t)) {
-							rfalse;
-						}
+                        if(buf1->(t)~=buf2->(t)) rfalse;
 					}else{
-                        if(util.orChar.toLower(buf1->(t))~=util.orChar.toLower(buf2->(t))) {
-							rfalse;
-						}
+                        if(util.orChar.toLower(buf1->(t))~=util.orChar.toLower(buf2->(t))) rfalse;
 					}
                 }
 				rtrue;
 			]
-        ,	getChar[buf pos; return buf->(pos+WORDSIZE);]
-		,	setChar[buf pos val; buf->(pos+WORDSIZE)=val;]
+       ,	startsWith[buf1 buf2 caseInsensitive
+                    t buf2len;
+				buf2len=self.getLength(buf2);
+				if(self.getLength(buf1) < buf2len) rfalse; ! buf1 is too small to start with buf2
+                for(t=WORDSIZE: t< buf2len+WORDSIZE :t++){
+					if(caseInsensitive==false){
+                        if(buf1->(t)~=buf2->(t)) rfalse;
+					}else{
+                        if(util.orChar.toLower(buf1->(t))~=util.orChar.toLower(buf2->(t))) rfalse;
+					}
+                }
+				rtrue;
+			]
+		  ,	endsWith[buf1 buf2 caseInsensitive
+                    t offset buf2len;
+				buf2len=self.getLength(buf2);
+				offset = self.getLength(buf2)-buf2len;
+
+				if(offset<0) rfalse; ! buf1 is too small to contain buf2
+                
+				for(t=WORDSIZE : t<buf2len+WORDSIZE :t++){
+					if(caseInsensitive==false){
+                        if(buf1->(offset+t)~=buf2->(t)) rfalse;
+					}else{
+                        if(util.orChar.toLower(buf1->(offset+t))~=util.orChar.toLower(buf2->(t))) rfalse;
+					}
+                }
+				rtrue;
+			]
+        ,	getChar[buf pos; 
+				bufSize=self.getSize(buf);
+				if(bufSize<0 || bufSize>pos) return -1;
+
+				return buf->(pos+WORDSIZE);
+			]
+		,	setChar[buf pos val
+					bufSize; 
+				bufSize=self.getSize(buf);
+				if(bufSize==-1 || bufSize>pos) 
+					buf->(pos+WORDSIZE)=val;
+				else {
+					#ifdef DEBUG;
+						print "WARNING!!! Tried to set a character at postion ", pos,", outside of the buffer size (",bufSize,").";
+					#endif;
+				}
+			]
 		,	convertToSizedBuffer[b size;
-				if(size==0) print "WARNING!!! util.orBuf.convertToSizedBuffer() has zero size specified.";
+				if(size==0) {
+					#ifdef DEBUG;
+						print "WARNING!!! util.orBuf.convertToSizedBuffer() has zero size specified.";
+					#endif;
+				}
 				if(self.isSized(b)) return b; !--already a sized
 				b=b+(WORDSIZE+2);
 				b-->(-1)=size-(WORDSIZE+WORDSIZE+2); !--the string length; the buffer length; and the 2 byte indicator
@@ -197,7 +249,8 @@ default        orUtilBuf_STAGE  0;
 			]
 		,	copy[toBuf fromBuf numCharsToCopy toPos fromPos
                     frmPtr toPtr size;
-				!TODO: is NULL the right value to use here?  If NULL is the same as zero, then this can all go away
+				
+				!--note: NULL equals -1
 				if(fromPos==NULL) fromPos=0;
 				if(toPos==NULL) toPos=0;
 
@@ -211,7 +264,7 @@ default        orUtilBuf_STAGE  0;
 				! for(i=0:i <numCharsToCopy:i++)
                 !     toBuf->(i+toPos+WORDSIZE)= fromBuf->(i+fromPos+WORDSIZE);
 
-				!The following uses "native" interpreter methods to do the above which should be significantly faster
+				!The following uses native interpreter methods to do the above which should be faster
 		#ifdef TARGET_ZCODE;
 				@copy_table frmPtr toPtr numCharsToCopy;
 		#ifnot;
@@ -223,8 +276,7 @@ default        orUtilBuf_STAGE  0;
 			]
         ,	mid[toBuf fromBuf fromPos numCharsToCopy
 					maxLengthToCopy;
-			!TODO
-			!maxLengthToCopy = util.orNum.min(self.getLength(fromBuf)-fromPos, self.getLength(toBuf));
+			
 				maxLengthToCopy = self.getLength(fromBuf)-fromPos;
 				if(numCharsToCopy==orBUF_END || numCharsToCopy>maxLengthToCopy) numCharsToCopy=maxLengthToCopy;
 				self.copy(toBuf, fromBuf, numCharsToCopy, 0, fromPos);
@@ -291,11 +343,13 @@ default        orUtilBuf_STAGE  0;
 				self.insert(buf, replaceTextBuf, pos);
 				return buf;
 			]
-		,   replaceAll[buf searchTextBuf replaceTextBuf startingIndex;
+		,   replaceAll[buf searchTextBuf replaceTextBuf startingIndex
+					rtlen;
+				rtlen=self.getLength(replaceTextBuf);
 
 				while(startingIndex ~=-1){
 					self.replace(buf, searchTextBuf, replaceTextBuf);
-					startingIndex=self.indexOf(buf, searchTextBuf, startingIndex);
+					startingIndex=self.indexOf(buf, searchTextBuf, startingIndex+rtlen);
 				}
 				return buf;
 			]
@@ -361,7 +415,7 @@ default        orUtilBuf_STAGE  0;
 			]
 			!if ever there is a need, this could be optimized.  Instead of deleting one character at a time, we could count up the characters and do a single operation.
 		,	trimLeft[buf;
-				while(self.getLength(buf)>0 && self.getChar(buf,0)==' ') self.delete(0);
+				while(self.getLength(buf)>0 && self.getChar(buf,0)==' ') self.delete(buf,0,1);
 				return buf;
 			]
 		,	trimRight[buf;

@@ -39,8 +39,8 @@ default        orHookStandardLibrary_STAGE 0;
 
     property individual ext_identical;
     property individual ext_displayStatus;
-    property individual ext_nounword;
-    property individual ext_nextword;
+    property individual ext_nounWord;
+    property individual ext_nextWord;
     property individual ext_beforeAction;
     property individual ext_afterAction;
     property individual ext_afterRoutines;
@@ -61,12 +61,12 @@ default        orHookStandardLibrary_STAGE 0;
     ];
 
     [ NounWord rv;
-        rv=LibraryExtensions.RunWhile(ext_nounword, 0);
+        rv=LibraryExtensions.RunWhile(ext_nounWord, 0);
         if(rv ~= 0) return rv;
         return _oldNounWord();
     ];
     [ NextWord rv;
-        rv=LibraryExtensions.RunWhile(ext_nextword, 0);
+        rv=LibraryExtensions.RunWhile(ext_nextWord, 0);
         if(rv ~= 0) return rv;
         return _oldNextWord();
     ];

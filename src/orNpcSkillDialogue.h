@@ -32,7 +32,7 @@ default        orNPCSkillDialogue_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-
+   global orDialogueAutoAnswer false;
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER PARSER
@@ -40,6 +40,7 @@ default        orNPCSkillDialogue_STAGE  0;
 
    class orNPCSkillDialogue
       with dialoguePool 0 0 0 0 0
+      , pendingQuestion 0
       , learnTopic[topic;
          if(util.orArray.find(topic,knownBy,self)==-1)
             util.orArray.append(topic,knownBy,self);
@@ -54,7 +55,7 @@ default        orNPCSkillDialogue_STAGE  0;
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
    orNpcSkill _orNPCSkillDialogue
-      with doesApplyToCharacter[npc; if(npc ofclass orNPCSkillDialogue) rtrue; rfalse;]
+      with appliesToCharacter[npc; if(npc ofclass orNPCSkillDialogue) rtrue; rfalse;]
 		,  canPerform[npc
                i count;
             for(i=0:i<util.orArray.getLength(npc, dialoguePool):i++){
@@ -78,7 +79,33 @@ default        orNPCSkillDialogue_STAGE  0;
          ]
 	;
 
+object _handleAutoAnswer LibraryExtensions
+with ext_topicAsked[top actor talkingTo;
+      if(talkingTo==player && orDialogueAutoAnswer==false && actor provides pendingQuestion) {
+         actor.pendingQuestion=top;
+         rtrue;
+      }
+      rfalse;
+];
+
 #endif; !--After VERBLIB
+#iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
+!======================================================================================
+! AFTER GRAMMAR
+[AnswerQuestionSub pq;
+   if(noun provides pendingQuestion && noun.pendingQuestion~=0){
+      pq=noun.pendingQuestion;
+      noun.pendingQuestion=0;
+      <<tellTopic noun pq>>;
+   }
+   else{
+      "There doesn't seem to be any open questions.";
+   }
+];
+
+Extend 'answer' first 
+   *	creature -> AnswerQuestion;
+#endif;
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE
 #endif; !--ndef _STAGE

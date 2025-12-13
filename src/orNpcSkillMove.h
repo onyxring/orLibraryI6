@@ -131,7 +131,7 @@ default        orNpcSkillMove_STAGE  0;
 				}
 			]
 		with _tempArray 0 0 0 0 0 0 0 0 0 0 !--conceptually, this private; but orArray needs it visible to be able to work on it
-		,	doesApplyToCharacter[npc; if(npc ofclass orNpcSkillMove) rtrue; rfalse;]
+		,	appliesToCharacter[npc; if(npc ofclass orNpcSkillMove) rtrue; rfalse;]
 		,	defaultPriority 5
 		,	canPerform[npc
 					target;
@@ -139,7 +139,7 @@ default        orNpcSkillMove_STAGE  0;
 				target=self._getTarget(npc);
 				if(target~=0 && self._targetCanBeFollowed(npc, target)) rtrue;
 				if(self._getCurrentDestination(npc)) rtrue;
-				if(util.orRef.resolveValue(npc,doesWander)==true) rtrue;
+				if(util.orRef.resolveValue(npc,moveDoesWander)==true) rtrue;
 				rfalse;
 			]
 		,	perform[npc
@@ -187,7 +187,7 @@ default        orNpcSkillMove_STAGE  0;
 					}
 				}
 				!--if all else fails, then just wander around in a near random fashion
-				if(npc provides doesWander && util.orRef.resolveValue(npc,doesWander)==true){
+				if(npc provides moveDoesWander && util.orRef.resolveValue(npc,moveDoesWander)==true){
 					self._getWanderDirection(npc);
 					self.moveInDirection(npc, self._getWanderDirection(npc));
 					return;
@@ -218,7 +218,7 @@ default        orNpcSkillMove_STAGE  0;
 		,	_moveIncrement 1
 		,	movePattern MOVE_PATTERN_REVERSE
 		,	lastLocation 0
-		,	doesWander true
+		,	moveDoesWander true
 		,	moveInDirection[dir;
 				_orNpcMoveEngine.moveInDirection(self, dir); !--call the engine to do the work
 			]

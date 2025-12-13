@@ -8,14 +8,14 @@
 ! Revision History
 ! 2001.12.26	Initial Creation
 ! ...			History from orLibrary v1 snipped away.
-! 2024.05.11	Refactored for the orLibrary version 2; refactored from original orLib's
-!				orDynaString.
+! 2024.05.11	Refactored for the orLibrary version 2, from original orLib's
+!				orDynaString extension.
 !--------------------------------------------------------------------------------------
 ! Complementary extensions:
 ! *	orPrint : If included, the orString.format() will also resolve print patterns.
 !======================================================================================
 ! Extension Framework management
-#ifndef        orExtensionFramework_STAGE	;
+#ifndef        orExtensionFramework_STAGE;
 default        orString_STAGE  	0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -94,11 +94,16 @@ default        orString_STAGE  	0;
 		!-- search routines
 		,	equals[altBuf caseInsensitive; return util.orBuf.equals(util.orStr.toAmbiguousBuffer(altBuf), self.getBuf(), caseInsensitive); ]
 		,	equalsOneOf[buf1 buf2 buf3 buf4 caseInsensitive;
-				if(buf1~=0 && util.orBuf.equals(util.orStr.toAmbiguousBuffer(buf1), self.getBuf(), caseInsensitive)==true) rtrue;
-				if(buf2~=0 && util.orBuf.equals(util.orStr.toAmbiguousBuffer(buf2), self.getBuf(), caseInsensitive)==true) rtrue;
-				if(buf3~=0 && util.orBuf.equals(util.orStr.toAmbiguousBuffer(buf3), self.getBuf(), caseInsensitive)==true) rtrue;
-				if(buf4~=0 && util.orBuf.equals(util.orStr.toAmbiguousBuffer(buf4), self.getBuf(), caseInsensitive)==true) rtrue;
+				if(buf4==true or false) caseInsensitive=buf4;
+				if(buf3==true or false) caseInsensitive=buf3;
+				if(buf2==true or false) caseInsensitive=buf2;
+				
+				if(self.startsWith(buf1, caseInsensitive)==true) rtrue;
+				if((~~(buf2==true or false)) && self.equals(buf2, caseInsensitive)==true) rtrue;
+				if((~~(buf3==true or false)) && self.equals(buf3, caseInsensitive)==true) rtrue;
+				if((~~(buf4==true or false)) && self.equals(buf4, caseInsensitive)==true) rtrue;
 				rfalse;
+				
 			]
 		,	equalsOneOfCaseInsensitive[buf1 buf2 buf3 buf4; return self.equalsOneOf(buf1, buf2, buf3, buf4, true); ]
 		,	indexOf[searchText startingIndex;  return util.orBuf.indexOf(self.getBuf(), util.orStr.toAmbiguousBuffer(searchText), startingIndex);  ]
@@ -111,6 +116,31 @@ default        orString_STAGE  	0;
 				}
 				return count;
 			]
+		,	startsWith[buf2 caseInsensitive; return util.orBuf.startsWith(self.getBuf(), util.orStr.toAmbiguousBuffer(buf2), caseInsensitive);]
+		,	startsWithOneOf[buf1 buf2 buf3 buf4 caseInsensitive;
+				if(buf4==true or false) caseInsensitive=buf4;
+				if(buf3==true or false) caseInsensitive=buf3;
+				if(buf2==true or false) caseInsensitive=buf2;
+				
+				if(self.startsWith(buf1, caseInsensitive)==true) rtrue;
+				if((~~(buf2==true or false)) && self.startsWith(buf2, caseInsensitive)==true) rtrue;
+				if((~~(buf3==true or false)) && self.startsWith(buf3, caseInsensitive)==true) rtrue;
+				if((~~(buf4==true or false)) && self.startsWith(buf4, caseInsensitive)==true) rtrue;
+				rfalse;
+			]
+		,	endsWith[buf2 caseInsensitive; return util.orBuf.endsWith(self.getBuf(), util.orStr.toAmbiguousBuffer(buf2),  caseInsensitive);]
+		,	endsWithOneOf[buf1 buf2 buf3 buf4 caseInsensitive;
+				if(buf4==true or false) caseInsensitive=buf4;
+				if(buf3==true or false) caseInsensitive=buf3;
+				if(buf2==true or false) caseInsensitive=buf2;
+				
+				if(self.endsWith(buf1, caseInsensitive)==true) rtrue;
+				if((~~(buf2==true or false)) && self.endsWith(buf2, caseInsensitive)==true) rtrue;
+				if((~~(buf3==true or false)) && self.endsWith(buf3, caseInsensitive)==true) rtrue;
+				if((~~(buf4==true or false)) && self.endsWith(buf4, caseInsensitive)==true) rtrue;
+				rfalse;
+			]
+
 		,	contains[searchText; return self.indexOf(searchText)>-1; ]
 		,	indexOfFirstFalse[routine startingIndex; return util.orBuf.indexOfFirstFalse(self.getBuf(), routine, startingIndex); ]
 		,	indexOfFirstTrue[routine startingIndex; return util.orBuf.indexOfFirstTrue(self.getBuf(), routine, startingIndex); ]
@@ -177,17 +207,19 @@ default        orString_STAGE  	0;
 			]
 		,	trimLeft[retval;
 				retval=self.clone();
-				util.orBuf.trimLeft(retval.getBuf(), self.getBuf());
+				util.orBuf.trimLeft(retval.getBuf());
 				return retval.free();
 			]
 		,	trimRight[retval;
+			return retval;
 				retval=self.clone();
-				util.orBuf.trimLeft(retval.getBuf(), self.getBuf());
+				util.orBuf.trimLeft(retval.getBuf());
 				return retval.free();
 			]
 		,	trim[retval;
 				retval=self.clone();
-				util.orBuf.trim(retval.getBuf(), self.getBuf());
+				return retval;
+				util.orBuf.trim(retval.getBuf());
 				return retval.free();
 			]
 		,	mid[start count retval;

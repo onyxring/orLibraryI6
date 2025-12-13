@@ -41,32 +41,82 @@ default        orPrintConjugate_English_STAGE  0;
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
 constant entrySize 5;
-   [ orPrintConjugate ptrn vrb;
-		if(ptrn.parametersString.isEmpty()) return;
-		print " ";
-		if(printIrregularVerbConjugation(ptrn)) return;
-		vrb=ptrn.getParamEphemeral(0);
-		__orPrintConjugateEnglish(ptrn.contextObject, vrb, ptrn);
-		vrb.free();
+   [ orPrintConjugate ptrn 
+         firstParm isModalVerb;
+
+		firstParm=ptrn.getParamEphemeral(0).trim();
+      if(firstParm.isEmpty()) return; !--nothing to conjugate
+      firstParm.lock();      
+      print " ";
+      if(firstParm.startsWithOneOf("could","would","should","might",true)){
+         isModalVerb=true;
+
+         !--print the model verb (same case has defined in the string incidentally)
+         if(firstParm.startsWith("should",true)){ 
+            firstParm.left(6).print();
+            firstParm.set(firstParm.mid(6,orBUF_END)); 
+         }
+         else{!would, could, might
+            firstParm.left(5).print();
+            firstParm.set(firstParm.mid(5,orBUF_END)); 
+         }
+         !--handle couldn't shouldn't wouldn't and mightn't; with or without the apostrophe 
+         if(firstParm.startsWithOneOf("n't ","nt ",true)){
+            print "n't ";
+            firstParm.set(firstParm.mid(4,orBUF_END).trim());
+         }
+         else{ !--handle could not, should not, would not, and might not
+            firstParm.set(firstParm.trimLeft()); !trim off any additional starting spaces before testing
+            if(firstParm.startsWith("not ",true)) print " not "; 
+            firstParm.set(firstParm.mid(4,orBUF_END).trim()); 
+         }
+         !at this point, parms is the first 
+      }
+      
+		if(printIrregularVerbConjugation(firstParm, isModalVerb, ptrn) ==false) 
+         __orPrintConjugateEnglish(firstParm, isModalVerb, ptrn);
+		
+		firstParm.free();      
 	];
-	[ __orPrintConjugateEnglish obj vrb ptrn !isPerfectTense !--TODO: handle isPerfectTense
+	[ printIrregularVerbConjugation  vrb isModalVerb ptrn
+      entryPos pos isThirdPerson; 
+      entryPos=findVerbEntryPos(vrb); !ptrn.getParamEphemeral(0));
+      if(entryPos==-1) return false;
+
+      pos=(entryPos*entrySize)+1; !+1 to advance past the hash key (root)
+
+      if(isModalVerb) {
+         if(getNarrativeTense() == PAST_TENSE) print " have ";   
+         !--root for all other person/tense combinations
+      }   
+      else{ 
+         if(getNarrativeTense() == PAST_TENSE) 
+            pos=pos+2; !--past tense
+         else{ !--present tense
+            if(ptrn.contextObject~=player ||  (ptrn.contextObject==player &&  player provides narrative_voice && player.narrative_voice == 3)) pos=pos+1;  !--3rd per, sing
+            !--all remaining forms use root 
+         }
+      }
+      util.orArray.get(_irregularVerbs, pos).print();
+      return true;
+   ];
+   [ __orPrintConjugateEnglish vrb isModalVerb ptrn
 			didPrintIrregular endingChar lookupForm;
 		
 		endingChar=vrb.getCharFromRight(0); !--get the last character once, to minimize repeat calls to this routine
-		! if(isPerfectTense){
-		! 	lookupForm=ptrn.getParamEphemeral(3);
-		! 	if(lookupForm==0) lookupForm=ptrn.getParamEphemeral(2);
-		! 	if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
+		if(isModalVerb){
+		 	lookupForm=ptrn.getParamEphemeral(3, vrb);
+		 	if(lookupForm==0) lookupForm=ptrn.getParamEphemeral(2);
+		 	if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
 		! 	if(vrb.right(1).equals("e")) 
 		! 		vrb.append("d").print();
 		! 	else 
 		! 		vrb.append("ed").print();
-		! 	vrb.free();
-		! 	return;
-		! }
+		 	return;
+		}
 		!--past tense
 		if(getNarrativeTense()== PAST_TENSE){
-			lookupForm=ptrn.getParamEphemeral(2); !--zero indexed.  3rd parameter is past tense form.
+			lookupForm=ptrn.getParamEphemeral(2, vrb); !--zero indexed.  3rd parameter is past tense form.
 			if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
 			
 			if(endingChar=='y' && util.orChar.isConsonant(vrb.getCharFromRight(1))) return vrb.left(vrb.getLength()-1).append("ied").print(); !--cry = cried
@@ -82,7 +132,7 @@ constant entrySize 5;
 		if(getNarrativeTense()== PRESENT_TENSE){
 			!--3rd person singular
 			if (self.contextObject hasnt pluralname && (self.contextObject~=player || getNarrativePerson()==THIRD_PERSON )) { 
-				lookupForm=ptrn.getParamEphemeral(1); !--zero indexed. 2nd parameter is 3rd person singular, present tense form
+				lookupForm=ptrn.getParamEphemeral(1, vrb); !--zero indexed. 2nd parameter is 3rd person singular, present tense form
 				if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
 
 				if(endingChar=='y' && util.orChar.isConsonant(vrb.getCharFromRight(1)))  {
@@ -111,26 +161,6 @@ constant entrySize 5;
    return hsh;
 ];
 
-[ printIrregularVerbConjugation  ptrn isPerfectTense !--TODO: handle isPerfectTense
-      entryPos pos isThirdPerson; 
-   entryPos=findVerbEntryPos(ptrn.getParamEphemeral(0));
-   if(entryPos==-1) return false;
-
-   pos=(entryPos*entrySize)+1; !+1 to advance past the hash key
-
-   !--TODO: handle perfect tense
-   !past tense
-   if(player provides narrative_tense && player.narrative_tense == PAST_TENSE){
-		pos=pos+2; 
-	}
-	else{ !--present tense
-      !--3rd person singular...
-      if (self.contextObject~=player ||  (self.contextObject==player &&  player provides narrative_voice && player.narrative_voice == 3)) pos=pos+1;  
-      !--other present tense, no change.
-   }
-   util.orArray.get(_irregularVerbs, pos).print();
-   return true;
-];
 
 !perform a binary search against the array, returs the number of the element in the array 
 [findVerbEntryPos str hsh lo hi mid el count;

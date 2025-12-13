@@ -48,7 +48,7 @@ class orReferByContents
 					rfalse;
 				]
 		,		discount[w o i;w=w;o=o;i=i;
-	#ifdef ordjective_STAGE;
+	#ifdef orAdjective_STAGE;
 					if((o provides adjective)==false) rfalse;
 					i=WordInProperty(w,o,adjective);
 					return i;

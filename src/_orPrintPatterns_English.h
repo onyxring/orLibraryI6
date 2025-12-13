@@ -53,7 +53,6 @@ default        orPrintPatterns_English_STAGE  0 ;
 				self.conjugate();				
 			]
 		,	runRule[ pat obj; pat=self.patternName; obj=self.contextObject;
-
 				if(obj<=0) rfalse; !everything below this requires a noun to be specified, even if it isn't printed...
 				!pronoun only. No noun, no verb.
 				if(pat.equalsOneOf("mine", "mineYoursIts")) {Mine(obj); rtrue;}
@@ -62,7 +61,6 @@ default        orPrintPatterns_English_STAGE  0 ;
 				if(pat.equalsOneOf("Me", "MeYouIt")) {CMe(obj); rtrue;}
 				if(pat.equalsOneOf("self", "myselfYourselfItself")) {Myself(obj); rtrue;}
 				if(pat.equalsOneOf("Self", "MyselfYourselfItself")) {CMyself(obj); rtrue;}
-
 				!possessive pronouns only.  No noun, no verb. 
 				if(pat.equalsOneOf("my","myYourIts")) { My(obj); rtrue; }
 				if(pat.equalsOneOf("My","MyYourIts")) { CMy(obj); rtrue; }

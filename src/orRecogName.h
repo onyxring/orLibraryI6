@@ -212,7 +212,7 @@ default        orRecogName_STAGE  0;
 
 				]
 	;
-	orInfExt with ext_nounword[i j s o r sc;
+	orInfExt with ext_nounWord[i j s o r sc;
 			i=NextWord();
 			if (i==0) { !--if not a recognised word
 				r=__checknounword.check_word(wn-1); !--lets do a little hocus pocus to ensure that we only scan the short_names of nearby objects once per turn (instead of the thirty or so that this routine is called.)

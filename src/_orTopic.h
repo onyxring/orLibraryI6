@@ -113,7 +113,7 @@ default        orTopic_STAGE  0;
 				if(t==-1) return;
 
 				self.&dissemTrack->t=p1;
-				self.&dissemTrack->(t+1)=p2; !TODO.  Will this cause a probablem, trying to put a double byte number into a single byte?  Or will it just trim the MSB and add what's left?
+				self.&dissemTrack->(t+1)=p2; 
 			]
 		,	getTracePos[
 					t;

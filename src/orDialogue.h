@@ -47,138 +47,8 @@ default        orDialogue_STAGE  0;
 	property individual ext_topicTell;
 	property individual ext_topicTold;
 #endif;
-!======================================================================================
-! AFTER Grammar
-#iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
-	orInfExt with ext_forceLookahead[; if(action_to_be==##sayTopic or ##unrecognizedTopicWords) rtrue; ] !--let's force look ahead resolution for the sayTopic and unrecognizedTopicWordsSub verbs.  This enables the chooseObject routine on the orTopic object to consider the subject when determining if it is in context.
-	,	ext_beforeparsing[; consult_from=0;] !--I suspect it is a bug in †he standard library that consult_from doesnt get reset each turn, but we'll just fix it here.
-	,	targetNpc 0	!we'll later use this to overwrite what the parser has determined is the second
-	,	ext_unknownverb[;  !treat, "person, hello" as "say hello to person"
-			if(actor ~= player) { 	!--the parser has determined this is a command to an NPC, but doesn't recognize the verb...
-								!--we assume this is a collection of non-verb words that the player is attempting to say...
-				self.targetNpc = actor; !--So let's undo the assumptions the parser has made; saving actor off to later be placed into the second variable
-				actor = player; !--since this is not a command, we restore the acting character as the player
-				verb_wordnum--; !--since we're not interpreting a word as a different verb, but inserting an implied verb, we back up the word number pointer to the first word considered for the remaining parser activities
-				return 'say'; !-- return say
-			}
-		]
-		!--We have multiple possible topics.  Normally, we let the parser takes care of this, but in the case of say verbs, the conversee isn't specified until after the topic (say hello to bob)
-		!--this causes problems when determining which topics are in context for the conversee, because we don't know who s/he is.  We handle this problem here...
-	,	ext_adjudicate[
-			npc i j obj top matchedTopic;
-		!--this logic only applies to grammars where the noun follows the topic, currently only "say, topic to character" forms.
-		if(action_to_be~=##sayTopic or ##vagueSayTopic) rfalse;
 
-		!--The parser will build a list of known topics, which match the names specified; however, two or more topics may have the
-		!  same names, but be in context for different NPCs.  Therefore, we need to limit our list of topics down
-		!  to those which are in context for the NPC we are talking to.
-
-		!--First we try to determine who we are talking to...
-		npc=self.targetNpc; !--if this is the result of a say command veiled as an order, then we know who we are talking to. So let's use that.
-		if(npc==0 && advance_warning~=-1) npc=advance_warning; !--if we specified the npc after the topic, then it should be in the look ahead variable (advance_warning)
-		if(npc==0) npc=ResolveActorTalkingTo(true); !--if undefined, lets assume who we were last talking to (making no alternative decisions if that doesn't work)...
-
-		!--There are two ways to whittle the list of options down...
-		if(npc) {  !--1. we know who we are talking to, so pick the first option in our list that works for them...
-			!the logic here is simple: iterate through all the collected possible topics and choose the first one which is in context for our conversee...
-			for(i=0: i<number_matched: i++) {
-				top = match_list-->i;
-				if(top == npc) return top; !--not a topic at all, but we are disambiguating the NPC we are talking to, so return it.
-				matchedTopic=self.matchTopic(top, npc);
-				if(matchedTopic) return matchedTopic;
-				!otherwise loop
-			}
-		}
-		else{ !--2. we don't know who we are speaking to, so pick the first option in our list that works for anyone nearby...
-
-			for(i=0: i<number_matched: i++) {
-				top = match_list-->i;
-
-				objectloop(obj near actor){
-					if(obj==actor) continue; !--skip over ourselves
-
-					if(obj has animate or talkable) { !--object is an npc, so test this
-						matchedTopic=self.matchTopic(top, obj);
-						if(matchedTopic) {
-							match_scores-->i = SCORE__IFGOOD;
-							return matchedTopic;
-						}
-					}
-
-					! Let's include characters who are added to the scope, but not actually present.  Currently we do NOT resolve thos which have been added via an add_to_scope routine, only property lists...
-					if(obj provides add_to_scope){
-						for(j=0:j<util.orArray.getLength(obj,add_to_scope):j++){
-							if(util.orRef.isObject())
-								matchedTopic=self.matchTopic(top, util.orArray.get(obj,add_to_scope,j));
-
-							if(matchedTopic) {
-								match_scores-->i = SCORE__IFGOOD;
-								return matchedTopic;
-							}
-						}
-					}
-				}
-			}
-		}
-		return false; !if none match, then we will return false to continue with the default parser behavior.
-	]
-	,	matchTopic[top npc !return the first topic in our list of options which matches the given npc
-				j;
-			if(npc hasnt animate or talkable) rfalse;
-			if((top ofclass orTopic)==false) rfalse;
-			if(top.isInContextFor(npc)){
-				for(j=0: j<number_matched: j++) match_scores-->j = 0;
-				number_matched=1;
-				match_list-->0 = top; !--we will only return one topic, the first one which is in context for the NPC.
-				dont_infer=true; !--we don't want to infer the topic, because we already know it is in context for the NPC.
-				self.targetNpc=npc;
-				return top;!--this topic is in context for the npc, so we will use it.
-			}
-			rfalse;
-		]
-	,	ext_playLoopRewriteParsedCommands[;
-			if(self.targetNpc) { !--if we previously detected "NPC, topic", lets actually rewrite it for the parser into: SAY topic TO npc
-				if(consult_from~=0){ !--did we detect words that didn't match a topic?
-					action=inputobjs-->0=##unrecognizedTopicWords; !--lets redirect this to our error handler, disguised as a verb.
-
-					!--TODO: the following line looks wrong.  inputobjs-->1 should be set to 2 according to my understanding of the parser, as it is in the subsequent code block...  comeback and test this.  It seems to work, but it might just be that some of the later code is deducing the npc when it should be explicitly set here.
-					inputobjs-->1=1; !--tell the parser that we actually have both noun and second
-					inputobjs-->2 = self.targetNpc; !--identify who we are talking to (this is used by both SAY and the unrecognizedTopicWords routines)
-				}
-				else{
-					action=inputobjs-->0=##sayTopic; !--ensure this is SAY, instead of ORDER or whatever else might have been determined by the parser
-					inputobjs-->1=2; !--tell the parser that we actually have both noun and second
-				}
-				inputobjs-->3 = self.targetNpc; !--identify who we are talking to (this is used by both SAY and the unrecognizedTopicWords routines)
-
-				self.targetNpc=0; !zero this out for next loop
-				rtrue; !--we did something, so don't do default behavior
-			}
-			rfalse;
-		]
-		!--we remove certain characters from the input, because we want to allow players to input them, but we don't want them to mess up parsing...
-		,	ext_keyboardPrepInput[a_buf
-				t triggerComma;
-
-			!commas are a special case, since we allow for them in orders or conversations like: bob, hello
-			if((WordValue(1)->#dict_par1) & DICT_VERB) triggerComma=true; !--if the first word is a verb, and therefore NOT a "bob, hello" command
-																			! syntax, then we ignore commas, so phrases like: "say red, blue balloon"
-																			! will be treated as "say red blue balloon"
-
-			for(t=WORDSIZE: t<=(a_buf-->1)+WORDSIZE: t++) {
-				if(a_buf->t==0) break;
-				if(a_buf->t==34 or 33 or 63 or 13) { !--convert quotes, exclamation points and question marks to spaces so we ignore them (also carriage returns, in the case where input comes from a source which captures those)
-					a_buf->t=32;
-					triggerComma=true; !--incidentally, if any of these are found, also start removing commas, e.g.: say "hello, how are you?" turns into: say hello how are you
-				}
-				 if(a_buf->t==44){ !--comma found
-				 	if(triggerComma) a_buf->t=32; !--we've determined that any commas to accept have already been accepted, so ignore them going forward
-				 	else triggerComma=true; !--otherwise, set it up to replace the next comma
-				 }
-			}
-		]
-	;
-
+#iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
 	!the player has specified a topic, but not who to ask/tell/say it to.  We try to deduce who the player is speaking with to scope in possible topics to match
 	[topicInVagueTarget top
 			npc; !isolate information known by the target
@@ -474,8 +344,140 @@ default        orDialogue_STAGE  0;
 		if(act==##askTopic or ##tellTopic or ##sayTopic or ##talk or ##vagueTalk or ##vagueAskTopic or ##vagueTellTopic or ##unrecognizedTopicWords or ##tell  or ##ask) return true;
 		return false;
 	];
+#endif; 
+!======================================================================================
+! AFTER Grammar
+#iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
+	orInfExt with ext_forceLookahead[; if(action_to_be==##sayTopic or ##unrecognizedTopicWords) rtrue; ] !--let's force look ahead resolution for the sayTopic and unrecognizedTopicWordsSub verbs.  This enables the chooseObject routine on the orTopic object to consider the subject when determining if it is in context.
+	,	ext_beforeparsing[; consult_from=0;] !--I suspect it is a bug in †he standard library that consult_from doesnt get reset each turn, but we'll just fix it here.
+	,	targetNpc 0	!we'll later use this to overwrite what the parser has determined is the second
+	,	ext_unknownverb[;  !treat, "person, hello" as "say hello to person"
+			if(actor ~= player) { 	!--the parser has determined this is a command to an NPC, but doesn't recognize the verb...
+								!--we assume this is a collection of non-verb words that the player is attempting to say...
+				self.targetNpc = actor; !--So let's undo the assumptions the parser has made; saving actor off to later be placed into the second variable
+				actor = player; !--since this is not a command, we restore the acting character as the player
+				verb_wordnum--; !--since we're not interpreting a word as a different verb, but inserting an implied verb, we back up the word number pointer to the first word considered for the remaining parser activities
+				return 'say'; !-- return say
+			}
+		]
+		!--We have multiple possible topics.  Normally, we let the parser takes care of this, but in the case of say verbs, the conversee isn't specified until after the topic (say hello to bob)
+		!--this causes problems when determining which topics are in context for the conversee, because we don't know who s/he is.  We handle this problem here...
+	,	ext_adjudicate[
+			npc i j obj top matchedTopic;
+		!--this logic only applies to grammars where the noun follows the topic, currently only "say, topic to character" forms.
+		if(action_to_be~=##sayTopic or ##vagueSayTopic) rfalse;
 
-	extend 'ask' replace
+		!--The parser will build a list of known topics, which match the names specified; however, two or more topics may have the
+		!  same names, but be in context for different NPCs.  Therefore, we need to limit our list of topics down
+		!  to those which are in context for the NPC we are talking to.
+
+		!--First we try to determine who we are talking to...
+		npc=self.targetNpc; !--if this is the result of a say command veiled as an order, then we know who we are talking to. So let's use that.
+		if(npc==0 && advance_warning~=-1) npc=advance_warning; !--if we specified the npc after the topic, then it should be in the look ahead variable (advance_warning)
+		if(npc==0) npc=ResolveActorTalkingTo(true); !--if undefined, lets assume who we were last talking to (making no alternative decisions if that doesn't work)...
+
+		!--There are two ways to whittle the list of options down...
+		if(npc) {  !--1. we know who we are talking to, so pick the first option in our list that works for them...
+			!the logic here is simple: iterate through all the collected possible topics and choose the first one which is in context for our conversee...
+			for(i=0: i<number_matched: i++) {
+				top = match_list-->i;
+				if(top == npc) return top; !--not a topic at all, but we are disambiguating the NPC we are talking to, so return it.
+				matchedTopic=self.matchTopic(top, npc);
+				if(matchedTopic) return matchedTopic;
+				!otherwise loop
+			}
+		}
+		else{ !--2. we don't know who we are speaking to, so pick the first option in our list that works for anyone nearby...
+
+			for(i=0: i<number_matched: i++) {
+				top = match_list-->i;
+
+				objectloop(obj near actor){
+					if(obj==actor) continue; !--skip over ourselves
+
+					if(obj has animate or talkable) { !--object is an npc, so test this
+						matchedTopic=self.matchTopic(top, obj);
+						if(matchedTopic) {
+							match_scores-->i = SCORE__IFGOOD;
+							return matchedTopic;
+						}
+					}
+
+					! Let's include characters who are added to the scope, but not actually present.  Currently we do NOT resolve thos which have been added via an add_to_scope routine, only property lists...
+					if(obj provides add_to_scope){
+						for(j=0:j<util.orArray.getLength(obj,add_to_scope):j++){
+							if(util.orRef.isObject())
+								matchedTopic=self.matchTopic(top, util.orArray.get(obj,add_to_scope,j));
+
+							if(matchedTopic) {
+								match_scores-->i = SCORE__IFGOOD;
+								return matchedTopic;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false; !if none match, then we will return false to continue with the default parser behavior.
+	]
+	,	matchTopic[top npc !return the first topic in our list of options which matches the given npc
+				j;
+			if(npc hasnt animate or talkable) rfalse;
+			if((top ofclass orTopic)==false) rfalse;
+			if(top.isInContextFor(npc)){
+				for(j=0: j<number_matched: j++) match_scores-->j = 0;
+				number_matched=1;
+				match_list-->0 = top; !--we will only return one topic, the first one which is in context for the NPC.
+				dont_infer=true; !--we don't want to infer the topic, because we already know it is in context for the NPC.
+				self.targetNpc=npc;
+				return top;!--this topic is in context for the npc, so we will use it.
+			}
+			rfalse;
+		]
+	,	ext_playLoopRewriteParsedCommands[;
+			if(self.targetNpc) { !--if we previously detected "NPC, topic", lets actually rewrite it for the parser into: SAY topic TO npc
+				if(consult_from~=0){ !--did we detect words that didn't match a topic?
+					action=inputobjs-->0=##unrecognizedTopicWords; !--lets redirect this to our error handler, disguised as a verb.
+
+					!--TODO: the following line looks wrong.  inputobjs-->1 should be set to 2 according to my understanding of the parser, as it is in the subsequent code block...  comeback and test this.  It seems to work, but it might just be that some of the later code is deducing the npc when it should be explicitly set here.
+					inputobjs-->1=1; !--tell the parser that we actually have both noun and second
+					inputobjs-->2 = self.targetNpc; !--identify who we are talking to (this is used by both SAY and the unrecognizedTopicWords routines)
+				}
+				else{
+					action=inputobjs-->0=##sayTopic; !--ensure this is SAY, instead of ORDER or whatever else might have been determined by the parser
+					inputobjs-->1=2; !--tell the parser that we actually have both noun and second
+				}
+				inputobjs-->3 = self.targetNpc; !--identify who we are talking to (this is used by both SAY and the unrecognizedTopicWords routines)
+
+				self.targetNpc=0; !zero this out for next loop
+				rtrue; !--we did something, so don't do default behavior
+			}
+			rfalse;
+		]
+		!--we remove certain characters from the input, because we want to allow players to input them, but we don't want them to mess up parsing...
+		,	ext_keyboardPrepInput[a_buf
+				t triggerComma;
+
+			!commas are a special case, since we allow for them in orders or conversations like: bob, hello
+			if((WordValue(1)->#dict_par1) & DICT_VERB) triggerComma=true; !--if the first word is a verb, and therefore NOT a "bob, hello" command
+																			! syntax, then we ignore commas, so phrases like: "say red, blue balloon"
+																			! will be treated as "say red blue balloon"
+
+			for(t=WORDSIZE: t<=(a_buf-->1)+WORDSIZE: t++) {
+				if(a_buf->t==0) break;
+				if(a_buf->t==34 or 33 or 63 or 13) { !--convert quotes, exclamation points and question marks to spaces so we ignore them (also carriage returns, in the case where input comes from a source which captures those)
+					a_buf->t=32;
+					triggerComma=true; !--incidentally, if any of these are found, also start removing commas, e.g.: say "hello, how are you?" turns into: say hello how are you
+				}
+				 if(a_buf->t==44){ !--comma found
+				 	if(triggerComma) a_buf->t=32; !--we've determined that any commas to accept have already been accepted, so ignore them going forward
+				 	else triggerComma=true; !--otherwise, set it up to replace the next comma
+				 }
+			}
+		]
+	;
+
+		extend 'ask' replace
 		* 											-> askTopic !provides syntax for "say topic to character"
 		* talkable 'about' scope=topicKnownByTarget -> askTopic
 		* talkable scope=topicKnownByTarget			-> askTopic

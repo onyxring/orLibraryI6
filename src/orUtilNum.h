@@ -36,8 +36,12 @@ default        orUtilNum_STAGE  0;
 system_file;
 #ifdef TARGET_ZCODE;
 	constant orMinEnd $7fff;
+	constant orUMinEnd $ffff;
+	constant orMaxEnd $8000;
 #ifnot;
 	constant orMinEnd $7fffffff;
+	constant orUMinEnd $ffffffff;
+	constant orMaxEnd $80000000;
 #endif;
 	object _orNum
 		with
@@ -71,7 +75,7 @@ system_file;
 			]
 		,	getBit[val bit; return (val & util.orNum.pow(2,bit))~=0; ]
 		,	setBitOn[val bit; return val | util.orNum.pow(2,bit); ]
-		,	setBitOff[val bit; return val & (util.orNum.uMaxWord - util.orNum.pow(2,bit)); ]
+		,	setBitOff[val bit; return val & (util.orNum.uMaxNumber - util.orNum.pow(2,bit)); ]
 		,	xor[val1 val2; return (val1 | val2) & (~(val1 & val2)); ]
 		,	max[val1 val2 val3 val4 val5
 					retval;
@@ -105,19 +109,19 @@ system_file;
 				retval=val1;
 				if(self.uIsGreaterThan(retval,val2)) retval=val2;
 				if(self.uIsGreaterThan(retval,val3)) retval=val3;
-				if(val3==orMinEnd) return retval;
+				if(val3==orUMinEnd) return retval;
 				if(self.uIsGreaterThan(retval,val4)) retval=val4;
-				if(val4==orMinEnd) return retval;
+				if(val4==orUMinEnd) return retval;
 				if(self.uIsGreaterThan(retval,val5)) retval=val5;
 				return retval;
 			]
-		,	maxWord		$7fff
-		,	uMaxWord	$ffff
+		,	maxNumber		$7fff
+		,	uMaxNumber	$ffff
 	;
 	orInfExt with ext_initialise[; !because you can't #ifdef to change object members, outside of routine code.
 		#ifdef TARGET_GLULX;
-			_orNum.maxWord=$7fffffff;
-			_orNum.uMaxWord=$ffffffff;
+			_orNum.maxNumber=$7fffffff;
+			_orNum.uMaxNumber=$ffffffff;
 		#endif;
 	];
 	!These three lines are pulled from Roger Firth's Dump.h extension; modified only to account for glulx's expanded wordsize

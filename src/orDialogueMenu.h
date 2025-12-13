@@ -63,10 +63,13 @@ default        orDialogueMenu_STAGE  0;
       class orMenu
       with childMenuItems 0 0 0 0 0 0 0 0 0 0 0 0
       ,  initForDisplay[
-               t o;
+               t talkingTo top;
             self.clear();
+            talkingTo=vagueError(ResolveActorTalkingTo());
+
             for(t=0:t<util.orArray.getLength(playerDialoguePool):t++){
-               self.add(util.orArray.get(playerDialoguePool,t));
+               top=util.orArray.get(playerDialoguePool,t);
+               if(top.isAppropriateFor(player, talkingTo)) self.add(top);
             }
             return util.orArray.getLength(self,childMenuItems);
          ]
@@ -129,7 +132,7 @@ verb meta 'ms' 'menuspeak' * -> menuSpeak;				!orLib: note that we launch the di
 [menuSpeakSub; orDialogueMenu.show(orMenuTopOnly); ];	!orLib: show the dialog menu if it contains anything to show
 
 verb meta 'ams' 'autoMenuSpeak' 
-	* 'on'/'true' -> toggleAutoMenuSpeak
+	* -> toggleAutoMenuSpeak
 	* 'on'/'true' -> autoMenuSpeakOn
 	* 'off'/'false' -> autoMenuSpeakOff
 ;

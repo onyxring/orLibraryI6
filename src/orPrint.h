@@ -61,7 +61,6 @@ default        orPrint_STAGE  0 ;
 		,	parseAndPrint[fullText p1 p2 p3 p4
 					startPtr endPtr currentPatternString;
 
-
 				fullText=util.orStr.new(fullText);
 				if(fullText.getLength()==0) return fullText.free();
 
@@ -144,9 +143,10 @@ default        orPrint_STAGE  0 ;
 					pr.contextObject=self.contextObject;
 					pr.objSpecifiedFirst=self.objSpecifiedFirst;
 					pr.parametersString=self.parametersString;
-
+ 
 					retval=pr.runRule();
 				}
+
 				
 				if(retval==false) {
 					_oprDefault.patternName=self.patternName;

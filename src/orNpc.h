@@ -82,7 +82,7 @@ system_file;
 
 ! 	array		npctemparray-->0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; !---this is a generic array for use by various npc behaviors
 ! 	array		npctemparraybaselevel-->0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; !---this is a generic array by base level object only
-	class orNpcSkill with doesApplyToCharacter[npc; npc=npc; rfalse;],
+	class orNpcSkill with appliesToCharacter[npc; npc=npc; rfalse;],
 			defaultPriority 5,
 			canPerform true,
 			perform[npc; npc=npc;]
@@ -205,7 +205,7 @@ system_file;
 				objectloop(npc ofclass orNPC){
 					npc.npcId=++count;
 					objectloop(skl ofclass orNpcSkill){
-						if(skl.doesApplyToCharacter(npc)) {
+						if(skl.appliesToCharacter(npc)) {
 							npc.learnSkill(skl);
 						}
 					}
