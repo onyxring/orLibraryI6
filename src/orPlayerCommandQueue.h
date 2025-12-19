@@ -91,7 +91,7 @@ default        orPlayerCommandQueue_STAGE  0;
 			return true;
 		}
 
-		if(a.getCustomFlag(noInferMessage)) no_infer_message = true;
+		if(a provides getCustomFlag && a.getCustomFlag(noInferMessage)) no_infer_message = true;
 
 		for(t=WORDSIZE:t<INPUT_BUFFER_LEN - WORDSIZE:t++) inputBuffer->t=0;
 
@@ -107,7 +107,7 @@ default        orPlayerCommandQueue_STAGE  0;
 
 		util.orBuf.toLower(inputBuffer); !all the text in the input buffer must be lower case or the parser won't recognize it
 
-		if(a.keepSilent==false){
+		if((a provides keepSilent)==false || a.keepSilent==false){
 			print (string) orQueuedActionPrompt;
 
 			style bold;
@@ -120,8 +120,10 @@ default        orPlayerCommandQueue_STAGE  0;
 		inputBuffer->0=INPUT_BUFFER_LEN - WORDSIZE; !for the Z-Machine only, this is a bit of manual patching, making the first byte equal to buffer size, just as though the standard library did all of this. (first byte size of buffer; second byte length of string, which is already populated because it cannot be longer than 255)
 		#endif;
 
-		orActionFlags=a.getCustomFlags();
-		orAction.destroy(a);
+		if(a provides getCustomFlags) 
+			orActionFlags=a.getCustomFlags();
+		if(a provides destroy) 
+			orAction.destroy(a);
 
 		!for(t=WORDSIZE:t<23:t++) print inputBuffer->t,",";
 		!new_line;

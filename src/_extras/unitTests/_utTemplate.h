@@ -1,6 +1,6 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD <REPLACEWITHNAME>
-! Unit Tests for the <REPLACEWITHNAME> orLibrary extension.
+! YYYY.MM.DD ut<REPLACEWITHNAME>
+! Unit Tests for the ut<REPLACEWITHNAME> orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -11,29 +11,28 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
-default        <REPLACEWITHNAME>_STAGE  0;
+default        ut<REPLACEWITHNAME>_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-#include "orTest";
+#include "_orUnitTest";
 #include "<REPLACEWITHNAME>";
 !--------------------------------------------------------------------------------------
 #ifnot;
-#ifndef        <REPLACEWITHNAME>_STAGE; message fatalerror orXFErrorInclude; #endif;
-#iftrue(       <REPLACEWITHNAME>_STAGE  < LIBRARY_STAGE);
-   #undef      <REPLACEWITHNAME>_STAGE  ;
-   Constant    <REPLACEWITHNAME>_STAGE  LIBRARY_STAGE;
-   #ifdef      <REPLACEWITHNAME>_STAGE  ; #endif;
-   #ifndef orExtensionFrameworkBrief; message "   <REPLACEWITHNAME>...";#endif;
+#ifndef        ut<REPLACEWITHNAME>_STAGE; message fatalerror orXFErrorInclude; #endif;
+#iftrue(       ut<REPLACEWITHNAME>_STAGE  < LIBRARY_STAGE);
+   #undef      ut<REPLACEWITHNAME>_STAGE  ;
+   Constant    ut<REPLACEWITHNAME>_STAGE  LIBRARY_STAGE;
+   #ifdef      ut<REPLACEWITHNAME>_STAGE  ; #endif;
+   #ifndef orExtensionFrameworkBrief; message "   ut<REPLACEWITHNAME>...";#endif;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
-   object <REPLACEWITHNAME>Room "<REPLACEWITHNAME> Room" has light with description "As good a place as any";
+   object ut<REPLACEWITHNAME>Start "<REPLACEWITHNAME> Room" has light with description "Where <REPLACEWITHNAME> tests are run.";
 
-   orTestCollection <REPLACEWITHNAME>Tests;
-		  orTest ->  with setup[; move player to <REPLACEWITHNAME>Room;],
-         command "",
-		  	assert[rsp;
-		  	];
+orUnitTest "ut<REPLACEWITHNAME>" with setup [; PlayerTo(ut<REPLACEWITHNAME>Start, 3); ] "x me"
+  , test 0 
+    "good-looking."   
+;
 
 #endif; !--After VERBLIB
 !======================================================================================

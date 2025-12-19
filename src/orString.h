@@ -211,18 +211,17 @@ default        orString_STAGE  	0;
 				return retval.free();
 			]
 		,	trimRight[retval;
-			return retval;
 				retval=self.clone();
 				util.orBuf.trimLeft(retval.getBuf());
 				return retval.free();
 			]
 		,	trim[retval;
 				retval=self.clone();
-				return retval;
 				util.orBuf.trim(retval.getBuf());
 				return retval.free();
 			]
-		,	mid[start count retval;
+		,	mid[start count 
+					retval;
 				retval=util.orStr.new();
 				util.orBuf.mid(retval.getBuf(), self.getBuf(), start, count);
 				return retval.free();

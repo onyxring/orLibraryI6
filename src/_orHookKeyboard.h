@@ -44,6 +44,7 @@ default        orHookKeyboard_STAGE  0; #ifnot;
 replace keyboard;
 replace KeyboardPrimitive _oldKeyboardPrimitive;
 
+property individual ext_keyboardPrimitiveNotify;
 property individual ext_keyboardPrimitive;
 property individual ext_keyboardGetInput;
 property individual ext_beforePrompt;
@@ -57,6 +58,7 @@ property individual ext_keyboardHandleOops;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 
 	[ KeyboardPrimitive  a_buffer a_table retval;
+		LibraryExtensions.RunAll(ext_keyboardPrimitiveNotify, a_buffer, a_table);
 		retval = LibraryExtensions.RunWhile(ext_keyboardPrimitive, false, a_buffer, a_table);
         if(retval==false) _oldKeyboardPrimitive(a_buffer, a_table);
 		return retval;

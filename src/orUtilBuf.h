@@ -58,6 +58,7 @@ default        orUtilBuf_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";
+#include "_orDeque";
 #include "orUtilNum";
 #include "orUtilChar";
 !--------------------------------------------------------------------------------------
@@ -81,11 +82,14 @@ default        orUtilBuf_STAGE  0;
 !--------------------------------------------------------------------------------------
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
 	constant orBUF_END -1;
-		default orStringDefaultSize 500;
-	!TODO: we've setup the concept of "sizedBuffers"; however we are not actually using these to enforce size, only to distinguish bufs from literals.  Need to add size enforcement to all of these.
+	default orStringDefaultSize 500;
+
+		orDeque _bufStreamStack
+			with buffers  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+			,	streams 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 !--only used by Glulx
+		;
+
 	object _orBuf
-	 private	_captureStreamValue
-		,	_captureBuffer
 	 	with set[buf stringVal;
 				if(self.isSized(stringVal)) {
 					self.setFromBuffer(buf, stringVal);
@@ -123,26 +127,33 @@ default        orUtilBuf_STAGE  0;
 				rfalse;
 			]
 		,	capture[buf size; size=size; !suppress unused warning 
-				self._captureBuffer=buf;
-				#ifndef TARGET_GLULX;
-			        @output_stream 3 buf;	!capture output to an array
-	            #ifnot;
-					if(size==0) size=self.getSize(buf);
-					if(size==-1) size=orStringDefaultSize;
-                    self._captureStreamValue=glk_stream_get_current();
-                    glk_stream_set_current(glk_stream_open_memory(self._captureBuffer+WORDSIZE, size, filemode_Write, 662));
+				_bufStreamStack.push(buf,buffers);
+				!self._captureBuffer=buf;
+				#ifdef TARGET_ZCODE;
+			        @output_stream 3 buf;	
+	            #ifnot; !--Handle nested memory stream assignments for glulx, in the same way Z-code does
+					if(size==0) size=self.getBestSize(buf);
+					_bufStreamStack.push(glk_stream_get_current(),streams);
+                    glk_stream_set_current(glk_stream_open_memory(buf+WORDSIZE, size, filemode_Write, 662));
 	            #endif;
 			]
-		,	release[;
-                #ifndef TARGET_GLULX;
-                    @output_stream -3;		!release output back to screen
-                #ifnot;
-                    glk_stream_close(glk_stream_get_current(), gg_arguments);
-                    glk_stream_set_current(self._captureStreamValue);
-                    (self._captureBuffer-->0)=gg_arguments-->1;
+		,	release[
+					buf;
+				
+				if(_bufStreamStack.getLength(buffers)==0) return 0;
+				buf=_bufStreamStack.pop(buffers);
+				#ifdef TARGET_ZCODE;
+                    @output_stream -3;		!release output 
+                #ifnot; !--Restore the last memory stream assignment in the same way z-code does
+					glk_stream_close(glk_stream_get_current(), gg_arguments);   
+					buf-->0=gg_arguments-->1;
+					
+					glk_stream_set_current(_bufStreamStack.pop(streams)); !restore the previous streamStack
+					
                 #endif;
-				self.setLength(self._captureBuffer,self.getLength(self._captureBuffer)); !--pointless, but this keeps length setting in one place, helping with things like profiling and consistency checks
-				return self._captureBuffer;
+				
+				self.setLength(buf,self.getLength(buf)); !--pointless, but this keeps length setting in one place, helping with things like profiling and consistency checks
+				return buf; !self._captureBuffer;
 			]
 		,	getLength [buf; return (buf-->0); ]
 		,	setLength [buf newLength
@@ -162,6 +173,7 @@ default        orUtilBuf_STAGE  0;
 				#ifdef TARGET_GLULX;
 					glk_put_buffer(buf+WORDSIZE, len); 
 				#ifnot;
+				
 					for(i=0:i<len:i++) {
 						c=self.getChar(buf,i);
 						if(c==0) break; !--Shouldn't normally happen, but if theres been some sizing issues, its better to just finish on an embedded zero
@@ -213,11 +225,12 @@ default        orUtilBuf_STAGE  0;
                 }
 				rtrue;
 			]
-        ,	getChar[buf pos; 
+        ,	getChar[buf pos
+					bufSize; 
 				bufSize=self.getSize(buf);
-				if(bufSize<0 || bufSize>pos) return -1;
+				if(bufSize<0 || bufSize>pos) return buf->(pos+WORDSIZE);
 
-				return buf->(pos+WORDSIZE);
+				return -1; 
 			]
 		,	setChar[buf pos val
 					bufSize; 

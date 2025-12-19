@@ -14,7 +14,8 @@
 default        utDoor_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-#include "orTest";
+#include "_orUnitTest";
+#include "orPlayerCommandQueue";
 #include "orDoor";
 !--------------------------------------------------------------------------------------
 #ifnot;
@@ -38,25 +39,25 @@ default        utDoor_STAGE  0;
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
 
-#ifndef orDoor; class orDoor; #endif;
-
     object orDoorRoomStart "room one" has light with description "As good a place as any.", n_to theOrDoor;
     object orDoorRoomLast "room two" has light with description "A better place than some.", s_to theOrDoor;
 
     orDoor theOrDoor "a door" with name 'door';
 
 
-   orTestCollection orDoorTests;
-		  orTest ->  with setup[; move player to orDoorRoomStart;],
-         command "n",
-		  	assert[rsp;
-		  		if(rsp.contains("room two")==false) return "Failed to move to expected location.";
-		  	];
+   ! orUnitTestCollection orDoorTests;
+	! 	  orUnitTest ->  with setup[; move player to orDoorRoomStart;],
+   !       command "n",
+	! 	  	assert[rsp;
+	! 	  		if(rsp.contains("room two")==false) return "Failed to move to expected location.";
+	! 	  	];
 
-		  orTest ->  with command "s",
-		  	assert[rsp;
-		  		if(rsp.contains("room one")==false) return "Failed to return to starting location.";
-		  	];
+	! 	  orUnitTest ->  with command "s",
+	! 	  	assert[rsp;
+	! 	  		if(rsp.contains("room one")==false) return "Failed to return to starting location.";
+	! 	  	];
+
+   
 
 #endif; !--After VERBLIB
 !======================================================================================

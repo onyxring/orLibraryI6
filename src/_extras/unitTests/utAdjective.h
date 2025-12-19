@@ -14,7 +14,7 @@
 default        utAdjective_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-#include "orTest";
+#include "_orUnitTest";
 #include "orAdjective";
 !--------------------------------------------------------------------------------------
 #ifnot;
@@ -43,27 +43,27 @@ default        utAdjective_STAGE  0;
          object -> marble "glass marble" with name 'marble', adjective  'glass';
          object -> marble_table "marble table" with name 'table', adjective  'marble';
 
-   orTestCollection orAdjectiveTests "orAdjective";
-		orTest -> with setup[; move player to utAdjectiveRoom;]
+   orUnitTestCollection orAdjectiveTests "orAdjective";
+		orUnitTest -> with setup[; move player to utAdjectiveRoom;]
       ,  command "x glass",
 			assert[rsp;
 				if(rsp.contains("Which do you mean")==false) return "Expected a disambiguation request between two items: looking glass and drinking glass.";
 				if(rsp.contains("glass marble"))  return "Disambiguation list includes items with only adjectives (glass marble).";
 			];
-		orTest -> with command "x looking glass",
+		orUnitTest -> with command "x looking glass",
 			assert[rsp; if(rsp.contains("You see nothing special about the looking glass.")==false) return "Expected resolution to the looking glass.";];
 
-		orTest -> with command "x marble",
+		orUnitTest -> with command "x marble",
 			assert[rsp; if(rsp.contains("You see nothing special about the glass marble.")==false) return "Expected resolution to the glass marble.";];
 
-		orTest -> with command "x table",
+		orUnitTest -> with command "x table",
 			assert[rsp; if(rsp.contains("You see nothing special about the marble table.")==false) return "Expected resolution to the marble table.";];
 
-		orTest -> with command "x drinking",
+		orUnitTest -> with command "x drinking",
 			setup[; #ifdef orAdjective; orAdjective.mode=PREFER_NOUN;#endif;],
 			assert[rsp; if(rsp.contains("You see nothing special about the drinking glass.")==false) return "Expected resolution to the drinking glass.";];
 
-		orTest -> with command "x drinking",
+		orUnitTest -> with command "x drinking",
 			setup[; #ifdef orAdjective; orAdjective.mode=REQUIRE_NOUN; #endif;],
 			assert[rsp; if(rsp.contains("You can't see any such thing.")==false) return "Expected no resolution from adjective only reference.";];
 
