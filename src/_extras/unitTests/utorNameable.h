@@ -1,6 +1,6 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorString
-! Unit Tests for the utorString orLibrary extension.
+! YYYY.MM.DD utorNameable
+! Unit Tests for the utorNameable orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -11,32 +11,33 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
-default        utorString_STAGE  0;
+default        utorNameable_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
-#include "orString";
+#include "orNameable";
 !--------------------------------------------------------------------------------------
 #ifnot;
-#ifndef        utorString_STAGE; message fatalerror orXFErrorInclude; #endif;
-#iftrue(       utorString_STAGE  < LIBRARY_STAGE);
-   #undef      utorString_STAGE  ;
-   Constant    utorString_STAGE  LIBRARY_STAGE;
-   #ifdef      utorString_STAGE  ; #endif;
-   #ifndef orExtensionFrameworkBrief; message "   utorString...";#endif;
+#ifndef        utorNameable_STAGE; message fatalerror orXFErrorInclude; #endif;
+#iftrue(       utorNameable_STAGE  < LIBRARY_STAGE);
+   #undef      utorNameable_STAGE  ;
+   Constant    utorNameable_STAGE  LIBRARY_STAGE;
+   #ifdef      utorNameable_STAGE  ; #endif;
+   #ifndef orExtensionFrameworkBrief; message "   utorNameable...";#endif;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
+   object utorNameableStart "orNameable Room" has light with description "Where orNameable tests are run.";
+   orNameable -> sword "sword" with name 'sword', 
+      description "Sharp and pointy.";
 
-global str;
-!--TODO: expand these tests. 
-orUnitTest "orString" 
-   with tests [; !tests trim(), trimLeft(), trimRight(), and print()
-         str=util.orStr.new("              sky is            "); 
-         print "The "; 
-         str.trim().print(); 
-         print " blue.";
-      ]  "The sky is blue."  !implicitly tests contains()
+orUnitTest "utorNameable" 
+   with tests [; PlayerTo(utorNameableStart, 3); ] noTest
+      "name the sword ~Excaliber~" "begin to think"
+      "x Excaliber" "Sharp and pointy"
+      "refer to the sword as Durandal" "begin to think" 
+      "x Excaliber" "can't see any such"
+      "x Durandal" "Sharp and pointy"
 ;
 
 #endif; !--After VERBLIB

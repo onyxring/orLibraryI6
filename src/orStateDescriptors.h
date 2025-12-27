@@ -40,6 +40,7 @@ default        orStateDescriptors_STAGE  0;
 !======================================================================================
 ! AFTER PARSER
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
+
 orInfExt with ext_messages[;
 		ListMiscellany:switch(lm_n){
 							1: print "closed";
@@ -86,7 +87,6 @@ orInfExt with ext_messages[;
 				print " (";
 
 				if(orStateDescriptors.suppressSingleItemWhich==0 && count==1) print (string)WHICH__TX,(isorare)o," ";
-
 				orStateDescriptors.runAccumulate(waeFullRoutines, o);
 				print ")";
 				rtrue;
@@ -118,7 +118,7 @@ orRoutineList orStateDescriptors
 	,	betweenCalls[prop hasState; prop=prop; !suppress warning
 			if(hasState==false) return;
 			self.remainingCount=self.remainingCount-1;
-			if(self.remainingCount>1) print COMMA__TX;
+			if(self.remainingCount>1) print (string) COMMA__TX;
 			if(self.remainingCount==1) print (SerialComma) self.totalCount, (string) AND__TX;
 		]
 	,	addRoomDescriptionHandler[r; self.add(waePartRoutines,r);]

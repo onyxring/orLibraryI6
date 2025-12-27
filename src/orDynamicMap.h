@@ -95,12 +95,13 @@ system_file;
 						}until(destroom~=curloc);
 						if(curloc provides (noun.door_dir) && curloc.(noun.door_dir)==0){
 							curloc.(noun.door_dir)=destroom;
-							destroom.(util.orMap.reverseDirection(noun.door_dir))=curloc;
+							destroom.(util.orMap.reverseDirProp(noun.door_dir))=curloc;
 						}
 						else self._fi_ptr--; !--wasnt able to go that way, undo the previous incremented counter for next attempt
 						if(self._fi_ptr>=(self.#found_in/WORDSIZE)) self.complete=true;
 				]
 	;
+	
 #endif; !--After Parser
 !======================================================================================
 ! AFTER VERBLIB

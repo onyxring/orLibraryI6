@@ -42,36 +42,30 @@ default        orPrintConjugate_English_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
 constant entrySize 5;
    [ orPrintConjugate ptrn 
-         firstParm isModalVerb;
+         firstParm modalVerb isModalVerb i;
 
 		firstParm=ptrn.getParamEphemeral(0).trim();
       if(firstParm.isEmpty()) return; !--nothing to conjugate
       firstParm.lock();      
+      modalVerb=firstParm.left(firstParm.indexOf(" ")).lock();
       print " ";
-      if(firstParm.startsWithOneOf("could","would","should","might",true)){
+      if(modalVerb.equalsOneOf("could","would","should","might",true) || 
+               modalVerb.equalsOneOf("couldn't", "wouldn't","shouldn't", "mightn't", true) || 
+               modalVerb.equalsOneOf("can", "must", "will","shall", true) || 
+               modalVerb.equalsOneOf("can't", "mustn't", "won't", "shan't",true) || 
+               modalVerb.equalsOneOf("cannot","musn't", "shalln't",true)
+            ){ 
          isModalVerb=true;
-
-         !--print the model verb (same case has defined in the string incidentally)
-         if(firstParm.startsWith("should",true)){ 
-            firstParm.left(6).print();
-            firstParm.set(firstParm.mid(6,orBUF_END)); 
-         }
-         else{!would, could, might
-            firstParm.left(5).print();
-            firstParm.set(firstParm.mid(5,orBUF_END)); 
-         }
-         !--handle couldn't shouldn't wouldn't and mightn't; with or without the apostrophe 
-         if(firstParm.startsWithOneOf("n't ","nt ",true)){
-            print "n't ";
-            firstParm.set(firstParm.mid(4,orBUF_END).trim());
-         }
-         else{ !--handle could not, should not, would not, and might not
-            firstParm.set(firstParm.trimLeft()); !trim off any additional starting spaces before testing
-            if(firstParm.startsWith("not ",true)) print " not "; 
+         
+         modalVerb.print();
+         firstParm.set(firstParm.mid(firstParm.indexOf(" "),orBUF_END).trim());    
+         print " ";
+         if(firstParm.startsWith("not ",true)) {
+            print "not "; 
             firstParm.set(firstParm.mid(4,orBUF_END).trim()); 
          }
-         !at this point, parms is the first 
       }
+      modalVerb.free();
       
 		if(printIrregularVerbConjugation(firstParm, isModalVerb, ptrn) ==false) 
          __orPrintConjugateEnglish(firstParm, isModalVerb, ptrn);
@@ -86,7 +80,10 @@ constant entrySize 5;
       pos=(entryPos*entrySize)+1; !+1 to advance past the hash key (root)
 
       if(isModalVerb) {
-         if(getNarrativeTense() == PAST_TENSE) print " have ";   
+         if(getNarrativeTense() == PAST_TENSE) {
+            print " have ";   
+            pos=pos+2;
+         }
          !--root for all other person/tense combinations
       }   
       else{ 
@@ -103,17 +100,36 @@ constant entrySize 5;
    [ __orPrintConjugateEnglish vrb isModalVerb ptrn
 			didPrintIrregular endingChar lookupForm;
 		
-		endingChar=vrb.getCharFromRight(0); !--get the last character once, to minimize repeat calls to this routine
-		if(isModalVerb){
-		 	lookupForm=ptrn.getParamEphemeral(3, vrb);
-		 	if(lookupForm==0) lookupForm=ptrn.getParamEphemeral(2);
-		 	if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
-		! 	if(vrb.right(1).equals("e")) 
-		! 		vrb.append("d").print();
-		! 	else 
-		! 		vrb.append("ed").print();
-		 	return;
+      if(isModalVerb){
+		 	if(getNarrativeTense()== PAST_TENSE){
+            print "have ";
+            lookupForm=ptrn.getParamEphemeral(3, vrb);    
+            if(lookupForm==0) lookupForm=ptrn.getParamEphemeral(2);
+            if(lookupForm~=-1 && lookupForm.isEmpty()==false) 
+               lookupForm.print();
+            else{
+               if(vrb.right(1).equals("e")) 
+                  vrb.append("d").print();
+               else 
+                  vrb.append("ed").print();
+            }
+            
+            return;
+         }
+         else{
+            lookupForm=ptrn.getParamEphemeral(1, vrb);
+         
+            if(lookupForm==0) lookupForm=ptrn.getParamEphemeral(2);
+		 	
+		! ! 	if(vrb.right(1).equals("e")) 
+		! ! 		vrb.append("d").print();
+		! ! 	else 
+		! ! 		vrb.append("ed").print();
+            print lookupForm;
+         }
+         return;
 		}
+      endingChar=vrb.getCharFromRight(0); !--get the last character once, to minimize repeat calls to this routine
 		!--past tense
 		if(getNarrativeTense()== PAST_TENSE){
 			lookupForm=ptrn.getParamEphemeral(2, vrb); !--zero indexed.  3rd parameter is past tense form.
@@ -310,7 +326,7 @@ array _irregularVerbs table [
    $7C0F "slink" "slinks" "slunk" 0
    $8458 "come" "comes" "came" "come"
    $85A3 "lose" "loses" "lost" 0
-   $85C9 "dream" "dreams" "dreamed" "dreamed"
+   $85C9 "dream" "dreams" "dreamed" 0
    $862B "shear" "shears" "shore" "shorn"
    $8650 "stand" "stands" "stood" 0
    $865C "gild" "gilds" "gilded" 0

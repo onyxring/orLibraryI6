@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 2014.05.01 orUnitTest
+! 2025.12.15 orUnitTest
 ! A framework for unit tests.  Used to issue text to the parser, then validate the
 ! response.
 !--------------------------------------------------------------------------------------
@@ -7,17 +7,10 @@
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 ! License:
 !--------------------------------------------------------------------------------------
-! Three concepts are important in this implementation:
-! 1. The orUnitTest class.   Use this to define a single test: configure any prerequisites for a
-!   test, specify game input which will automatically play out without a user having to
-!   enter it, and routines to interrogate the games responses and check for expected
-!   results, reporting results.
-! 2. The orUnitTestCollection which groups orUnitTests together, plays them out in sequence, and
-!   aggregates their results.
-! 3. The orUnitTestManager object which coordinates multiple test collections.
+! 
 !--------------------------------------------------------------------------------------
 ! Revision History
-! 2024.05.01	Initial Creation
+! 2025.12.15	Initial Creation
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
@@ -38,26 +31,76 @@ default        orUnitTest_STAGE   0;
 ! BEFORE  PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
   default orStringDefaultSize	2000;  !we use big strings to capture and analyze game behavior
-  global testResult;
-  global tmpCatch;
+  Constant noTest -1;
 
-  global currentTest 0;
-  global success 0;
-  global failed 0;
+  global testResult;    !a place to capture the results of the current running test
+  global tmpCatch;      !a place to capture the results of the current single step of the current running test
+  global currentTest 0; !the current test being run
+  global success 0;     !number of total successes 
+  global failed 0;      !number of total failures
 
   class orUnitTest 
-  with  isComplete[;return (self.ptr>=util.orArray.getSize(self, test));]
-      , runSetup[
+    with  isComplete[;return (self.ptr>=self.getTotalTests());]
+      ,   getNumTestsForProperty[prop; return util.orArray.getLength(self,prop)/2; ]
+      ,   getPropFromIndex[i
+              count; 
+            
+            count=self.getNumTestsForProperty(tests); 
+            if(i<count) return tests;
+            
+            count=count+self.getNumTestsForProperty(tests1); 
+            if(i<count) return tests1;
+            
+            count=count+self.getNumTestsForProperty(tests2); 
+            if(i<count) return tests2;
+            
+            count=count+self.getNumTestsForProperty(tests3); 
+            if(i<count) return tests3;
+
+            count=count+self.getNumTestsForProperty(tests4); 
+            if(i<count) return tests4;
+
+            print "ERROR getPropFromIndex: parameter value (",i,") exceeds the total number of tests defined (",count,")";
+            return -1;
+          ]
+      ,   getPropIndexFromIndex[i;
+            if(i<self.getNumTestsForProperty(tests)) return i*2;
+            i=i-self.getNumTestsForProperty(tests);
+            
+            if(i<self.getNumTestsForProperty(tests1)) return i*2;
+            i=i-self.getNumTestsForProperty(tests1);
+
+            if(i<self.getNumTestsForProperty(tests2)) return i*2;
+            i=i-self.getNumTestsForProperty(tests2);
+
+            if(i<self.getNumTestsForProperty(tests3)) return i*2;
+            i=i-self.getNumTestsForProperty(tests3);
+
+            if(i<self.getNumTestsForProperty(tests4)) return i*2;
+            
+            print "ERROR getPropIndexFromIndex: parameter exceeds the total number of tests defined by (",i-self.getNumTestsForProperty(tests4),")";
+            return -1;
+          ]
+      
+      ,   getTotalTests[count;
+            count=util.orArray.getLength(self,tests)/2;
+            count=count+util.orArray.getLength(self,tests1)/2;
+            count=count+util.orArray.getLength(self,tests2)/2;
+            count=count+util.orArray.getLength(self,tests3)/2;
+            count=count+util.orArray.getLength(self,tests4)/2;
+            return count;
+          ]
+      ,   runSetup[
             val;
-          val=util.orArray.get(self,setup,self.ptr);
+          val=util.orArray.get(self,self.getPropFromIndex(self.ptr),self.getPropIndexFromIndex(self.ptr));
           if(metaclass(val)==routine) return val();
           return playerCommands.push(val);          
         ]
       , validate[str
             val retval;
           self.curResult=str;
-          val=util.orArray.get(self,test,self.ptr);
-          if(val==0) return -1;
+          val=util.orArray.get(self,self.getPropFromIndex(self.ptr),self.getPropIndexFromIndex(self.ptr)+1);
+          if(val==noTest) return -1; !-- -1: neither pass nor fail, don't count this in the final tally
           if(metaclass(val)==routine) return val(str);
           
           val = util.orStr.new(val); !--ensure its a string 
@@ -71,8 +114,11 @@ default        orUnitTest_STAGE   0;
       ]
       , curResult 0
       , ptr 0
-      , setup[;]
-      , test[str; rtrue;]
+      , tests 0 0 
+      , tests1 0 0 
+      , tests2 0 0 
+      , tests3 0 0 
+      , tests4 0 0 
       , assertContains[val; 
           print "^    Contains ~"; util.orStr.print(val); print "~: ";
           if(self.curResult.contains(val)) {
@@ -110,6 +156,9 @@ default        orUnitTest_STAGE   0;
     with ext_initialise[; 
           tmpCatch=util.orStr.new();
           testResult=util.orStr.new();
+          #ifdef orUnitTestAutoRun;
+            playerCommands.pushCommand("utrun");
+          #endif;
         ]  
       , ext_afterprompt[; !--this runs right before the status line is printed; before player input
           tmpCatch.release(); !--stop capturing so the status line isn't captured too.
@@ -131,7 +180,7 @@ default        orUnitTest_STAGE   0;
         verb meta 'utFinish' *-> utFinish;
         
         [utRunSub 
-              t count result;
+              t result;
             tmpCatch.release(); !--stop capturing output 
             testResult.set(testResult.append(tmpCatch)); !--add the output to the results accumulated so far
 
@@ -147,6 +196,7 @@ default        orUnitTest_STAGE   0;
               testResult.set("");
               currentTest.ptr++;
             }
+            
             objectloop(t ofclass orUnitTest && t.isComplete()==false){
               currentTest=t;
               
@@ -164,6 +214,8 @@ default        orUnitTest_STAGE   0;
           print "^----------------------------------------------------------------------------------";
           print "^Tests complete: ",success,"/",success+failed," succeeded; ",failed," FAILED.";
         ];
+
+        
 #endif; !--after Grammar
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE

@@ -19,6 +19,7 @@
 #ifdef orDialogue_STAGE; #include "orDialogue"; #endif;
 #ifdef orDistinctMeSelf_STAGE; #include "orDistinctMeSelf"; #endif;
 #ifdef orDistinctRead_STAGE; #include "orDistinctRead"; #endif;
+#ifdef orDynamicMap_STAGE; #include "orDynamicMap"; #endif;
 #ifdef orDoor_STAGE; #include "orDoor"; #endif;
 #ifdef orExits_STAGE; #include "orExits"; #endif;
 #ifdef orFirstImpressions_STAGE; #include "orFirstImpressions"; #endif;

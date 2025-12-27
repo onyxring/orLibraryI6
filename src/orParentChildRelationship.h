@@ -35,6 +35,7 @@ default        orParentChildRelationship_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
+	Global matched_pcr 0;
 	attribute contained;
 	attribute supported;
 
@@ -137,7 +138,7 @@ default        orParentChildRelationship_STAGE  0;
 			Miscellany: switch(n){
 							58: p=inferPcr(x1,x2);
 								if(p==0) return L__M(##Miscellany, 26, x1);
-								print "(first taking ", (the) x1," ", (nop) p.sayFromPrep(), " ", (the) x2, ")";
+								print_ret "(first taking ", (the) x1," ", (nop) p.sayFromPrep(), " ", (the) x2, ")";
 					}
 			Enter: switch(n){
 						1:  print "But "; CSubjectIs(actor,true,true);
@@ -214,12 +215,17 @@ default        orParentChildRelationship_STAGE  0;
 		,	includeContentsInExamine true
 		,	sayPrep[; print (string)self.preposition; ]
 		,	sayToPrep[;
-				if(self.toPreposition==0)  print (string)self.sayPrep();
-				print (string)self.toPreposition;
+				if(self.toPreposition==0) 
+					self.sayPrep();
+				else
+					print (string)self.toPreposition;
 			]
 		,	sayFromPrep[;
-				if(self.fromPreposition==0)  print "from ",(string)self.sayPrep();
-				print (string)self.fromPreposition;
+				if(self.fromPreposition==0)  {
+					print "from "; 
+					self.sayPrep();
+				}
+				else print (string)self.fromPreposition;
 			]
 		,	isAppliedTo [c;
 				if(isMissingPcr(c) && numPcrsProvidedBy(parent(c))==1 && self.isProvidedBy(parent(c))) return true;
@@ -589,7 +595,12 @@ default        orParentChildRelationship_STAGE  0;
 	[ InsertSub;
 		GenericInsertSub(##Insert, orPcrContainer);
 	];
-	[ PutOnSub;  GenericInsertSub(##PutOn, orPcrSupporter); ];
+	[ PutOnSub;  
+		if(matched_pcr==0) 
+			GenericInsertSub(##PutOn, orPcrSupporter); 
+		else 
+			GenericInsertSub(##PutOn, matched_pcr); 
+	];
 	[ DropSub r;
 		_oldDropSub();
 		if(parent(noun)==parent(actor)) {
@@ -658,18 +669,48 @@ default        orParentChildRelationship_STAGE  0;
 		rtrue;
 	];
 
-
-	[inferPcr p c r;
+	[inferPcr c p 
+			r;
 		 if(p==0 || c==0) return 0;
 		 r = getPcrFromChild(c);
 		 if(r == 0) r = getFirstPcrProvidedBy(p);
 		 if(r == 0) r = orPcrSupporter; !--default to supporter if no other relationship is found
 		 return r;
 	];
+	
+	[pcrPreposition 
+			str pcr;
+		
+		matched_pcr=0;
+		str=util.orStr.new();
+		
+		!--convert the string of text the user typed into a string, so we can do stuff with it...
+		str.capture();
+		util.orBuf.print(WordAddress(wn)-WORDSIZE,WordAddress(wn+1)-WordAddress(wn)); !--take the word the user typed and remember it
+		str.release();
+		
+		!--...like make sure it doesn't have any additional spaces.
+		str.set(str.trim());
+		
+		objectloop(pcr ofclass orParentChildRelationship){
+			if(util.orStr.areEqual(pcr.preposition,str, true)) { !--... and match it against literal strings in the pcr;
+				matched_pcr=pcr;
+				break;
+			}
+		}
+		str.free();
 
-
+		if(matched_pcr==0) return GPR_FAIL;
+		NextWord(); !--we matched, so advance wn to the next word
+		return GPR_PREPOSITION;
+	];
 
 #endif; !--After VERBLIB
+#iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
+extend only 'put' 
+    * multiexcept pcrPreposition noun     -> putOn
+;
+#endif;
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE
 #endif; !--ndef _STAGE

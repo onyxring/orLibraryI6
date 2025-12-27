@@ -29,9 +29,9 @@ default        ut<REPLACEWITHNAME>_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
    object ut<REPLACEWITHNAME>Start "<REPLACEWITHNAME> Room" has light with description "Where <REPLACEWITHNAME> tests are run.";
 
-orUnitTest "ut<REPLACEWITHNAME>" with setup [; PlayerTo(ut<REPLACEWITHNAME>Start, 3); ] "x me"
-  , test 0 
-    "good-looking."   
+orUnitTest "ut<REPLACEWITHNAME>" 
+   with tests [; PlayerTo(ut<REPLACEWITHNAME>Start, 3); ] noTest
+               "x me" "good-looking"   
 ;
 
 #endif; !--After VERBLIB

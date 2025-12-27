@@ -41,10 +41,10 @@ object candlestick "candlestick" utorFirstImpressionsStart
       exert across the back of someone's head. Definitely
       lethal.";
 
-orUnitTest "orFirstImpressions" with setup [; PlayerTo(utorFirstImpressionsStart, 3); ] "x candlestick" "x candlestick"
-  , test 0 !no test validation for the first setup
-    "Definitely lethal."
-    "!Definitely lethal."
+orUnitTest "orFirstImpressions" 
+   with tests [; PlayerTo(utorFirstImpressionsStart, 3); ] noTest
+      "x candlestick" "Definitely lethal."
+      "x candlestick" "!Definitely lethal."
 ;
 
 #endif; !--After VERBLIB

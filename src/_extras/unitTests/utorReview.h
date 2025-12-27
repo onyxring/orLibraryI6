@@ -1,6 +1,6 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorString
-! Unit Tests for the utorString orLibrary extension.
+! YYYY.MM.DD utorReview
+! Unit Tests for the utorReview orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -11,32 +11,31 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
-default        utorString_STAGE  0;
+default        utorReview_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
-#include "orString";
+#include "orReview";
 !--------------------------------------------------------------------------------------
 #ifnot;
-#ifndef        utorString_STAGE; message fatalerror orXFErrorInclude; #endif;
-#iftrue(       utorString_STAGE  < LIBRARY_STAGE);
-   #undef      utorString_STAGE  ;
-   Constant    utorString_STAGE  LIBRARY_STAGE;
-   #ifdef      utorString_STAGE  ; #endif;
-   #ifndef orExtensionFrameworkBrief; message "   utorString...";#endif;
+#ifndef        utorReview_STAGE; message fatalerror orXFErrorInclude; #endif;
+#iftrue(       utorReview_STAGE  < LIBRARY_STAGE);
+   #undef      utorReview_STAGE  ;
+   Constant    utorReview_STAGE  LIBRARY_STAGE;
+   #ifdef      utorReview_STAGE  ; #endif;
+   #ifndef orExtensionFrameworkBrief; message "   utorReview...";#endif;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
+   object utorReviewStart "orReview Room" has light with description "Where orReview tests are run.";
 
-global str;
-!--TODO: expand these tests. 
-orUnitTest "orString" 
-   with tests [; !tests trim(), trimLeft(), trimRight(), and print()
-         str=util.orStr.new("              sky is            "); 
-         print "The "; 
-         str.trim().print(); 
-         print " blue.";
-      ]  "The sky is blue."  !implicitly tests contains()
+   object -> table_rvw "table" with name 'table', description "The wooden table is old and stained.";
+   
+orUnitTest "utorReview" 
+   with tests [; PlayerTo(utorReviewStart, 3); ] noTest 
+      "review table" "have not already examined"   
+      "x table" "is old and stained"   
+      "review table" "is old and stained"   
 ;
 
 #endif; !--After VERBLIB

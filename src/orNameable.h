@@ -39,7 +39,7 @@
 default        orNameable_STAGE  0;
 !======================================================================================
 ! INCLUDE DEPENDENCIES
-!#include "orPronoun";
+#include "_orPronoun_English";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
 #ifnot;

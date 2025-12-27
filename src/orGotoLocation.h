@@ -16,8 +16,8 @@
 default        orGotoLocation_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-#include "_orMapPathFinder";
 #include "_orTrackSeen";
+#include "orUtilMapPathFinder";
 #include "orPlayerCommandQueue";
 !--------------------------------------------------------------------------------------
 #ifnot;
@@ -30,7 +30,7 @@ default        orGotoLocation_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-
+	Global orPathFinderAvoidUnvisitedLocations = false;
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER PARSER
@@ -53,16 +53,18 @@ orInfExt with ext_messages[;
 	!for(i=0: i < util.orMap.pathFinder.getLength(path) : i++){
 	for(i=0: i < util.orArray.getlength(util.pathFinder,path) : i++){ !TODO need to test this
 		!playerActions.push(##go, util.orMap.pathFinder.&path-->(i)); !!TODO use orArray
-		playerActions.push(##go, util.orArray.get(util.orMap.pathFinder,path,i)); !TODO need to test this
+		playerCommands.push(##go, util.orArray.get(util.orMap.pathFinder,path,i)); !TODO need to test this
 	}
 ];
 [VisitedRoom o;
 	switch(scope_stage){
 			1: return false;
-			2: objectloop(o && metaclass(o) == object && parent(o)==0 && o has beenSeen)
+			2: objectloop(o && metaclass(o) == object && parent(o)==0 && o has beenSeen){
+					print "[Placing ",(name)o," in scope]";
 					PlaceInScope(o);
-				return true;
-			3: "I'm not sure where that is."; !TODO: make this a default message
+				}
+				rtrue;
+			3: "You don't recall that location."; 
 		}
 	rfalse;
 ];

@@ -1,6 +1,6 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorString
-! Unit Tests for the utorString orLibrary extension.
+! YYYY.MM.DD utorExits
+! Unit Tests for the utorExits orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -11,32 +11,35 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
-default        utorString_STAGE  0;
+default        utorExits_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
-#include "orString";
+#include "orExits";
 !--------------------------------------------------------------------------------------
 #ifnot;
-#ifndef        utorString_STAGE; message fatalerror orXFErrorInclude; #endif;
-#iftrue(       utorString_STAGE  < LIBRARY_STAGE);
-   #undef      utorString_STAGE  ;
-   Constant    utorString_STAGE  LIBRARY_STAGE;
-   #ifdef      utorString_STAGE  ; #endif;
-   #ifndef orExtensionFrameworkBrief; message "   utorString...";#endif;
+#ifndef        utorExits_STAGE; message fatalerror orXFErrorInclude; #endif;
+#iftrue(       utorExits_STAGE  < LIBRARY_STAGE);
+   #undef      utorExits_STAGE  ;
+   Constant    utorExits_STAGE  LIBRARY_STAGE;
+   #ifdef      utorExits_STAGE  ; #endif;
+   #ifndef orExtensionFrameworkBrief; message "   utorExits...";#endif;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
-
-global str;
-!--TODO: expand these tests. 
-orUnitTest "orString" 
-   with tests [; !tests trim(), trimLeft(), trimRight(), and print()
-         str=util.orStr.new("              sky is            "); 
-         print "The "; 
-         str.trim().print(); 
-         print " blue.";
-      ]  "The sky is blue."  !implicitly tests contains()
+   object utorExitsStart "orExits Room" has light with description "Where orExits tests are run."
+      ,  n_to laboratory_exts
+      ,  w_to study_exts
+      ,  e_to kitchen_exts
+      ,  s_to "the wall"
+   ;
+   object laboratory_exts;
+   object study_exts;
+   object kitchen_exts;
+   
+orUnitTest "utorExits" 
+   with tests [; PlayerTo(utorExitsStart, 3); ] noTest
+      "exits" "The only exits lay north, east, and west."
 ;
 
 #endif; !--After VERBLIB

@@ -1,6 +1,6 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorString
-! Unit Tests for the utorString orLibrary extension.
+! YYYY.MM.DD utorPrefixSuffix
+! Unit Tests for the utorPrefixSuffix orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -11,32 +11,31 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
-default        utorString_STAGE  0;
+default        utorPrefixSuffix_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
-#include "orString";
+#include "orPrefixSuffix";
 !--------------------------------------------------------------------------------------
 #ifnot;
-#ifndef        utorString_STAGE; message fatalerror orXFErrorInclude; #endif;
-#iftrue(       utorString_STAGE  < LIBRARY_STAGE);
-   #undef      utorString_STAGE  ;
-   Constant    utorString_STAGE  LIBRARY_STAGE;
-   #ifdef      utorString_STAGE  ; #endif;
-   #ifndef orExtensionFrameworkBrief; message "   utorString...";#endif;
+#ifndef        utorPrefixSuffix_STAGE; message fatalerror orXFErrorInclude; #endif;
+#iftrue(       utorPrefixSuffix_STAGE  < LIBRARY_STAGE);
+   #undef      utorPrefixSuffix_STAGE  ;
+   Constant    utorPrefixSuffix_STAGE  LIBRARY_STAGE;
+   #ifdef      utorPrefixSuffix_STAGE  ; #endif;
+   #ifndef orExtensionFrameworkBrief; message "   utorPrefixSuffix...";#endif;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
+   object utorPrefixSuffixStart "orPrefixSuffix Room" has light with description "Where orPrefixSuffix tests are run.";
 
-global str;
-!--TODO: expand these tests. 
-orUnitTest "orString" 
-   with tests [; !tests trim(), trimLeft(), trimRight(), and print()
-         str=util.orStr.new("              sky is            "); 
-         print "The "; 
-         str.trim().print(); 
-         print " blue.";
-      ]  "The sky is blue."  !implicitly tests contains()
+   object -> mrsRobinson "Mrs. Robinson" has proper 
+      with description "Loved by Beatles. And Jesus.",
+      name 'mrs' 'robinson';
+
+orUnitTest "utorPrefixSuffix" 
+   with tests [; PlayerTo(utorPrefixSuffixStart, 3); ] noTest
+   "x Mrs. Robinson" "!That's not a verb I recog"
 ;
 
 #endif; !--After VERBLIB

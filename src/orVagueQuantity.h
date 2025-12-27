@@ -57,11 +57,13 @@ default        orVagueQuantity_STAGE  0;
          ],
          ext_wlrPluralMany[obj quantity
                idx;
+
             obj=self.getObj(obj,quantity);
             idx=self.findEntry(obj,quantity);
             if(idx<0) rfalse;
 
             print (string)util.orArray.get(obj, vagueQuantity, idx+1);
+
             return true;
          ],
          getObj[obj;
@@ -69,19 +71,18 @@ default        orVagueQuantity_STAGE  0;
             return orVagueQuantityController;
          ],
          findEntry[obj quantity
-               t ptr;
+               t ptr size;
             if(parent(obj) has specificQuantity) return -1;
             if(obj has specificQuantity) return -1;
 
             ptr=-1;
 
-            for(t=0:t<util.orArray.getSize(obj,vagueQuantity):t=t+2){
-               if(util.orArray.get(obj,vagueQuantity,t)>quantity) break;
+            size=util.orArray.getSize(obj,vagueQuantity);
+            for(t=0:t<size:t=t+2){
+               if(util.orArray.get(obj,vagueQuantity,t)>quantity || util.orArray.get(obj,vagueQuantity,t)==0) break;
                ptr=t;
 
-               if(util.orArray.getSize(obj,vagueQuantity)>t+2 && util.orArray.get(obj,vagueQuantity,t+2)<=1) t++;
             }
-
             return ptr;
          ],
          vagueQuantity 2 "a couple of" 3 "a few" 5 "several" 10 "numerous" 0 0 0 0 0 0 0 0 0 0; !default
