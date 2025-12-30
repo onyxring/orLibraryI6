@@ -34,6 +34,7 @@ default        orTopic_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 	system_file;
 
+	Constant ORDIA_ALL=true;
 	Constant ORDIA_RESPONSE_ONLY=-1;
 	property individual knownBy;
 	property individual context;

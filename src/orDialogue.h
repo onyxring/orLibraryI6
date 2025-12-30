@@ -22,6 +22,7 @@ default        orDialogue_STAGE  0;
 ! INCLUDE DEPENDENCIES
 #include "orStylePrintRules";
 #include "orUtilArray";
+#include "_orPronoun_English";
 #include "_orTopic";
 #include "_orHookParser";
 #include "_orInfExt";

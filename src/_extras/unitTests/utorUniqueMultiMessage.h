@@ -44,13 +44,13 @@ default        utorUniqueMultiMessage_STAGE  0;
        rock_umm ->->;
 
    orUnitTest "utorUniqueMultiMessage" 
-      with tests [; PlayerTo(utorUniqueMultiMessageStart, 3); ] noTest
+       with tests [; PlayerTo(utorUniqueMultiMessageStart, 3); ] noTest
          "take all from bowl" [val
                                     retval; 
-                                 retval=retval+self.assertContains("5 marbles : Removed."); 
-                                 retval=retval+self.assertContains("2 candies : Removed."); 
-                                 retval=retval+self.assertContains("rock : Removed."); 
-                                 return retval==3;
+                                  retval=retval+self.assertContains("5 marbles : Removed."); 
+                                  retval=retval+self.assertContains("2 candies : Removed."); 
+                                  retval=retval+self.assertContains("rock : Removed."); 
+                                  return retval==3;
                               ]
     ;
 

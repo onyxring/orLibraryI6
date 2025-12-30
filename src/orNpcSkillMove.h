@@ -34,6 +34,7 @@ default        orNpcSkillMove_STAGE  0;
 	property individual movePath;
 	property individual moveArrived;
 	property individual followTarget;
+	property individual moveTargetFound;
 
 	Constant MOVE_PATTERN_REVERSE	0;
 	Constant MOVE_PATTERN_REPEAT 	1;

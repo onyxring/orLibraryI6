@@ -11,48 +11,64 @@ Constant orUnitTestAutoRun true;
 !---------------------------------------------------------------------------------------------------
 ! Include unit unit tests here...
 
-! ! Chapter 4 "Narrative Flexibility"
-! #include "utorFirstImpressions";
-! #include "utorStateDescriptors";
-! #include "utorCantGoOdd";
-! #include "utorUniqueMultiMessage"; !Fails with orAdjective included
-! #include "utorVagueQuantity"; !Fails with orAdjective or orRecogName included
+! Chapter 4 "Narrative Flexibility"
+#include "utorFirstImpressions";
+#include "utorStateDescriptors";
+#include "utorCantGoOdd";
+#include "utorUniqueMultiMessage"; !Fails with orAdjective included
+#include "utorVagueQuantity"; !Fails with orAdjective or orRecogName included
 
-! ! Chapter 5 "Parsing and Disambiguation"
-! !#include "utorAdjective";  !Causes failures with orUniqueMultiMessage, orVagueQuantity, orParentChildRelationship, orDynamicMap
-!  #include "utorBetterChoice"; !Fails with orImplicitCommands included
-!  #include "utorPrefixSuffix";
-! ! #include "utorRecogName"; !Causes failures with orVagueQuantity
+! Chapter 5 "Parsing and Disambiguation"
+#include "utorAdjective";  !Causes failures with orUniqueMultiMessage, orVagueQuantity, orParentChildRelationship, orDynamicMap
+#include "utorBetterChoice"; !Fails with orImplicitCommands included
+#include "utorPrefixSuffix";
+! #include "utorRecogName"; !Causes failures with orVagueQuantity
 
-! ! ! Chapter 6 "Modeling and Mechanics" orPlayerCommandQueue is absent from this list since this entire test suite is based on it.  Will add it as test cases which aren't covered by this test framework are identified.
-! ! #include "utorBackdrop"; !* Failed entries
-! ! !#include "utorImplicitCommands"; !Causes failures with orBetterChoice
-!  #include "utorParentChildRelationship"; !Fails with orAdjective included
-!  #include "utorRemoteLook";
+! Chapter 6 "Modeling and Mechanics" orPlayerCommandQueue is absent from this list since this entire test suite is based on it.  Will add it as test cases which aren't covered by this test framework are identified.
+! #include "utorBackdrop"; !* Failed entries
+! #include "utorImplicitCommands"; !Causes failures with orBetterChoice
+#include "utorParentChildRelationship"; !Fails with orAdjective included
+#include "utorRemoteLook";
 
-! ! ! Chapter 7 "Miscellaneous Enhancements" - currently no unit tests, since orMenu and orStatusLine are UI-centric extensions.  Will add some as non-UI centric test cases are identified.
+! Chapter 7 "Miscellaneous Enhancements" - currently no unit tests, since orMenu and orStatusLine are UI-centric extensions.  Will add some as non-UI centric test cases are identified.
 
-! ! ! Chapter 8 "Additonal Verbs"
-!  #include "utorDistinctRead";
-!  #include "utorExits";
-!  #include "utorReview";
+! Chapter 8 "Additonal Verbs"
+#include "utorDistinctRead";
+#include "utorExits";
+#include "utorReview";
 ! ! !#include "utorGotoLocation"; * Failed entries
 
-! ! ! Chapter 9 "World Mapping"
-!  #include "utorDoor"; 
-!  #include "utorDynamicMap"; !Fails with orAdjective included
+! Chapter 9 "World Mapping"
+#include "utorDoor"; 
+#include "utorDynamicMap"; !Fails with orAdjective included
 
-! ! Chapter 10 "Miscellaneous Game Objects"
-! #include "utorNameable"; 
-! #include "utorReferByContents"; 
+! Chapter 10 "Miscellaneous Game Objects"
+#include "utorNameable"; 
+#include "utorReferByContents"; 
 
-! ! ! Chapter 11 "Text Routines" - currently no unit tests, since orCenter and orTransiton are UI-centric extensions.  Will add some as non-UI centric test cases are identified.
+! Chapter 11 "Text Routines" - currently no unit tests, since orCenter and orTransiton are UI-centric extensions.  Will add some as non-UI centric test cases are identified.
 
-! ! ! Chapter 12 "Dynamic Text" - currently no unit tests for orGibberish since it produces random output across interpreters, even when the random seed has been set.
-!#include "utorString";
-!#include "utorPrint";
-#include "utorPrintConjugate";
+! Chapter 12 "Dynamic Text" - currently no unit tests for orGibberish since it produces random output across interpreters, even when the random seed has been set.
+#include "utorString";
+#include "utorPrint";
+!#include "utorPrintConjugate";
 
+! Chapter 13 "Knowledge and Conversation" - currently no unit tests for _orTopic, _orTopicPool, or orDiallogueMenu
+!#include "utorDialogue";
+
+! Chapter 14 "Autonomous NPCs"
+#include "utorNpc";
+#include "utorNpcSkillMove";
+#include "utorNpcSkillDialogue";
+
+! Chapter 15 "Additional NPC extensions"
+#include "utorDistinctMeSelf";
+
+! Chapter 16 "The util Object"
+#include "utorUtilLoopArray";
+
+! Chapter 17 "A Few Additional Utilities"
+#include "utorDeque";
 !---------------------------------------------------------------------------------------------------
 #include "#parser";
 #include "#verblib"; 

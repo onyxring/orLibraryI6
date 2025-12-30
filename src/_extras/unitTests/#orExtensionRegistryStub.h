@@ -25,3 +25,10 @@
 #ifdef utorReferByContents_STAGE; #include "utorReferByContents"; #endif;
 #ifdef utorPrint_STAGE; #include "utorPrint"; #endif;
 #ifdef utorPrintConjugate_STAGE; #include "utorPrintConjugate"; #endif;
+#ifdef utorDialogue_STAGE; #include "utorDialogue"; #endif;
+#ifdef utorNpc_STAGE; #include "utorNpc"; #endif;
+#ifdef utorDistinctMeSelf_STAGE; #include "utorDistinctMeSelf"; #endif;
+#ifdef utorNpcSkillMove_STAGE; #include "utorNpcSkillMove"; #endif;
+#ifdef utorNpcSkillDialogue_STAGE; #include "utorNpcSkillDialogue"; #endif;
+#ifdef utorDeque_STAGE; #include "utorDeque"; #endif;
+#ifdef utorUtilLoopArray_STAGE; #include "utorUtilLoopArray"; #endif;

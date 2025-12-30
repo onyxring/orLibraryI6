@@ -35,8 +35,8 @@ object -> gotie "Gotie";
 object -> spirit "Jacob" has proper;
 object -> scrooge "Ebenezer" has proper;
 object -> robot "robot";
-object -> box "box";
-object -> toy "toy";
+object -> box_op "box";
+object -> toy_op "toy";
 
 orUnitTest "utorPrint" 
    with tests [; 
@@ -52,8 +52,8 @@ orUnitTest "utorPrint"
             orPrint("You pick up $1 rock$s:1;.", 1);
             orPrint("You pick up $1 rock$s:1;.", 3);
             actor=robot;
-            noun=box;
-            second=toy;
+            noun=box_op;
+            second=toy_op;
             orPrint("$The:actor $the:noun $A:second $a:second");
             orPrint("$up(upper) and $lo(LOWER).");
       ]   [val retval count; 

@@ -35,8 +35,8 @@ default        utorPrintConjugate_STAGE  0;
 
 orUnitTest "utorPrintConjugate" 
    with tests [; PlayerTo(utorPrintConjugateStart, 3); ] noTest
-      [;selfobj.narrative_tense=PRESENT_TENSE; noun=troll; orPrint("Every breath $the:noun(take), every move $the:noun(make)."); ] "Every breath the troll takes, every move the troll makes."
-      [;selfobj.narrative_tense=PAST_TENSE; noun=trolls; orPrint("Every breath $the:noun(take), every move $the:noun(make)."); ] "Every breath the trolls took, every move the trolls made."
+      [;selfobj.narrative_tense=PRESENT_TENSE; noun=troll; orPrint("Every breath $the:noun(take), every move $the:noun(make), $iAm:player watching $meYouIt:noun."); ] "Every breath the troll takes, every move the troll makes."
+      [;selfobj.narrative_tense=PAST_TENSE; noun=trolls; orPrint("Every breath $the:noun(take), every move $the:noun(make), $iAm:player watching $meYouIt:noun."); ] "Every breath the trolls took, every move the trolls made."
       [;selfobj.narrative_tense=PAST_TENSE;noun=tool; orPrint("$That:noun(would fix) nothing."); ] "That tool would have fixed nothing."
       [;selfobj.narrative_tense=PAST_TENSE;noun=tool; orPrint("$The:noun(should not go) to the store."); ] "That tool should not have gone to the store."
       [;selfobj.narrative_tense=PRESENT_TENSE; actor=troll; orPrint("$The:actor(couldn't swing) the axe."); ] "The troll couldn't swing the axe."
