@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorVagueQuantity
+! 2025.12.31 utorVagueQuantity
 ! Unit Tests for the utorVagueQuantity orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
@@ -38,13 +38,14 @@ marble2 ->->; marble2 ->->; marble2 ->->; marble2 ->->;
     marble2 ->->; marble2 ->->; marble2 ->->; marble2 ->->; 
     marble2 ->->; marble2 ->->; marble2 ->->; marble2 ->->;    
 
-
 orUnitTest "utorVagueQuantity" 
    with tests [; PlayerTo(utorVagueQuantityStart, 3); ] noTest 
    "x bowl" "are numerous marbles."   
-   "take 6 marbles. x bowl" "are several marbles."  
+   "take 6 marbles" "Taken"
+   "x bowl" "are several marbles."  
    "take 3 marbles. x bowl" "are a few marbles."  
    "take 1 marble. x bowl" "are a couple of marbles."  
+   "drop all" noTest !--clear for other unit tests
 ;
 
 #endif; !--After VERBLIB

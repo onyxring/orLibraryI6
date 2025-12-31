@@ -66,8 +66,8 @@ default        orImplicitCommands_STAGE  0;
 
    !-- a simple helper used to simplify the syntax for returning a full action (n, v, s).
    [tempAction a n s;
-      _tempAction.initialize(a,n,s);
-      _tempAction.isMeta=false;
+      _tempAction.initializeAction(a,n,s);
+      !_tempAction.isMeta=false;
       return _tempAction;
    ];
    orInfExt with
@@ -79,15 +79,15 @@ default        orImplicitCommands_STAGE  0;
 
          tmp=LibraryExtensions.RunWhile(ext_generateImplicitCommands, false); !--check to see if we have any necessary implicit commands to handle
          if(tmp==true) rtrue;
+
          if(tmp~=0) return queueImplicitPrerequisite(tmp.getAction(), tmp.getNoun(), tmp.getSecond());
          rfalse;
       ],
-      ext_generateImplicitCommands[;             !--3. We use the hook created above to detect and return prerequisit as actions
+      ext_generateImplicitCommands[;             !--3. We use the hook created above to detect and return prerequisits as actions
          if(noun==0 || util.orRef.isObject(noun)==0) rfalse;
          if(orActionFlags~=0) rfalse;
          if(action==##empty or ##transfer) rfalse;
          if(action==##puton or ##insert && second==0 or noun) rfalse;
-
 
          !--implicit take
          if(noun~= actor && noun notin actor && noun hasnt static or scenery && (not_holding~=0 || action == ##throwAt or ##wear or ##putOn or ##insert or ##give or ##show or ##wave)) { !--implicit take
@@ -130,15 +130,16 @@ default        orImplicitCommands_STAGE  0;
 
    [queueImplicitPrerequisite act n s
          tmp;
+      
       !--loading these in the front of the queue, so do these in reverse order...
       tmp=playerCommands.preemptAction(action, noun, second);  !last: retry the current action
-      tmp.setCustomFlagOn(isRootOfImplicitCommands); !TODO: not used
+      tmp.setCustomFlagOn(isRootOfImplicitCommands);         !TODO: not used
       tmp.setCustomFlagOn(noInferMessage);
 
       tmp=playerCommands.preemptAction(act,n,s);             !but first do this implicit action
       tmp.setCustomFlagOn(noInferMessage);
 
-      meta=true;
+      meta=true;      
       rtrue;
    ];
 
@@ -149,7 +150,7 @@ default        orImplicitCommands_STAGE  0;
 !======================================================================================
 ! AFTER GRAMMAR
 #iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
-   !I believe this is a defect in the standard library, in that waving something should always prefer something held for waving, over something not held
+   !The following corrects what I believe to be a minor defect in the standard library, in that waving something should always prefer something held for waving, over something not held
    extend 'wave' first
       * held -> wave
       * held 'at' noun -> wave

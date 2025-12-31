@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorAdjective
+! 2025.12.31 utorAdjective
 ! Unit Tests for the utorAdjective orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
@@ -53,6 +53,7 @@ default        utorAdjective_STAGE  0;
       "x drinking" "for drinking"   
       [;orAdjective.mode=REQUIRE_NOUN;] noTest
       "x drinking" "can't see any such thing"
+      "drop all" noTest !--clean up for other unit tests
    ;
 
 #endif; !--After VERBLIB

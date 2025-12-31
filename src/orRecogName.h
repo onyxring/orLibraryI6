@@ -103,7 +103,7 @@ default        orRecogName_STAGE  0;
 
 		for(markerend=markerstart=o=WORDSIZE:o<len:o++)		!search for words in short_name until match is found
 		{
-			if((o+1)==len)o=len; !--if reached end of line, then go ahead and adjust the pointer as though an word break was found
+			if((o+1)==len)o=len; !--if reached end of line, then go ahead and adjust the pointer as though a word break was found
 			if(o==len || _namebuffer1->o==' ' or ',' or '.')		!if found a whole word, or end of line...
 			{
 				if(o==markerstart) { !--if this word break is the first char, then this will be empty, so ignore
@@ -219,8 +219,7 @@ default        orRecogName_STAGE  0;
 				if(r==true) return '.FALSEWORD';
 				if(r==-1){
 					sc=ScopeCeiling(actor);
-					objectloop(o && IndirectlyContains(sc, o)==true){ !--TODO can this be made better????
-					!objectloop(o near actor){ !--TODO can this be made better????
+					objectloop(o && IndirectlyContains(sc, o)==true){ !--TODO can this be made better? For example with something like o near actor)?
 						if(MatchAgainstShortName(o,wn-1)==true) {
 							__checknounword.add_word(wn-1,true);
 							return '.FALSEWORD';
@@ -228,7 +227,7 @@ default        orRecogName_STAGE  0;
 					}
 					__checknounword.add_word(wn-1,false);
 				}
-				rfalse;
+			 	rfalse;
 			}
 
 			if (i==ME1__WD or ME2__WD or ME3__WD) return 1;
@@ -251,7 +250,6 @@ default        orRecogName_STAGE  0;
 			!----------------------------------------------------
 			! New Code here... Matches names text
 			!----------------------------------------------------
-
 
 			util.orBuf.capture(_namebuffer1);
 			print(name)o1;

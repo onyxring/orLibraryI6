@@ -122,13 +122,13 @@ default        orAdjective_STAGE  0;
 			else{
 				if(ValueOrRun(orAdjective,mode)==REQUIRE_NOUN) objRequiresNoun=true;
 			}
-
 			if(n==0 && objRequiresNoun)  return 0; 
-			
+
 			return a+n; !--we return the total words.  We've identified objects reference by nouns with the noun_ref attribute; adjudicate can select these from objects referenced only by adjectives
 		]
 	,	ext_adjudicate[
 				o i retval nRef aRef;
+			
 				!--count up objects referenced only by adjectives vs those referenced only by nouns
 				for(i=0: i<number_matched:i++) {
 					o = match_list-->i;
@@ -147,7 +147,7 @@ default        orAdjective_STAGE  0;
 					no_infer_message=true;
 					return retval; !--we are dealing with only one noun referenced object, so return that
 				}
-				!--we can't decide here.  We know that we have at least two noun referenced objects and at least one object referenced only adjectives, so lets eliminate the adjective-only references for further adjudication attempts
+				!--we can't decide here.  We know that we have at least two noun-referenced objects and at least one object referenced only adjectives, so lets eliminate the adjective-only references for further adjudication attempts
 				for(i=number_matched-1: i>=0:i--) {
 					o = match_list-->i;
 					if(o hasnt noun_ref) util.orParser.removeMatchPos(i);

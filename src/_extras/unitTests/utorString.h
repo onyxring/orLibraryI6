@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorString
+! 2025.12.31 utorString
 ! Unit Tests for the utorString orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher

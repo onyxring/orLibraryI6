@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorBackdrop
+! 2025.12.31 utorBackdrop
 ! Unit Tests for the utorBackdrop orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
@@ -53,9 +53,11 @@ default        utorBackdrop_STAGE  0;
             "The plants are thick, mostly impenetrable."
             [; if (action==##Enter) <<go w_obj>>; ]  
             bdEnd;
+
    object motherNature "Mother Nature" clearing2 has proper
       with react_before[;
-         take: if(orBackdropEngine.getKeyword(clearing2)=='plant'){ 
+         take: 
+               if(orBackdropEngine.getKeyword(clearing2)=='plant'){ 
                   move player to utorBackdropStart;
                   "~No,~ says the goddess, wagging a finger. ~There are consequences for trying to steal my children.";
                }

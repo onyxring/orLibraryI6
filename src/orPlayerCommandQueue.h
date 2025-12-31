@@ -70,10 +70,8 @@ default        orPlayerCommandQueue_STAGE  0;
 
 	[doQueuedAction inputBuffer
 			a iqa t;
-
-		if(playerCommands.getLength()==0) rfalse; !--no queued actions
-
-		if(just_undone~=0){ !--there are queued actions, but they were restored from the last undo, so lets not do them...
+		
+		if(playerCommands.getLength()==0 ||  just_undone~=0){ !--no queued actions, or there ARE queued actions, but they were restored from the last undo, so lets not do them...
 			playerCommands.clear();
 			rfalse;
 		}
@@ -95,11 +93,13 @@ default        orPlayerCommandQueue_STAGE  0;
 
 		for(t=WORDSIZE:t<INPUT_BUFFER_LEN - WORDSIZE:t++) inputBuffer->t=0;
 
-		!also print it to the passed in input buffer, which is where the text would go if they actually DID type it
+		!also print it to the passed in input buffer, which is where the text would go if the player actually DID type it
 
 		util.orBuf.capture(inputBuffer);
 			 a.print();
 		util.orBuf.release(); !--since we print to it as though it were a normal array, buffer starts with a WORD-sized length (the MSB will be zero unless we printed too much).
+		
+		
 
 		for(t=WORDSIZE:t<INPUT_BUFFER_LEN:t++) {
 			if(inputBuffer->t==13 or 10) inputBuffer->t=32; !remove returns, since these are not possible via input but may show up from the print statment

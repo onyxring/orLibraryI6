@@ -103,7 +103,7 @@ default        orDialogue_STAGE  0;
 	];
 
 	[askTopicSub
-			topic talkingTo s;
+			topic talkingTo s saveSelf;
 
 		talkingTo=noun;
 		topic=second;
@@ -143,9 +143,13 @@ default        orDialogue_STAGE  0;
 		!Ask
 		if(util.orArray.get(topic,quip,1)~=-1){ !--if ask is different than tell
 			s=util.orArray.get(topic,quip,0);
-			if(util.orRef.isRoutine(s))
-				s();
-			else
+
+			if(util.orRef.isRoutine(s)){
+				saveSelf=self;
+				self=topic;
+				s(actor, talkingTo);
+				self=saveSelf;
+			}else
 				print (string)s;
 			print "^^";
 		}
@@ -161,7 +165,7 @@ default        orDialogue_STAGE  0;
 	[vagueTalkSub; print_ret "You mumble a few words to no one in particular."; ];
 
 	[tellTopicSub
-			topic talkingTo s;
+			topic talkingTo s saveSelf;
 
  		talkingTo=noun;
 		topic=second;
@@ -209,11 +213,13 @@ default        orDialogue_STAGE  0;
 		else
 			s=util.orArray.get(topic,quip,0);
 
-		if(util.orRef.isRoutine(s))
-			s();
-		else
+		if(util.orRef.isRoutine(s)){
+			saveSelf=self;
+			self=topic;
+			s(actor, talkingTo);
+			self=saveSelf;
+		}else
 			print (string)s,"^";
-
 		topic.recordTell(actor, talkingTo);
 		if(topic has learnable && talkingTo provides learnTopic)
 			talkingTo.learnTopic(topic);

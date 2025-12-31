@@ -107,12 +107,13 @@ default        orTopic_STAGE  0;
 		,	recordTell[p1 p2
 					t;
 
-				p1=self._getCharacterId(p1);
-				p2=self._getCharacterId(p2);
-
+				if(self.hasBeenToldTo(p2,p1)) return;
 				t=self.getTracePos();
 				if(t==-1) return;
 
+				p1=self._getCharacterId(p1);
+				p2=self._getCharacterId(p2);
+				
 				self.&dissemTrack->t=p1;
 				self.&dissemTrack->(t+1)=p2; 
 			]

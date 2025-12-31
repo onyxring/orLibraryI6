@@ -91,6 +91,16 @@ class orReferByContents
 					return -1;
 				]
 	;
+	object _orReferByContents LibraryExtensions
+		with  ext_adjudicate[
+				o i retval nRef aRef;			
+				!--we we have multiple things referenced. Often this is because we are also considering the contents inside a referByContents container
+				for(i=0: i<number_matched:i++) {
+					o = match_list-->i;
+					if(parent(o)~=0 && parent(o) ofclass orReferByContents) util.orParser.removeMatchPos(i); !--don't consider the contents of referByContents
+				}
+				rfalse;
+		];
 #endif; !--After Parser
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE

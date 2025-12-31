@@ -60,9 +60,11 @@ default        orHookStandardLibrary_STAGE 0;
         return _oldAfterRoutines();
     ];
 
-    [ NounWord rv;
+    [ NounWord rv 
+            swn; swn=wn;
         rv=LibraryExtensions.RunWhile(ext_nounWord, 0);
         if(rv ~= 0) return rv;
+        wn=swn; 
         return _oldNounWord();
     ];
     [ NextWord rv;

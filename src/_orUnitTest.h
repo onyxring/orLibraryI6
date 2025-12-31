@@ -98,6 +98,11 @@ default        orUnitTest_STAGE   0;
         ]
       , validate[str
             val retval;
+          if(str.lower().contains("error",true)){
+              print "^Found ERROR in response...";
+              self.printResponse();
+              rfalse;
+          }
           self.curResult=str;
           val=util.orArray.get(self,self.getPropFromIndex(self.ptr),self.getPropIndexFromIndex(self.ptr)+1);
           if(val==noTest) return -1; !-- -1: neither pass nor fail, don't count this in the final tally
@@ -153,7 +158,8 @@ default        orUnitTest_STAGE   0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 
   object _orTestHooks LibraryExtensions 
-    with ext_initialise[; 
+    with areUnitTestsRunning false
+    , ext_initialise[; 
           tmpCatch=util.orStr.new();
           testResult=util.orStr.new();
           #ifdef orUnitTestAutoRun;
@@ -165,10 +171,9 @@ default        orUnitTest_STAGE   0;
           testResult.set(testResult.append(tmpCatch)); !--add the input this turn to our running memory, since restarting the capture after the status line will reset our capture buffer
         ]
       , ext_keyboardPrimitiveNotify[ c t; !--this runs just before player input
-          if(playerCommands.getLength()>0){
-            tmpCatch.capture(); 
+          if(_orTestHooks.areUnitTestsRunning==true && playerCommands.getLength()>0){
+             tmpCatch.capture();              
           }
-          rfalse;
         ]
     ;
 
@@ -181,6 +186,8 @@ default        orUnitTest_STAGE   0;
         
         [utRunSub 
               t result;
+              
+            _orTestHooks.areUnitTestsRunning=true;
             tmpCatch.release(); !--stop capturing output 
             testResult.set(testResult.append(tmpCatch)); !--add the output to the results accumulated so far
 
@@ -197,6 +204,7 @@ default        orUnitTest_STAGE   0;
               currentTest.ptr++;
             }
             
+            !--despite being an objectloop, this only runs agaist the first test then returns
             objectloop(t ofclass orUnitTest && t.isComplete()==false){
               currentTest=t;
               
@@ -210,6 +218,7 @@ default        orUnitTest_STAGE   0;
         ];
         
         [utFinishSub ;
+          _orTestHooks.areUnitTestsRunning=false;
           tmpCatch.release(); 
           print "^----------------------------------------------------------------------------------";
           print "^Tests complete: ",success,"/",success+failed," succeeded; ",failed," FAILED.";

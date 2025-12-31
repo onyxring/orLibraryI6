@@ -121,17 +121,8 @@ Constant bdDescr	1;
 		,   _usedProperty 0		!--... which position and property are being referenced.
 		,   _usedObject  0		!--... and on which object the backdrop is defined
 		,	_sayDescription[obj; return self._printResponse(obj,true);  ]
-		,	isBackdropReferenced[;
-				if(self._usedObject==0) rfalse;
-				if(second==0) rfalse;
-				if(second == orBackdropEngine) rtrue;
-				if(second ofclass orBackdrop) rtrue;
-				rfalse;
-			]
-		,	getContainer[; if(self.isBackdropReferenced()==false) return 0; return self._usedObject; ]
 		,	getKeyword[loc;
-				if(self.isBackdropReferenced()==false) return 0;
-				if(loc~=0 && loc~=self.getContainer()) return 0;
+				if(loc~=0 && self._usedObject~=loc) return 0; 
 				return util.orArray.get(self._usedObject,self._usedProperty, self._usedPos);
 			]
 		,	short_name "your surroundings"

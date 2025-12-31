@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD  
+! 2025.12.31  
 ! Unit Tests for the utorImplicitCommands orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
@@ -47,10 +47,8 @@ default        utorImplicitCommands_STAGE  0;
          }
       ];
    
-   
-
 orUnitTest "utorImplicitCommands" 
-   with tests [; PlayerTo(utorImplicitCommandsStart, 3); turns=1;] noTest 
+   with tests [; PlayerTo(utorImplicitCommandsStart, 3); turns=0;] noTest 
       "eat banana" "(first taking the banana)"
       "score" "2 turns"
       "take key" "Taken."

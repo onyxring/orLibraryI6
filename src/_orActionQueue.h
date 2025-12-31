@@ -49,45 +49,45 @@ default        orActionQueue_STAGE  0;
 		,	_second 0
 		,	_cmd 0
 		,	_flags 0
-		with _performer[; return actor;]
-		,  create[a n s displayText;
-				self.initialize(a,n,s,displayText);
-			]
-		,	destroy[;
-#ifdef orString_STAGE;
-				if(self._cmd ofclass orString) { !--just an extra safeguard in case we previously failed to free the orString
-					self._cmd.free();
-					self._cmd=0;
-				}
-#endif;
-			]
-		,	initialize[a n s displayText; ! performer displayText;
-#ifdef orString_STAGE;
-				if(self._cmd ofclass orString) { !--just an extra safeguard in case we previously failed to free the orString
-					self._cmd.free();
-					self._cmd=0;
-				}
-				if(util.orRef.isString(a) || a ofclass orString) {
-					if(a ofclass orString) a=util.orStr.new(a); !--create a safe copy of the orString object (the calling routine will free the passed in parameter)
-#ifnot;
-				if(util.orRef.isString(a)) {
-#endif;
-					self._cmd=a;
-					self._displayTextOverride=n;
-					self._action=0;
-					self._noun=0;
-					self._second=0;
-				}
-				else{
-					self._action=a;
-					self._noun=n;
-					self._second=s;
-					self._displayTextOverride=displayText;
-					self._cmd=0;
-				}
+		,	_initializeCommon[; 
+				!--todo: add support for orStrings passed to cmd and displayText
+				self._cmd=0;
+				self._displayTextOverride=0;
+				self._action=0;
+				self._noun=0;
+				self._second=0;
 				self._flags=0;
+				self.isMeta=false;
+				self.keepSilent=false;
 				self._performer=self.orAction::_performer; !--reset to base routine
 				self.canAttempt=self.orAction::canAttempt; !--reset to default in case overridden in a previous instance...
+			]
+		with _performer[; return actor;]
+		,	initializeAction[a n s displayText meta; 
+				self._initializeCommon();				
+				self._action=a;
+				self._noun=n;
+				self._second=s;
+				self._displayTextOverride=displayText;
+				self.isMeta=meta;
+				return self;
+			]
+		,	initializeCommand[cmd displayText meta; 
+				self._initializeCommon();				
+				self._cmd=cmd;
+				self._displayTextOverride=displayText;
+				self.isMeta=meta;
+
+				return self;
+			]		
+		,	destroy[;
+#ifdef orString_STAGE;
+				!--just an extra safeguard in case we previously failed to free the orString
+				if(self._cmd ofclass orString) self._cmd.free();
+				if(self._displayTextOverride ofclass orString) self._displayTextOverride.free();
+				self._cmd=0;
+				self._displayTextOverride=0;
+#endif;
 			]
 		,	keepSilent false
 		,	getAction[;return self._action;]
@@ -97,12 +97,6 @@ default        orActionQueue_STAGE  0;
 		,	getCustomFlag[bit;return util.orNum.getBit(self._flags,bit);]
 		,	setCustomFlagOn[bit;self._flags=util.orNum.setBitOn(self._flags,bit);]
 		,	setCustomFlagOff[bit;self._flags=util.orNum.setBitOff(self._flags,bit);]
-			! createTextCommand[cmd;
-			! 	self._cmd=cmd;
-			! 	self._displayTextOverride=0;
-			! 	self._performer=self.orAction::_performer; !--reset to base routine
-			! 	self.canAttempt=self.orAction::canAttempt; !--reset to default in case overridden in a previous instance...
-			! ],
 		,	isMeta false
 		,	_displayTextOverride 0
 		,	print[;
@@ -114,7 +108,7 @@ default        orActionQueue_STAGE  0;
 
 			]
 		,	formatCommand[
-					n s a;
+					n s a;		
 				if(self._cmd~=0) {
 #ifdef orString_STAGE;
 					if(self._cmd ofclass orString){
@@ -248,43 +242,51 @@ default        orActionQueue_STAGE  0;
 		,	arrayPropName _queuedActions
 		,	preemptAction[v n s displayText meta silent
 					actn;
-				actn=self.preQueue(v,n,s,displayText, meta);
+				actn=self.preQueueAction(v,n,s,displayText, meta);
 				actn.keepSilent=silent;
 				return actn;
 			]
 		,	preemptCommand[cmd meta silent
 					actn;
-				actn=self.preQueue(cmd,0,0,0, meta);
+				actn=self.preQueueCommand(cmd,0, meta);
 				actn.keepSilent=silent;
 				return actn;
 			]
 		,	pushAction[v n s displayText meta silent
 					actn;
-				actn=self.enqueue(v,n,s,displayText, meta);
+				actn=self.enqueueAction(v,n,s,displayText, meta);
 				actn.keepSilent=silent;
 				return actn;
 			]
 		,	pushCommand[cmd meta silent
 					actn;
-				actn=self.enqueue(cmd,0,0,0, meta);
+				actn=self.enqueueCommand(cmd,0, meta);
 				actn.keepSilent=silent;
 				return actn;
 			]
-		,	preQueue[v n s seltxt meta
+		,	preQueueAction[v n s seltxt meta silent
 					actn;
-				actn = orAction.create(v, n, s);
-				if(seltxt~=0) actn._displayTextOverride=seltxt;
-
-				actn.isMeta=meta;
+				actn = orAction.create().initializeAction(v,n,s,seltxt,meta);
+				actn.keepSilent=silent;
 				self.orDeque::push(actn);
 				return actn;
 			]
-		,	enqueue[v n s seltxt meta
+		,	preQueueCommand[cmd seltxt meta silent
 					actn;
-				actn = orAction.create(v, n, s);
-				if(seltxt~=0) actn._displayTextOverride=seltxt;
-
-				actn.isMeta=meta;
+				actn = orAction.create().initializeCommand(cmd,seltxt,meta);
+				actn.keepSilent=silent;
+				self.orDeque::push(actn);
+				return actn;
+			]				
+		,	enqueueAction[v n s seltxt meta
+					actn;
+				actn = orAction.create().initializeAction(v,n,s,seltxt,meta);
+				self.orDeque::enqueue(actn);
+				return actn;
+			]
+		,	enqueueCommand[cmd seltxt meta
+					actn;
+				actn = orAction.create().initializeCommand(cmd,seltxt,meta);
 				self.orDeque::enqueue(actn);
 				return actn;
 			]

@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorDialogue
+! 2025.12.31 utorDialogue
 ! Unit Tests for the utorDialogue orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
@@ -16,7 +16,7 @@ default        utorDialogue_STAGE  0;
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orDialogue";
-
+#include "orNpc"; 
 !--------------------------------------------------------------------------------------
 #ifnot;
 #ifndef        utorDialogue_STAGE; message fatalerror orXFErrorInclude; #endif;
@@ -30,16 +30,16 @@ default        utorDialogue_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
    object utorDialogueStart "orDialogue Room" has light with description "Where orDialogue tests are run.";
    
-      object -> magicMirror "magic mirror" has talkable 
+      orNpc -> magicMirror "magic mirror" has talkable 
 	      with name 'magic' 'mirror', 
-            description[; if(tBeauty.hasBeenTold())  "Etched in the 	glass is a taunting shape, seemingly a mustache.";
+            description[; if(tBeauty.hasBeenTold(player))  "Etched in the 	glass is a taunting shape, seemingly a mustache.";
             "It reflects back the truth. Verbally."; 
          ];
 
-      object -> servant "servant" has animate with name 'servant', 
+      orNpc -> servant "servant" has animate with name 'servant', 
          description "Waiting quietly to attend to your needs",
          orders[;
-               AskTopic: <AskTopic noun second, self>;
+               AskTopic: <<AskTopic noun second, self>>;
          ];
       
       orTopic tBestNumber with knownBy magicMirror
@@ -47,9 +47,8 @@ default        utorDialogue_STAGE  0;
       ,  dissemTrack 0 0
       ,  quip "~What's the best number?~"
          [teller talkingTo;
-            if(self.hasBeenToldTo(talkingTo)){
-            print "~I told you already...~ the mirror says.";
-               }
+            if(self.hasBeenToldTo(talkingTo)) print "~I told you already...~ the mirror says.";
+               
             "~Two is the best. It's the only prime number that is even.~";
          ];
 
@@ -78,10 +77,23 @@ orUnitTest "utorDialogue"
                "tell mirror about mom" "That's YOUR mom"   
                "tell mirror about beauty" "no response"   
                "ask mirror about mom" "no response"   
-               "ask mirror about number" "????"   
-   ,  tests1   "ask mirror about number" "????"   
-               "servant, ask mirror about number" "????"   
-               "servant, ask mirror about number" "????"   
+               "ask mirror about number" [val; 
+                     val=self.assertContains("Two is the best.");
+                     val=val+self.assertDoesNotContain("I told you already");
+                     return val==2;
+                  ]
+   ,  tests1   "ask mirror about number" "I told you already"   
+               "servant, ask mirror about number" [val; 
+                     val=self.assertContains("Two is the best.");
+                     val=val+self.assertDoesNotContain("I told you already");
+                     val=val+self.assertDoesNotContain("better things to do");
+                     return val==3;
+                  ]
+               "servant, ask mirror about number" [val; 
+                     val=self.assertContains("I told you already");
+                     val=val+self.assertDoesNotContain("better things to do");
+                     return val==2;
+                  ]
                "a beauty" "her mustache is quite remarkable"   
                "t mom" "YOUR mom"   
                "say mom to mirror" "YOUR mom"   

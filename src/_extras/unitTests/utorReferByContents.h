@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! YYYY.MM.DD utorReferByContents
+! 2025.12.31 utorReferByContents
 ! Unit Tests for the utorReferByContents orLibrary extension.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
@@ -47,10 +47,14 @@ orUnitTest "utorReferByContents"
          move bottle1 to selfobj; 
          move bottle2 to selfobj;
       ] noTest
-      "drop marbles" "!first taking"
+      "drop marbles" [val retval;
+                        retval=self.assertDoesNotContain("first taking");
+                        retval=retval+self.assertContains("Dropped");
+                        return retval==2;
+                  ]
       "i" "!marbles"
       "eat marshmallows" "Not bad"
-      "drop all" noTest!cleanup for next test
+      "drop all" noTest !cleanup for next test
 ;
 
 #endif; !--After VERBLIB
