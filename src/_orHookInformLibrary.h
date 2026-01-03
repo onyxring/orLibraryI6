@@ -41,6 +41,7 @@ default        orHookInformLibrary_STAGE  0;
    property individual ext_playLoopAssignObjectVariables;
    property individual ext_playLoopPerformSingleObjectAction;
    property individual ext_playLoopPerformMultiObjectAction;
+   property individual ext_afterGamePrologueNotify;
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER PARSER
@@ -61,6 +62,7 @@ default        orHookInformLibrary_STAGE  0;
          #Endif; ! TARGET_
 
          GamePrologue();
+         LibraryExtensions.RunAll(ext_afterGamePrologueNotify);
 
          while (~~deadflag) {    ! everything happens in this loop
             #Ifdef EnglishNaturalLanguage;

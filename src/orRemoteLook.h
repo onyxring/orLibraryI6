@@ -110,8 +110,8 @@ default        orRemoteLook_STAGE  0;
 				!1: print "It",(string)IS__TX," too dark to see that way.^";
 				1: print "What lies in that direction is unclear.^";
 				2: print (The)lm_o," ",(isorare)lm_o," closed and I cannot see through it.^";
-				!4: print (ig)CICant(actor)," see anything in that direction.^[Warning: obsolete message referenced (LookDirecton#4 from orRemoteLook).]^^";
-				!5: print (ig)CIVerb(actor,"did","do","does")," not see anything like that.^";
+				!4: print (nop)CICant(actor)," see anything in that direction.^[Warning: obsolete message referenced (LookDirecton#4 from orRemoteLook).]^^";
+				!5: print (nop)CIVerb(actor,"did","do","does")," not see anything like that.^";
 			}
 	];
 

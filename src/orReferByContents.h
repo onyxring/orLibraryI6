@@ -19,7 +19,7 @@
 default        orReferByContents_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-
+#include "orUtilParser";
 !--------------------------------------------------------------------------------------
 #ifnot;
 #ifndef        orReferByContents_STAGE; message fatalerror orXFErrorInclude; #endif;

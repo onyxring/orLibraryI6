@@ -27,17 +27,16 @@ default        orPrint_STAGE  0 ;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-	!replace PrintOrRun;
-	!property individual ext_orPrintConjugate;
+	
 #endif; !BEFORE PARSER
 !======================================================================================
 ! AFTER PARSER
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
-	!special includes, not typical for the Extension Managment Framework, to load  language-specific print rules
+	!special includes, not typical for the Extension Managment Framework, to load language-specific print rules
 	#ifdef LIBRARY_ENGLISH; #ifndef orPrintPatterns_English_STAGE;
 		#ifndef orExtensionFrameworkBrief; message "      (English detected. Including English print patterns.)"; #endif;
 		Default orPronoun_English_STAGE BEFORE_PARSER;
-		#include "_orPronoun_English"; !pronoun is a requirement of the english print patters.  Give it a chance to catchup with the current compiler stage
+		#include "_orPronoun_English"; !pronoun is a requirement of the english print patterns.  Give it a chance to catchup with the current compiler stage.
 		Default orPrintPatterns_English_STAGE BEFORE_PARSER;
 		#include "_orPrintPatterns_English"; !also include let the English print patterns extension catch up, since it wasn't included manually
 	#endif; #endif;
@@ -244,10 +243,12 @@ default        orPrint_STAGE  0 ;
 			if(orPrintEngine.parametersString.isEmpty())return 0;
 			return orPrintEngine.parametersString.numOccurances(":")+1;
 		]
-	,	_getTokenFromString[n list t pos posEnd;
-			for(pos=-1, t=0:t<n:t++) pos=list.indexOf(":",pos); !pos to the starting seperator in question (zero should leave pos at -1, the imaginary first seperator that precedes the list of tokens)
-			posEnd=list.indexOf(":",pos+1); !posEnd to the next seperator, following pos
+	,	_getTokenFromString[n list 
+				t pos posEnd;
+			
+			for(pos=-1, t=0:t<n:t++) pos=list.indexOf(":",pos+1); !pos to the starting seperator in question (zero should leave pos at -1, the imaginary first seperator that precedes the list of tokens)
 
+			posEnd=list.indexOf(":",pos+1); !posEnd to the next seperator, following pos
 			if(posEnd==-1) posEnd=list.getLength()+1;  !there isnt one, so pull in the rest of the string and add 1, so posEnd points to an imaginary last seperator following the list of tokens, is the same manner as the above (we adjust this down next)
 
 			posEnd--; ! don't include our ending token (imaginary or otherwise)
@@ -354,9 +355,7 @@ default        orPrint_STAGE  0 ;
 #iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
 	#ifndef orPrintConjugate;
 	!if we don't have a conjugation pattern in place, then use this fallback which 
-	!	prints the first element in the parameters string.  This shouldn't be reached 
-	!	unless we are using a language other than English, and a default conjugation 
-	!	rule hasn't been implemented.
+	!	prints the first element in the parameters string.  
 	[ orPrintConjugate ptrn;
 		if(ptrn.parametersString.isEmpty()) return;
 		print " "; ptrn.getParamEphemeral(0).print(); 

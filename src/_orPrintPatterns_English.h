@@ -55,6 +55,7 @@ default        orPrintPatterns_English_STAGE  0 ;
 		,	runRule[ pat obj; pat=self.patternName; obj=self.contextObject;
 				if(obj<=0) rfalse; !everything below this requires a noun to be specified, even if it isn't printed...
 				!pronoun only. No noun, no verb.
+				
 				if(pat.equalsOneOf("mine", "mineYoursIts")) {Mine(obj); rtrue;}
 				if(pat.equalsOneOf("Mine", "MineYoursIts")) {CMine(obj); rtrue;}
 				if(pat.equalsOneOf("me","meYouIt")) {Me(obj); rtrue;}
@@ -80,7 +81,7 @@ default        orPrintPatterns_English_STAGE  0 ;
 					rtrue;
 				}
 				if(pat.equalsOneOf("iAm", "iAmYouAreItIs")) {
-					print (IAm)obj;
+					print (iAm)obj;
 					rtrue;
 				}
 				if(pat.equalsOneOf("IAm", "IAmYouAreItIs")) {

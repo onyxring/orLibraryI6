@@ -153,6 +153,7 @@ default        orUtilMapPathFinder_STAGE  0;
 				]
 		with	ext_initialise[;_orMap.pathFinder=self;] !install this into the orMap object, where it belongs...
 		,		path 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+		,		getPathLength[; return util.orArray.getLength(self, path);]
 		,		determinePath[npc_cntx endroom
 						t startroom;
 					if(parent(npc_cntx)==0){
@@ -177,16 +178,18 @@ default        orUtilMapPathFinder_STAGE  0;
 				]
 		,		convertPathToDirections[startingLoc
 						i room prevRoom;
-					!for(i=util.orMap.path.getLength(path)-1:i>=0:i--){
+					
 					for(i=util.orArray.getLength(self,path)-1:i>=0:i--){
 
 						room=self.&path-->i;
+						
 						if(i>0)
 							prevRoom=self.&path-->(i-1);
 						else
 							prevRoom=startingLoc;
 
 						self.&path-->i=self._directionOfAdjacentRoom(prevRoom, room);
+						
 					}
 				]
 	;

@@ -153,16 +153,27 @@ system_file;
 				objectloop(npc ofclass orNpc) if(npc.npcId==id) return npc;
 				return 0;
 			]
-		,	daemon [npc; ! t lowest_priority highest_priority outcount savedparent savedparentloc;
+		,	daemon [npc t low high; ! t lowest_priority highest_priority outcount savedparent savedparentloc;
 				if(self.areEnabled==false) return;
-
+				low=999;
+				
 				self.areActing=true;
-				objectloop(npc ofclass orNpc && valueorrun(npc,isEnabled)==true) {
-					if(npc==player && valueorrun(npc,possessed)==false) continue;
-					npc.heartbeat();
+				
+				objectloop(npc ofclass orNpc && valueorrun(npc,isEnabled)==true){
+				 	t=valueorrun(npc,priority);
+				 	if(t>high) high=t; 
+				 	if(t<low) low=t; 
+				}
+				!--TODO: there are more efficient ways to do this, if we set a priority disparity of 9999 and 1, we will iterate over this empty object loops a lot.  A sorted array of actual priorities would be better.
+				for(t=high:t>=low:t--){				
+					objectloop(npc ofclass orNpc && valueorrun(npc,isEnabled)==true && valueorrun(npc,priority)==t){
+						if(npc==player && valueorrun(npc,possessed)==false) continue;
+						npc.heartbeat();
+					}
 				}
 				self.areActing=false;
 
+				!--the following is orNPC code from the old ORLibrary 1.3c.  Therea are things that this does, which the current implementation doesn't do.  Keeping them here for reference, since the need for these edge cases may come up.
 				!--in the weird case that the player is inside of a floating object...
 				!savedparent=parent(player);
 				!savedparentloc=parent(parent(player));

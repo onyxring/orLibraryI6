@@ -24,6 +24,7 @@ Constant Story				"orLibrary Unit Test Runner";
 Constant orUnitTestAutoRun true;
 !---------------------------------------------------------------------------------------------------
 ! Include unit tests here...
+
 !--Chapter 4 "Narrative Flexibility" --------------------------------------------------------------------
 #include "utorFirstImpressions";
 #include "utorStateDescriptors";
@@ -49,7 +50,7 @@ Constant orUnitTestAutoRun true;
 #include "utorDistinctRead";
 #include "utorExits";
 #include "utorReview";
-!#include "utorGotoLocation"; * Failed entries
+#include "utorGotoLocation";
 
 !--Chapter 9 "World Mapping" --------------------------------------------------------------------
 #include "utorDoor"; 
@@ -59,19 +60,19 @@ Constant orUnitTestAutoRun true;
 #include "utorNameable"; 
 #include "utorReferByContents";  
 
-!--Chapter 11 "Text Routines" --------------------------------------------------------------------
+!--Chapter 11 "Text Routines" -------------------------------------------------------------------
 
 !--Chapter 12 "Dynamic Text" --------------------------------------------------------------------
 #include "utorString";
 #include "utorPrint";
-!#include "utorPrintConjugate"; * Needs work
+#include "utorPrintConjugate";  
 
 !--Chapter 13 "Knowledge and Conversation" --------------------------------------------------------------------
 #include "utorDialogue"; 
 
 !--Chapter 14 "Autonomous NPCs"
 #include "utorNpc";
-!#include "utorNpcSkillMove"; *Needs work
+#include "utorNpcSkillMove"; 
 #include "utorNpcSkillDialogue";
 
 !--Chapter 15 "Additional NPC extensions"
@@ -85,6 +86,6 @@ Constant orUnitTestAutoRun true;
 !---------------------------------------------------------------------------------------------------
 #include "#parser";
 #include "#verblib"; 
-[Initialise o; ]; 
+[Initialise; ]; 
 #Include "#grammar"; 
 end;

@@ -27,8 +27,6 @@ default        utorGotoLocation_STAGE  0;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
-   !object utorGotoLocationStart "orGotoLocation Room" has light with description "Where orGotoLocation tests are run.";
-
    object laboratory_goloc "Laboratory" has light
    with name 'lab' 'laboratory',
    description "...",
@@ -52,7 +50,7 @@ default        utorGotoLocation_STAGE  0;
    object closet_goloc "Closet" has light
    with name 'closet' 'wardrobe'
    description "...",
-   w_to study_goloc;
+   s_to study_goloc;
 
    object bathroom_goloc "Bathroom" has light
    with name 'bath' 'bathroom',
@@ -61,13 +59,13 @@ default        utorGotoLocation_STAGE  0;
 
 
 orUnitTest "utorGotoLocation" 
-   with tests [; PlayerTo(laboratory_goloc, 3); ] noTest
+   with tests [; orPathFinderAvoidUnvisitedLocations = true; PlayerTo(laboratory_goloc, 3); ] noTest
       "s. go west. w" "Bathroom"
       "go to laboratory" "Laboratory"
       "go to kitchen" "don't recall that location"
       [; 
-         orPathFinderAvoidUnvisitedLocations = false;
-         playerCommands.pushCommand("go to kitchen");
+          orPathFinderAvoidUnvisitedLocations = false;
+          playerCommands.pushCommand("go to kitchen");
       ] "Kitchen"
 ;
 

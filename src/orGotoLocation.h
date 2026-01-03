@@ -6,8 +6,6 @@
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 ! License: Public Domain
 !--------------------------------------------------------------------------------------
-!
-!--------------------------------------------------------------------------------------
 ! Revision History
 ! 2024.08.12	Initial Creation
 !======================================================================================
@@ -30,7 +28,7 @@ default        orGotoLocation_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-	Global orPathFinderAvoidUnvisitedLocations = false;
+	Global orPathFinderAvoidUnvisitedLocations = true;
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER PARSER
@@ -47,20 +45,23 @@ orInfExt with ext_messages[;
 	if(util.orMap.pathFinder.determinePath(location, noun)<0){
 		return L__M(##gotoLocation, 1);
 	}
-
 	util.orMap.pathFinder.convertPathToDirections(location);
+	
+	print "^[one: ",playerCommands.getLength(),"]";
 
-	!for(i=0: i < util.orMap.pathFinder.getLength(path) : i++){
-	for(i=0: i < util.orArray.getlength(util.pathFinder,path) : i++){ !TODO need to test this
-		!playerActions.push(##go, util.orMap.pathFinder.&path-->(i)); !!TODO use orArray
-		playerCommands.push(##go, util.orArray.get(util.orMap.pathFinder,path,i)); !TODO need to test this
+	!for(i=0: i < util.orArray.getLength(util.orMap.pathFinder,path) : i++){ 
+	for(i=0: i < util.orMap.pathFinder.getPathLength() : i++){ 
+		if(util.orArray.get(util.orMap.pathFinder,path,i)<0) continue; !-- a -1 is creeping in during path determination.  This ignores it for now, but... TODO: look into why this is happening.
+		print "pushing action...";
+		playerCommands.pushAction(##go, util.orArray.get(util.orMap.pathFinder,path,i));
 	}
+	print "^[final: ",playerCommands.getLength(),"]";
 ];
+
 [VisitedRoom o;
 	switch(scope_stage){
 			1: return false;
-			2: objectloop(o && metaclass(o) == object && parent(o)==0 && o has beenSeen){
-					print "[Placing ",(name)o," in scope]";
+			2: objectloop(o && metaclass(o) == object && parent(o)==0 && (o has beenSeen|| orPathFinderAvoidUnvisitedLocations==false) ){
 					PlaceInScope(o);
 				}
 				rtrue;

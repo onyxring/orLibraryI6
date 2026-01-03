@@ -30,14 +30,15 @@ default        utorString_STAGE  0;
 
 global str;
 !--TODO: expand these tests. 
-orUnitTest "orString" 
-   with tests [; !tests trim(), trimLeft(), trimRight(), and print()
-         str=util.orStr.new("              sky is            "); 
-         print "The "; 
-         str.trim().print(); 
-         print " blue.";
-      ]  "The sky is blue."  !implicitly tests contains()
-;
+ orUnitTest "orString" 
+    with tests [; !tests trim(), trimLeft(), trimRight(), and print()
+          str=util.orStr.new("              sky is            "); 
+          print "The "; 
+          str.trim().print(); 
+          print " blue.";
+          str.free();
+       ]  "The sky is blue."  !implicitly tests contains()
+ ;
 
 #endif; !--After VERBLIB
 !======================================================================================

@@ -34,6 +34,7 @@ default        orHookVerbs_STAGE  0;
    replace LookSub;
    replace GoSub;
    replace TransferSub;
+   replace PlayerTo _oldPlayerTo;
 
    property individual ext_examineSub;
    property individual ext_preDescription;
@@ -41,8 +42,10 @@ default        orHookVerbs_STAGE  0;
    property individual ext_lookSub;
    property individual ext_goSub;
    property individual ext_goSubNoDir;
+   property individual ext_playerToNotify;
 
    Global orSuppressNewlineAfterDescription false;
+    
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER PARSER
@@ -58,7 +61,10 @@ default        orHookVerbs_STAGE  0;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
-
+    [ PlayerTo newplace flag;
+        LibraryExtensions.RunAll(ext_playerToNotify,newplace, flag); 
+        return _oldPlayerTo(newplace, flag);
+    ];
    [ ExamineSub i;
         orSuppressNewlineAfterDescription =false;
         if(LibraryExtensions.RunWhile(ext_examineSub,false)~=false) return;
@@ -156,6 +162,7 @@ default        orHookVerbs_STAGE  0;
 ];
 
 [ GoSub i j k movewith thedir next_loc;
+
     if(LibraryExtensions.RunWhile(ext_goSub,false)~=false) return;
     ! first, check if any PushDir object is touchable
     if (second && second notin Compass && ObjectIsUntouchable(second)) return;

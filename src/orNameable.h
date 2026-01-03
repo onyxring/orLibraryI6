@@ -143,7 +143,7 @@ default        orNameable_STAGE  0;
 			Name:
 				switch(n){
 					1 :	x1._afterDescription=true;
-						print (ig)CIVerb(actor,"began","begin")," to think of ",(the)x1," as ";
+						print (nop)CIVerb(actor,"began","begin")," to think of ",(the)x1," as ";
 						if(x1.customArticle==0) print "~";
 						x1._customName();
 						print".";
@@ -153,7 +153,7 @@ default        orNameable_STAGE  0;
 						print (The)x1," cannot be named.^";
 						!bkt_c();
 					3:	!bkt_o();
-						print (ig)CIVerb(actor,"forgot","forget")," any name ",(I)actor," may have given ",(the)x1,".^";
+						print (nop)CIVerb(actor,"forgot","forget")," any name ",(I)actor," may have given ",(the)x1,".^";
 						!bkt_c();
 				}
 		];

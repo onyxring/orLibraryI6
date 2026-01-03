@@ -97,8 +97,7 @@ default        orString_STAGE  	0;
 				if(buf4==true or false) caseInsensitive=buf4;
 				if(buf3==true or false) caseInsensitive=buf3;
 				if(buf2==true or false) caseInsensitive=buf2;
-				
-				if(self.startsWith(buf1, caseInsensitive)==true) rtrue;
+				if(self.equals(buf1, caseInsensitive)==true) rtrue;
 				if((~~(buf2==true or false)) && self.equals(buf2, caseInsensitive)==true) rtrue;
 				if((~~(buf3==true or false)) && self.equals(buf3, caseInsensitive)==true) rtrue;
 				if((~~(buf4==true or false)) && self.equals(buf4, caseInsensitive)==true) rtrue;
@@ -240,7 +239,7 @@ default        orString_STAGE  	0;
 					retval;
 				retval=util.orStr.new();
 				if(pattern==0) pattern="$0";
-				pattern=util.orStr.new(pattern);
+				pattern=util.orStr.new(pattern);  !convert whatever was passed in (literal or otherwise) to an orString object
 				pattern.set(pattern.replaceAll("$0",self));
 
 
@@ -257,7 +256,6 @@ default        orString_STAGE  	0;
 #endif;
 				pattern.free();
 				return retval.free();
-
 			]
 	;
 	#endif; !--BEFORE PARSER

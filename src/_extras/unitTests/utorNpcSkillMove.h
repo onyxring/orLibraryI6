@@ -49,26 +49,36 @@ default        utorNpcSkillMove_STAGE  0;
    n_to foyer, e_to study, w_to diningroom, s_to kitchen
    ;
 
+
    orNpc maid_sm "maid" atrium has female 
       class orNpcSkillMove
       with name 'maid'
-      ,  followTarget 0;
+      ,  followTarget 0
+      ,  priority 2
+      ,  isEnabled false
+      ;
 
    orNpc butler_sm "butler" atrium 
       class orNpcSkillMove
       with name 'butler'
+      ,  priority 4
       ,  movePath foyer diningRoom study
       ,  isEnabled false;
 
 orUnitTest "utorNpcSkillMove" 
-   with tests [; PlayerTo(atrium, 3); ] noTest
+   with tests [; maid_sm.isEnabled=true;
+                  PlayerTo(atrium, 3); 
+               ] noTest
                "z" "maid departs"   
                [;
                   move maid_sm to atrium; 
-                  butler.isEnabled=true; 
-                  maid_sm.followTarget=butler;
+                  butler_sm.isEnabled=true; 
+                  maid_sm.followTarget=butler_sm;
                   playerCommands.pushCommand("z");
-               ] "?"
+               ] [;
+                  if(self.assertContains("butler departs") && self.assertContains("maid departs")) rtrue;
+                  rfalse;
+               ]
 ;
 
 #endif; !--After VERBLIB

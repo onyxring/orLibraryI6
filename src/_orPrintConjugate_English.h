@@ -40,15 +40,25 @@ default        orPrintConjugate_English_STAGE  0;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
-constant entrySize 5;
+   constant entrySize 5;
+
+   constant PRES_TENSE_FORM 0;
+   constant PRES_TENSE_3RD_PERSON_SING_FORM 1;
+   constant PAST_TENSE_FORM 2;
+   constant PAST_PARTICIPLE_FORM 3;
+   
+
    [ orPrintConjugate ptrn 
          firstParm modalVerb isModalVerb i;
+      if(ptrn.parametersString.isEmpty()) return;
 
+      print " "; !--we've aleady printed the noun, so add a space.
 		firstParm=ptrn.getParamEphemeral(0).trim();
       if(firstParm.isEmpty()) return; !--nothing to conjugate
       firstParm.lock();      
       modalVerb=firstParm.left(firstParm.indexOf(" ")).lock();
-      print " ";
+      
+      !--Let's determine if we are dealing with a modal verb and print it out if so...
       if(modalVerb.equalsOneOf("could","would","should","might",true) || 
                modalVerb.equalsOneOf("couldn't", "wouldn't","shouldn't", "mightn't", true) || 
                modalVerb.equalsOneOf("can", "must", "will","shall", true) || 
@@ -58,83 +68,90 @@ constant entrySize 5;
          isModalVerb=true;
          
          modalVerb.print();
-         firstParm.set(firstParm.mid(firstParm.indexOf(" "),orBUF_END).trim());    
          print " ";
+
+         firstParm.set(firstParm.mid(firstParm.indexOf(" "),orBUF_END).trim());    
          if(firstParm.startsWith("not ",true)) {
             print "not "; 
             firstParm.set(firstParm.mid(4,orBUF_END).trim()); 
          }
+
+         if(getNarrativeTense() == PAST_TENSE) print "have ";
       }
-      modalVerb.free();
       
-		if(printIrregularVerbConjugation(firstParm, isModalVerb, ptrn) ==false) 
-         __orPrintConjugateEnglish(firstParm, isModalVerb, ptrn);
+      !Having dealt with all the modal verb stuff, now we are ready to print the actual verb.
+		!First, check and see if it has irregular conjugation, either known or specified in the pattern parameter.  Print if so...
+         
+      if(tryPrintIrregularVerbConjugation(firstParm, isModalVerb, ptrn) ==false) 
+         printRegularVerbConjugate(firstParm, isModalVerb, ptrn); !if not, then use normal conjugation rules
 		
+      modalVerb.free();
 		firstParm.free();      
 	];
-	[ printIrregularVerbConjugation  vrb isModalVerb ptrn
-      entryPos pos isThirdPerson; 
-      entryPos=findVerbEntryPos(vrb); !ptrn.getParamEphemeral(0));
-      if(entryPos==-1) return false;
+   
+   !--print irregular verb form if found
+	[ tryPrintIrregularVerbConjugation  vrb isModalVerb ptrn
+      entryPos verbword form wordOffset; 
 
-      pos=(entryPos*entrySize)+1; !+1 to advance past the hash key (root)
-
-      if(isModalVerb) {
-         if(getNarrativeTense() == PAST_TENSE) {
-            print " have ";   
-            pos=pos+2;
-         }
-         !--root for all other person/tense combinations
-      }   
-      else{ 
-         if(getNarrativeTense() == PAST_TENSE) 
-            pos=pos+2; !--past tense
-         else{ !--present tense
-            if(ptrn.contextObject~=player ||  (ptrn.contextObject==player &&  player provides narrative_voice && player.narrative_voice == 3)) pos=pos+1;  !--3rd per, sing
-            !--all remaining forms use root 
-         }
+      !--identify the form we should use. If its the root form, then just exit and let the default conjugation rules take care of it
+      if(getNarrativeTense() == PAST_TENSE) {
+         if(isModalVerb) 
+            form=PAST_PARTICIPLE_FORM; ! could have flown 
+         else
+            form=PAST_TENSE_FORM; ! flew
       }
-      util.orArray.get(_irregularVerbs, pos).print();
-      return true;
+      else{ !--present tense
+         if(~isModalVerb && (ptrn.contextObject~=player ||  (ptrn.contextObject==player &&  player provides narrative_voice && player.narrative_voice == 3))) 
+            form=PRES_TENSE_3RD_PERSON_SING_FORM; !flies      
+
+         rfalse;  !no special conjugation for root verbs !fly or could fly
+      }
+      
+      
+      !--We now know our form we should be printing; check and see if a word
+      !--   was specifed as a parameter for that form and use it if so
+      verbword=ptrn.getParamEphemeral(form); 
+      if(verbword>0) {         
+         verbword.print();
+         rtrue;
+      }
+      
+      !--otherwise, consult our list of known irregular verbs.
+      entryPos=findVerbEntryPos(vrb); 
+      if(entryPos==-1) rfalse; !not found, so exit and let our regular conjugation approach handle the verb 
+      wordOffset= (entryPos * entrySize)+1; !+1, because the first element in the array is the hash lookup value
+      
+      verbword=util.orArray.get(_irregularVerbs, wordOffset+form);  
+      
+      !A common pattern: if the past participle is not specified, we can use the regular past tense form
+      if(verbword==0 && form == PAST_PARTICIPLE_FORM) { 
+         form= PAST_TENSE_FORM;
+         verbword=util.orArray.get(_irregularVerbs, wordOffset+form);  
+      }
+      
+      if(verbword==0) rfalse; !--something went wrong.  We found an entry but arrived a zero.  This shouldn't happen, if our list of irregular verbs is formatted correctly
+      verbword.print(); 
+      rtrue;
    ];
-   [ __orPrintConjugateEnglish vrb isModalVerb ptrn
-			didPrintIrregular endingChar lookupForm;
+   [ printRegularVerbConjugate vrb isModalVerb ptrn
+			didPrintIrregular endingChar lookupForm printForm;
 		
       if(isModalVerb){
-		 	if(getNarrativeTense()== PAST_TENSE){
-            print "have ";
-            lookupForm=ptrn.getParamEphemeral(3, vrb);    
-            if(lookupForm==0) lookupForm=ptrn.getParamEphemeral(2);
-            if(lookupForm~=-1 && lookupForm.isEmpty()==false) 
-               lookupForm.print();
-            else{
-               if(vrb.right(1).equals("e")) 
-                  vrb.append("d").print();
-               else 
-                  vrb.append("ed").print();
-            }
-            
-            return;
-         }
-         else{
-            lookupForm=ptrn.getParamEphemeral(1, vrb);
-         
-            if(lookupForm==0) lookupForm=ptrn.getParamEphemeral(2);
-		 	
-		! ! 	if(vrb.right(1).equals("e")) 
-		! ! 		vrb.append("d").print();
-		! ! 	else 
-		! ! 		vrb.append("ed").print();
-            print lookupForm;
-         }
-         return;
+		 	if(getNarrativeTense()== PAST_TENSE) 
+               printForm=PAST_TENSE_FORM; !"could have jumped" (but modal verb already printed)
+         else
+               printForm=PRES_TENSE_FORM;  !"could jump" (but modal verb already printed)
 		}
+      else{ !--present tense
+         if (self.contextObject hasnt pluralname && (self.contextObject~=player || getNarrativePerson()==THIRD_PERSON )) 
+            printForm = PRES_TENSE_3RD_PERSON_SING_FORM;
+         else
+            printForm=PRES_TENSE_FORM;  
+      }
+
       endingChar=vrb.getCharFromRight(0); !--get the last character once, to minimize repeat calls to this routine
 		!--past tense
-		if(getNarrativeTense()== PAST_TENSE){
-			lookupForm=ptrn.getParamEphemeral(2, vrb); !--zero indexed.  3rd parameter is past tense form.
-			if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
-			
+		if(printForm== PAST_TENSE_FORM){
 			if(endingChar=='y' && util.orChar.isConsonant(vrb.getCharFromRight(1))) return vrb.left(vrb.getLength()-1).append("ied").print(); !--cry = cried
 			if(endingChar=='e') return vrb.append("d").print(); !--hope = hoped
 			
@@ -144,11 +161,12 @@ constant entrySize 5;
 			if(endingChar~='w' or 'x' or 'y' && util.orChar.isConsonant(endingChar) && util.orChar.isVowel(vrb.getCharFromRight(1)) && util.orChar.isConsonant(vrb.getCharFromRight(2)))
 				print (char)endingChar; !--hop = hopped
 			print "ed"; 
+         return;
 		}
-		if(getNarrativeTense()== PRESENT_TENSE){
+		if(printForm == PRES_TENSE_3RD_PERSON_SING_FORM){
 			!--3rd person singular
 			if (self.contextObject hasnt pluralname && (self.contextObject~=player || getNarrativePerson()==THIRD_PERSON )) { 
-				lookupForm=ptrn.getParamEphemeral(1, vrb); !--zero indexed. 2nd parameter is 3rd person singular, present tense form
+				lookupForm=ptrn.getParamEphemeral(PRES_TENSE_3RD_PERSON_SING_FORM); !--zero indexed. 2nd parameter is 3rd person singular, present tense form
 				if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
 
 				if(endingChar=='y' && util.orChar.isConsonant(vrb.getCharFromRight(1)))  {
@@ -158,13 +176,12 @@ constant entrySize 5;
 				
 				return vrb.append("s").print(); !--default: hide=hides
 			}
-			!--1st, 2nd, or 3rd person plural
-			else{
-				vrb.print(); !--the first pattern matches the passed in verb pattern
-				return;
-			}
+      }
+		if(printForm == PRES_TENSE_FORM){!--1st, 2nd, or 3rd person plural
+         vrb.print(); !--the first pattern matches the passed in verb pattern
+         return;
 		}
-		
+      print "ERROR: Unexpected error attempting to conjugate "; vrb.print(); print ".";
 	 ];
 ! A simple FNV-0 hashing implementation, used to speed lookups.
 [hashString str i hsh;
@@ -210,7 +227,7 @@ array _irregularVerbs table [
    $0971 "know" "knows" "knew" "known"
    $099F "teach" "teaches" "taught" 0
    $0A13 "misunderstand" "misunderstands" "misunderstood" 0
-   $0B43 "spoil" "spoils" "spoiled" 0
+   !$0B43 "spoil" "spoils" "spoilt" 0 !Only irregular in british spelling
    $0C18 "knit" "knits" "knit" 0
    $0C98 "dig" "digs" "dug" 0
    $0CFD "mishear" "mishears" "misheard" 0
@@ -465,5 +482,6 @@ array _irregularVerbs table [
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE
 #endif; !--ndef _STAGE
+
 
 

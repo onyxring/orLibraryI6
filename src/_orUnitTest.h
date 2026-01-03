@@ -7,8 +7,6 @@
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 ! License:
 !--------------------------------------------------------------------------------------
-! 
-!--------------------------------------------------------------------------------------
 ! Revision History
 ! 2025.12.15	Initial Creation
 !======================================================================================
@@ -160,8 +158,8 @@ default        orUnitTest_STAGE   0;
   object _orTestHooks LibraryExtensions 
     with areUnitTestsRunning false
     , ext_initialise[; 
-          tmpCatch=util.orStr.new();
-          testResult=util.orStr.new();
+          tmpCatch=util.orStr.new(); !--these are never freed, since the opposite of initialize
+          testResult=util.orStr.new(); !--   would be game shutdown (and that clears out everything)
           #ifdef orUnitTestAutoRun;
             playerCommands.pushCommand("utrun");
           #endif;
@@ -187,6 +185,10 @@ default        orUnitTest_STAGE   0;
         [utRunSub 
               t result;
               
+            if(playerCommands.getLength()>0){ !--Normally, utRun occurs after the unit test commands have run; however, if one of the commands adds more commands to the playerCommands queue, then let's just ignore this well-intentioned utRun call and add a new one to the queue
+              playerCommands.pushCommand("utRun", true, true);
+              return;
+            }
             _orTestHooks.areUnitTestsRunning=true;
             tmpCatch.release(); !--stop capturing output 
             testResult.set(testResult.append(tmpCatch)); !--add the output to the results accumulated so far
@@ -214,12 +216,13 @@ default        orUnitTest_STAGE   0;
               playerCommands.pushCommand("utRun", true, true);
               return;
             }
-            playerCommands.pushCommand("utFinish", true, true);
+            playerCommands.pushCommand("utFinish", true, true);            
         ];
         
         [utFinishSub ;
           _orTestHooks.areUnitTestsRunning=false;
           tmpCatch.release(); 
+          
           print "^----------------------------------------------------------------------------------";
           print "^Tests complete: ",success,"/",success+failed," succeeded; ",failed," FAILED.";
         ];

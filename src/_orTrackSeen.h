@@ -22,6 +22,8 @@ default        orTrackSeen_STAGE  0;
 ! INCLUDE DEPENDENCIES
 #include "_orInfExt";
 #include "_orHookStandardLibrary";
+#include "_orHookInformLibrary";
+#include "_orHookVerbs";
 !--------------------------------------------------------------------------------------
 #ifnot;
 #ifndef        orTrackSeen_STAGE; message fatalerror orXFErrorInclude; #endif;
@@ -37,15 +39,18 @@ default        orTrackSeen_STAGE  0;
 #endif; !--before parser
 !======================================================================================
 ! AFTER VERBLIB
-
-! Note: this is hardly an extension at all; however, this functionality is used by at
-! least two other extensions which actually do something with the tracking mechanism.
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
     orInfExt with ext_afterAction[;
-            if(action==##Examine && noun) give noun beenSeen;
-            if(action==##Look) give location beenSeen;
-
-        ];
+            if(action==##Examine && noun) give noun beenSeen;           
+            if(action==##Look ) give location beenSeen; !in the context of rooms, beenSeen is redundant to the Standard Librdary's visited attribute
+        ]
+    ,   ext_afterGamePrologueNotify[;
+            give location beenSeen; !when the location in initialise
+	    ]
+    ,   ext_playerToNotify[ newloc;
+            give newloc beenSeen; 
+	    ]
+;
 #endif; !--After VERBLIB
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE

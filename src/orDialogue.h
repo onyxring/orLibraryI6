@@ -66,7 +66,7 @@ default        orDialogue_STAGE  0;
 					if(npc provides iDunno)
 					 	printorrun(npc,iDunno);
 					else
-						print (ig)CIVerb(npc,"did","do","does")," not appear to know the answer to that.^";
+						print (nop)CIVerb(npc,"did","do","does")," not appear to know the answer to that.^";
 				}
 				else print "I'm not sure who you want to talk to.^";
 		}
@@ -82,7 +82,7 @@ default        orDialogue_STAGE  0;
 			3: 	if(npc provides iDunno)
 					printorrun(npc,iDunno);
 				else
-					print (ig)CIVerb(npc,"did","do","does")," not appear to know the answer to that.^";
+					print (nop)CIVerb(npc,"did","do","does")," not appear to know the answer to that.^";
 		}
 	];
 
@@ -314,7 +314,7 @@ default        orDialogue_STAGE  0;
 		}
 	];
 	[vagueError res;
-		if(res==0) print "There ",(ig)ppf("was","is","will be")," nothing to speak with.^";
+		if(res==0) print "There ",(nop)ppf("was","is","will be")," nothing to speak with.^";
 		if(res<0) {
 			print "You'll need to be more specific. Who ",(italics)"exactly"," did you want to speak with?^";
 			res=0;

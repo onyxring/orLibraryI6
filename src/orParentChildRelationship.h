@@ -188,7 +188,7 @@ default        orParentChildRelationship_STAGE  0;
 
 			! 		}
 			! Open:	if(n==4){
-			! 			print (ig)CIVerb(actor,"opened","open"), " ",(the) x1, ", revealing ";
+			! 			print (nop)CIVerb(actor,"opened","open"), " ",(the) x1, ", revealing ";
 			! 			SetContainedChildrenWorkFlag(x1,true);
 			! 			if(WriteListFrom(child(x1),
 			! 		      ENGLISH_BIT + WORKFLAG_BIT + TERSE_BIT + CONCEAL_BIT)==0) "nothing.";

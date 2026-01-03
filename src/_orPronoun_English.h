@@ -17,7 +17,7 @@
 !
 ! Things to remember about this implementation.
 ! Functions, such as civerb() and iverb() return a value after they have
-! printed.  When printing these the (ig) printrule should be used.
+! printed.  When printing these the (nop) printrule should be used.
 !
 ! PrintRules:
 !
@@ -109,12 +109,29 @@ default        orPronoun_English_STAGE  0;
 	! 	print (object)o;
 	! ];
 	system_file;
-	#ifndef ppf;[ppf f s l; f=l; print (string)s;]; #endif;
-	#ifndef fst;[fst f s l; f=l; print (string)s;]; #endif;
+	  !------------------------------------------------------------------------
+    ! ppf (past, present, future tense options)
+    [ppf past present future;
+        switch(getNarrativeTense())
+        {
+            PAST_TENSE: print (string) past;
+            PRESENT_TENSE: print (string) present;
+            FUTURE_TENSE:print (string) future;
+        }
+    ];
+    !------------------------------------------------------------------------
+    ! fst (First,Second,Third Person options)
+    [fst first second third;
+        switch(getNarrativePerson())
+        {
+            FIRST_PERSON:    print (string) first;
+            SECOND_PERSON:    print (string) second;
+            THIRD_PERSON:    print (string) third;
+        }
+    ];
 	!----------------------------------------------------------------------
 	! Special formating print routines go here
 	!----------------------------------------------------------------------
-	#ifndef ig; [ig o;o=null;]; #endif; !ignore print rule
 	!----------------------------------------------------------------------
 	! All common code in the pronoun print routines is contined here.
 	! These are broken up into two routines because a single routine would
@@ -260,19 +277,20 @@ default        orPronoun_English_STAGE  0;
 	!----------------------------------------------------------
 	! pass false for generic singular object or true for generic plural object, otherwise pass in the object itself
 	[Am obj; !was/am/will/were/are/is
+		
 		if(obj==player && getNarrativePerson()~=THIRD_PERSON) !first or second person
 		{
 			switch(getNarrativePerson())
 			{
-			FIRST_PERSON: print (ig) ppf("was","am","will");
-			SECOND_PERSON: print (ig) ppf("were","are","will");
+			FIRST_PERSON: print (nop) ppf("was","am","will");
+			SECOND_PERSON: print (nop) ppf("were","are","will");
 			}
 			return;
 		}
 		if(obj~=null && (obj == true || obj has pluralname))
-			print (ig) ppf("were","are","will");
+			print (nop) ppf("were","are","will");
 		else
-			print (ig) ppf("was","is","will");
+			print (nop) ppf("was","is","will");
 	];
 	[TheIAm obj; print (TheI)obj," ",(Am)obj;];
 	[CTheIAm obj; print (CTheI)obj," ",(Am)obj;];
@@ -287,10 +305,10 @@ default        orPronoun_English_STAGE  0;
 	[Have obj; !had/have/will have
 		!--for present tense always use "have" except when speaking in singular third person
 		if(obj hasnt pluralname && (obj~=player || (obj==player && getNarrativePerson()==THIRD_PERSON))) {
-			print (ig) ppf("had","has","will have had");
+			print (nop) ppf("had","has","will have had");
 			return;
 		}
-		print (ig) ppf("had","have","will have had");
+		print (nop) ppf("had","have","will have had");
 	];
 	[IHave obj; print (TheI)obj," ",(Have)obj;];
 	[CIHave obj; print (CTheI)obj," ",(Have)obj;];

@@ -70,15 +70,13 @@ default        orPlayerCommandQueue_STAGE  0;
 
 	[doQueuedAction inputBuffer
 			a iqa t;
-		
+
 		if(playerCommands.getLength()==0 ||  just_undone~=0){ !--no queued actions, or there ARE queued actions, but they were restored from the last undo, so lets not do them...
 			playerCommands.clear();
 			rfalse;
 		}
 		a=playerCommands.dequeue();
-
 		iqa=ValueOrRun(playerCommands,interrupt);
-
 		!-- actions have been interrupted...
 		if(iqa){ ! || a.CanAttempt()==false){
 			if(iqa==true) L__M(##Miscellany,99);
@@ -99,8 +97,6 @@ default        orPlayerCommandQueue_STAGE  0;
 			 a.print();
 		util.orBuf.release(); !--since we print to it as though it were a normal array, buffer starts with a WORD-sized length (the MSB will be zero unless we printed too much).
 		
-		
-
 		for(t=WORDSIZE:t<INPUT_BUFFER_LEN:t++) {
 			if(inputBuffer->t==13 or 10) inputBuffer->t=32; !remove returns, since these are not possible via input but may show up from the print statment
 		}
@@ -109,7 +105,6 @@ default        orPlayerCommandQueue_STAGE  0;
 
 		if((a provides keepSilent)==false || a.keepSilent==false){
 			print (string) orQueuedActionPrompt;
-
 			style bold;
 			util.orBuf.print(inputBuffer); !--print the text of the command so it resembles something typed.
 			style roman;
@@ -120,11 +115,9 @@ default        orPlayerCommandQueue_STAGE  0;
 		inputBuffer->0=INPUT_BUFFER_LEN - WORDSIZE; !for the Z-Machine only, this is a bit of manual patching, making the first byte equal to buffer size, just as though the standard library did all of this. (first byte size of buffer; second byte length of string, which is already populated because it cannot be longer than 255)
 		#endif;
 
-		if(a provides getCustomFlags) 
-			orActionFlags=a.getCustomFlags();
-		if(a provides destroy) 
-			orAction.destroy(a);
-
+		if(a provides getCustomFlags)  orActionFlags=a.getCustomFlags();
+		if(a provides destroy) orAction.destroy(a);
+		
 		!for(t=WORDSIZE:t<23:t++) print inputBuffer->t,",";
 		!new_line;
 

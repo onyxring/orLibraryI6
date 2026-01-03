@@ -56,25 +56,25 @@ orUnitTest "utorPrint"
             second=toy_op;
             orPrint("$The:actor $the:noun $A:second $a:second");
             orPrint("$up(upper) and $lo(LOWER).");
-      ]   [val retval count; 
-         count++; retval=retval+self.assertContains("Weller says: ~Now is the time for all good men to come to the aid of their country.~"); !--doesnt actually test style, but at least verifies the style print patterns don't print
-         count++; retval=retval+self.assertContains("~7~ IS TRULY PRIME. (~2~ AND ~3~ ARE ONLY HONORARILY SO)");
-         count++; retval=retval+self.assertContains("Father Naru blesses Gotie.");
-         count++; retval=retval+self.assertContains("Jacob materializes to stop Ebenezer.");
-         count++; retval=retval+self.assertContains("3four5");
-         #ifdef TARGET_ZCODE;
-            count++; retval=retval+self.assertContains("The number 257 is $0101 in hex.");
-         #ifnot;
-            count++; retval=retval+self.assertContains("The number 257 is $00000101 in hex.");
-         #endif;
-         count++; retval=retval+self.assertContains("You pick up 1 rock.");
-         count++; retval=retval+self.assertContains("You pick up 3 rocks.");
-         count++; retval=retval+self.assertContains("The robot the box A toy a toy");
-         count++; retval=retval+self.assertContains("UPPER and lower.");
-
-         return retval==count;
-      ]  
-      !--TODO: Add test cases from the rest of orPrint
+         ]   [val retval count; 
+               count++; retval=retval+self.assertContains("Weller says: ~Now is the time for all good men to come to the aid of their country.~"); !--doesnt actually test style, but at least verifies the style print patterns don't print
+               count++; retval=retval+self.assertContains("~7~ IS TRULY PRIME. (~2~ AND ~3~ ARE ONLY HONORARILY SO)");
+               count++; retval=retval+self.assertContains("Father Naru blesses Gotie.");
+               count++; retval=retval+self.assertContains("Jacob materializes to stop Ebenezer.");
+               count++; retval=retval+self.assertContains("3four5");
+               #ifdef TARGET_ZCODE;
+                  count++; retval=retval+self.assertContains("The number 257 is $0101 in hex.");
+               #ifnot;
+                  count++; retval=retval+self.assertContains("The number 257 is $00000101 in hex.");
+               #endif;
+               count++; retval=retval+self.assertContains("You pick up 1 rock.");
+               count++; retval=retval+self.assertContains("You pick up 3 rocks.");
+               count++; retval=retval+self.assertContains("The robot the box A toy a toy");
+               count++; retval=retval+self.assertContains("UPPER and lower.");
+               
+               return retval==count;
+            ]  
+         !--TODO: Add test cases from the rest of orPrint
 ;
 
 #endif; !--After VERBLIB

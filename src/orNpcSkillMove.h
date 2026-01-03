@@ -310,7 +310,7 @@ default        orNpcSkillMove_STAGE  0;
 ! 		,		last_location	0
 ! 		,		no_where_to_go	0
 ! 		,		missing_path_msg[;
-! 					print (ig)CIVerb(self,"looked","look")," a little disoriented for a moment. ";
+! 					print (nop)CIVerb(self,"looked","look")," a little disoriented for a moment. ";
 ! 				]
 ! 		,		ajoining_room_to_direction[room t o; !---given an ajoining room, return the dir_obj the npc needs to travel to get there
 ! 					objectloop(t in compass) { !---t is the direction object
@@ -399,7 +399,7 @@ default        orNpcSkillMove_STAGE  0;
 ! 					}
 ! 					self.doverb(##go,DirectionObjFromDirection(direction));
 ! 					if(parent(self)==self.last_location) {
-! 						!print "[ERROR:  npc was not able to travel in direction ",(ig)LanguageDirection(direction),".]";
+! 						!print "[ERROR:  npc was not able to travel in direction ",(nop)LanguageDirection(direction),".]";
 ! 						if(self.missing_path_msg~=0 && CanPlayerWitness(self)==true) printorrun(self,missing_path_msg); !--print a message to indicate a problem with the path
 ! 						return; !---didn't go anywhere...
 ! 					}
@@ -421,20 +421,20 @@ default        orNpcSkillMove_STAGE  0;
 ! 		with ext_messages[;
 ! 		FollowNPC:
 ! 			switch(lm_n){
-! 				1: print (ig)CIVerb(actor,"began","begin")," to follow ",(TheMe)noun,", but ",(ig)vrb(actor,"seemed","seem")," to have lost ",(me)noun,". ";
+! 				1: print (nop)CIVerb(actor,"began","begin")," to follow ",(TheMe)noun,", but ",(nop)vrb(actor,"seemed","seem")," to have lost ",(me)noun,". ";
 ! 					rtrue;
 ! 			}
 ! 		ContinueFollowingObject:
 ! 			switch(lm_n){
 ! 				1:	if(noun==actor){
-! 						print (ig)CICant(actor)," follow ",(Myself)noun,". ";
+! 						print (nop)CICant(actor)," follow ",(Myself)noun,". ";
 ! 					}
 ! 					else{
-! 						print (ig)CICant(actor)," follow ",(TheMe)noun,". ";
+! 						print (nop)CICant(actor)," follow ",(TheMe)noun,". ";
 ! 					}
-! 					print_ret (ig)CIHave(noun)," not gone anywhere. ";
-! 				2: print_ret (ig)CIVerb(actor,"looked","look")," at ",(TheMe)noun," and then ",(ig)vrb(actor,"nodded","nod")," agreeably. ";
-! 				3: print_ret (ig)CIVerb(actor,"shook","shake")," ",(my)actor," head. ~I don't follow,~ ",(ig)CIVerb(actor,"said","say"),". ";
+! 					print_ret (nop)CIHave(noun)," not gone anywhere. ";
+! 				2: print_ret (nop)CIVerb(actor,"looked","look")," at ",(TheMe)noun," and then ",(nop)vrb(actor,"nodded","nod")," agreeably. ";
+! 				3: print_ret (nop)CIVerb(actor,"shook","shake")," ",(my)actor," head. ~I don't follow,~ ",(nop)CIVerb(actor,"said","say"),". ";
 ! 			}
 ! StopVague:
 ! 					bkt_o();
@@ -444,18 +444,18 @@ default        orNpcSkillMove_STAGE  0;
 ! 					rtrue;
 ! 		StopFollowing:
 ! 			switch(lm_n){
-! 				1:	print_ret (ig)CIVerb(actor,"stopped","stop")," paying attention to ",(TheMe)noun," and ",(ig)vrb(actor,"looked","look")," away.";
+! 				1:	print_ret (nop)CIVerb(actor,"stopped","stop")," paying attention to ",(TheMe)noun," and ",(nop)vrb(actor,"looked","look")," away.";
 ! 				2:  print_ret (CIAm)actor," not following anything. ";
 ! 			}
 ! 		Halt:
 ! 			switch(lm_n){
 ! 				1:print_ret (CIAm)actor," not moving around. ";
-! 				2:print_ret (ig)CIVerb(actor,"stood","stand")," still.";
+! 				2:print_ret (nop)CIVerb(actor,"stood","stand")," still.";
 ! 			}
 ! 		Unhalt:
 ! 			switch(lm_n){
 ! 				1:print_ret (CIAm)actor," not standing particularly still. ";
-! 				2:print_ret (ig)CIVerb(actor,"resumed","resume")," a more mobile posture. ";
+! 				2:print_ret (nop)CIVerb(actor,"resumed","resume")," a more mobile posture. ";
 ! 			}
 ! 	];
 ! 	[DirectionObjFromDirection d;

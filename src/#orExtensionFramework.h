@@ -19,10 +19,7 @@
 !--------------------------------------------------------------------------------------
 system_file;
 !======================================================================================
-! orLibrary Versioning
-!======================================================================================
-default orLibVersion "2.0b";
-default orLibDateStamp "2025.12.29";
+#include "_#version"; 
 !======================================================================================
 default orXFErrorInclude "ERROR: orExtensionFramework extensions must only be #Included once, before including '#orParser'.";
 !--Do some checking to make sure things are included in the right order; notify of detected sequencing issues.
