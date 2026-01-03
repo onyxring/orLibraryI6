@@ -1,5 +1,5 @@
 # The OnyxRing Library for Inform 6, version 2
-The orLibrary is an extension framework, and a collection of extensions, for the Inform 6 compiler and standard library. 
+The orLibrary is an extension framework, and a collection of extensions, for the Inform 6 compiler and Standard Library. 
 
 If you are not sure where to start, the [User's Guide](https://github.com/onyxring/orLibraryI6/blob/main/src/_extras/orLUG.pdf) is probably the best place [(download)](https://github.com/onyxring/orLibraryI6/raw/refs/heads/main/src/_extras/orLUG.pdf), assuming you are already familiar with Inform 6. 
 

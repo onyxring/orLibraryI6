@@ -33,7 +33,6 @@ default        orHookVerbs_STAGE  0;
    replace ExamineSub;
    replace LookSub;
    replace GoSub;
-   replace TransferSub;
    replace PlayerTo _oldPlayerTo;
 
    property individual ext_examineSub;
@@ -251,32 +250,6 @@ default        orHookVerbs_STAGE  0;
     action = ##Go;
     if (AfterRoutines() || keep_silent) return;
     LookSub(1);
-];
-
-[ TransferSub ks;
-    ks = keep_silent;
-
-    if (noun notin actor) {
-        keep_silent = true;
-        AttemptToTakeObject(noun);
-    }
-
-    if (noun in actor) {
-    	if (second has supporter) <PutOn noun second, actor>;
-	    !--jimf: I think the following, from the standard library, has a bug which generates a bogus insert after the appropriate drop...
-        !if (second == d_obj) <Drop noun, actor>;
-	    !<Insert noun second, actor>;
-
-        !--jimf: In my tests, the following fixes it...
-        else if (second == d_obj) <Drop noun, actor>;
-	    else <Insert noun second, actor>;
-    }
-
-    keep_silent = ks;
-
-    if (noun notin actor) rfalse;
-    rtrue;
-
 ];
 
 #endif; !--After VERBLIB

@@ -1,0 +1,23 @@
+Release notes for the orLibrary
+===============================
+The orLibrary is an extension framework and collection of opt-in extensions, 
+used to enhance Inform 6's Standard library.  Based on versions produced in 
+2001-2004, this second major revision was introduced as a public beta in 2026.
+
+Version 2.0b (Jan 2026)
+------------------------
+This is the first public beta for this second major release of the orLibrary.
+It contains 48 "Primary" extensions targeted at general-purpose projects, plus
+an additional 21 "Supporting" extensions which provide low-level features 
+which may serve as a foundation for extension developers to build upon.
+
+More detail about this releases contents, the "Primary" extensions in 
+particular, can be found in the orLibrary User's Guide (orLUG), which accompanys
+the library.  Additionally, this free, online viewer will let you view it 
+without committing to the install:
+
+https://nbviewer.org/github/onyxring/orLibraryI6/blob/main/src/_extras/orLUG.pdf
+
+A special thanks goes out to @otistdog, for his review of the library and the 
+documentation and suggestions.  His attention to detail is exceptional.
+

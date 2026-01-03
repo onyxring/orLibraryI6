@@ -713,11 +713,12 @@ property individual ext_adjudicate;
 
     for (line=0 : line<=num_lines : line++) {
 
-        for (i=0 : i<32 : i++) {
-            line_token-->i = ENDIT_TOKEN;
-            line_ttype-->i = ELEMENTARY_TT;
-            line_tdata-->i = ENDIT_TOKEN;
-        }
+        !--removed from Standard Library 6.12.8
+        ! for (i=0 : i<32 : i++) {
+        !     line_token-->i = ENDIT_TOKEN;
+        !     line_ttype-->i = ELEMENTARY_TT;
+        !     line_tdata-->i = ENDIT_TOKEN;
+        ! }
 
         ! Unpack the syntax line from Inform format into three arrays; ensure that
         ! the sequence of tokens ends in an ENDIT_TOKEN.
