@@ -29,24 +29,25 @@ default        utorVagueQuantity_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
    object utorVagueQuantityStart "orVagueQuantity Room" has light with description "Where orVagueQuantity tests are run.";
 
-class marble2 with name 'marble' 'marbles//p', short_name "marble",
-   plural "marbles";
+class fish with name 'fish',
+   short_name "fish",
+   plural "fish",
+   vagueQuantity 4 "some" 6 "a school of" true 9 "far too many";
 
-object -> bowl2 "bowl" with name 'bowl' has open container;
-    
-marble2 ->->; marble2 ->->; marble2 ->->; marble2 ->->; 
-    marble2 ->->; marble2 ->->; marble2 ->->; marble2 ->->; 
-    marble2 ->->; marble2 ->->; marble2 ->->; marble2 ->->;    
+object -> bowl2 "bowl" with name 'bowl' has open container;    
+    fish ->->; fish ->->; fish ->->; fish ->->; 
+    fish ->->; fish ->->; fish ->->; fish ->->; 
+    fish ->->; fish ->->; fish ->->; fish ->->;    
 
 orUnitTest "utorVagueQuantity" 
    with tests [; PlayerTo(utorVagueQuantityStart, 3); ] noTest 
-   "x bowl" "are numerous marbles."   
-   "take 6 marbles" "Taken"
-   "x bowl" "are several marbles."  
-   "take 3 marbles. x bowl" "are a few marbles."  
-   "take 1 marble. x bowl" "are a couple of marbles."  
+   "x bowl" "are far too many fish."   
+   "take 5 fish" "Taken"
+   "x bowl" "is a school of fish."  
+   "take 3 fish. x bowl" "are some fish."  
+   "take 1 fish. x bowl" "are three fish."  
    "drop all" noTest !--clear for other unit tests
-;
+   ;
 
 #endif; !--After VERBLIB
 !======================================================================================

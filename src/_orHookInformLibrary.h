@@ -41,7 +41,7 @@ default        orHookInformLibrary_STAGE  0;
    property individual ext_playLoopAssignObjectVariables;
    property individual ext_playLoopPerformSingleObjectAction;
    property individual ext_playLoopPerformMultiObjectAction;
-   property individual ext_afterGamePrologueNotify;
+   property individual ext_afterGamePrologueNotify;  
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER PARSER

@@ -32,9 +32,11 @@ default        orHookParser_STAGE  0;
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
 replace Adjudicate; ! _oldAdjudicate;
 replace Parser__parse;
+replace R_Process _oldR_Process;
 property individual ext_suppressParsingImplicitTake;
 property individual ext_forceLookAhead;
 property individual ext_adjudicate;
+property individual ext_redirectActionNotify;
 #endif;
 !======================================================================================
 ! AFTER PARSER
@@ -1266,7 +1268,10 @@ property individual ext_adjudicate;
     jump GiveError;
 
 ]; ! end of Parser__parse
-
+[ R_Process a n s p;
+    LibraryExtensions.RunAll(ext_redirectActionNotify, a, n, s, p);
+    _oldR_Process(a, n, s, p);
+];
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER PARSER

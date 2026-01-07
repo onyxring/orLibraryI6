@@ -47,7 +47,7 @@ default        utorDialogue_STAGE  0;
       ,  dissemTrack 0 0
       ,  quip "~What's the best number?~"
          [teller talkingTo;
-            if(self.hasBeenToldTo(talkingTo)) print "~I told you already...~ the mirror says.";
+            if(self.hasBeenToldTo(talkingTo,0,true)) print "~I told you already...~ the mirror says.";
                
             "~Two is the best. It's the only prime number that is even.~";
          ];

@@ -32,6 +32,7 @@ default        orHookWriteList_STAGE  0;
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
 	replace WriteListR;
     property individual ext_wlrPluralMany;
+    property individual ext_forceSingular;
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER VERBLIB
@@ -62,10 +63,17 @@ default        orHookWriteList_STAGE  0;
     }
 
     if (c_style & ISARE_BIT) {
-        if (j == 1 && o hasnt pluralname) Tense(IS__TX, WAS__TX);
-        else                              Tense(ARE__TX, WERE__TX);
-        if (c_style & NEWLINE_BIT)   print (string) COLON__TX, "^";
-        else                         print (char) ' ';
+
+        ! if (j == 1 && o hasnt pluralname) 
+        if((j == 1 && o hasnt pluralname) || LibraryExtensions.RunWhile(ext_forceSingular, false, o, j)==true ) !--new extension
+            Tense(IS__TX, WAS__TX);
+        else
+            Tense(ARE__TX, WERE__TX);
+
+        if (c_style & NEWLINE_BIT)   
+            print (string) COLON__TX, "^";
+        else
+            print (char) ' ';
         c_style = c_style - ISARE_BIT;
     }
 
@@ -100,7 +108,6 @@ default        orHookWriteList_STAGE  0;
         }
     }
     senc--;
-
     for (i=1,j=o,k=0,mr=0 : senc>=0 : i++,senc--) {
         while (((classes_p->k) ~= i) && ((classes_p->k) ~= -i)) {
             k++; j=NextEntry(j, depth);

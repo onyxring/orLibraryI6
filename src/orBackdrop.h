@@ -59,7 +59,7 @@ Constant bdDescr	1;
 	property individual backdrops3;
 
 	!--an ever present object, which interjects itself if the player is referencing dictionary words listed in the location's backdrops property
-	object orBackdropEngine has scenery proper !talkable
+	object orBackdropEngine has scenery proper talkable !--talkable, because people may try to talk to backdrops
 		private _getEndPos[obj
 					i;
 				i=self._usedPos;
@@ -92,14 +92,13 @@ Constant bdDescr	1;
 					i=self._getDescriptionPos(obj);
 				else
 					i=self._getIgnoreMsgPos(obj);
-
 				if(i==bdDefault) {
 					L__M(##Miscellany, 39);
 					rtrue;
 				}
-
 				!---at this point i should point to the index of the message to print
 				e=util.orArray.get(obj,self._usedProperty,i);
+
 				switch(metaclass(e)){
 		#ifdef orString;
 					Object:
@@ -113,7 +112,7 @@ Constant bdDescr	1;
 		#endif;
 					Routine:
 						if(e()==false) L__M(##Miscellany, 39);
-						rtrue; !action was redirected, so return true to suppress the automatic line feed
+						!orSuppressNewlineAfterDescription=true; !action was redirected, so suppress the automatic line feed (NOTE: comes up when not redirected, just using a routine to print. Perhaps detect this in a different way?)
 
 				}
 			]
@@ -122,22 +121,22 @@ Constant bdDescr	1;
 		,   _usedObject  0		!--... and on which object the backdrop is defined
 		,	_sayDescription[obj; return self._printResponse(obj,true);  ]
 		,	getKeyword[loc;
-				if(loc~=0 && self._usedObject~=loc) return 0; 
+				if(loc~=0 && self._usedObject~=loc) return 0; 	
 				return util.orArray.get(self._usedObject,self._usedProperty, self._usedPos);
 			]
 		,	short_name "your surroundings"
 		,	found_in [;rtrue;] !-always present
 		,   chooseobject[code;
-				if(code<2) return 2; !--exclude backdrops from "all" check
+				if(code<2) return 2; !--exclude backdrops from "all" check			
 				return 0; !--prefer other real objects
 			]
-		,   description[; self._sayDescription(location);]
+		,   description[; return self._sayDescription(location);  ]
 		!,	descriptionVerbs ##Examine ##Search 0 0 0 0
 		,	descriptionVerbs ##Examine 0 0 0 0 0
 		,	registerDescriptionVerb[v; util.orArray.append(self, descriptionVerbs, v); ]
 		,	before[obj;
-				if(util.orArray.find(self, descriptionVerbs, action)~=-1) {
-					rfalse; !--is this a verb which should respond with a description?
+				if(util.orArray.find(self, descriptionVerbs, action)>-1) { !--is this a verb which should respond with a description?
+					rfalse; !--if so, then don't interupt the normal printing logic here
 				}
 				if(obj==0) obj=location;
 				if(self._handleOtherActions(obj)==false) !if the handler returned true, then we are probably redirecting an action to skip the terminating new_line, since the other action will do that when it completes.
@@ -196,7 +195,7 @@ Constant bdDescr	1;
 						break;
 					}
 				}
-				if(pos<0)pos=0;
+				if(pos<0)pos=0; 
 				switch(prop){
 					backdrops: retval=1;
 					backdrops1: retval=2;
@@ -211,6 +210,13 @@ Constant bdDescr	1;
 				orBackdropEngine._usedProperty=0;
 				orBackdropEngine._usedPos=0;
 				orBackdropEngine._usedObject=0;
+			]
+		, 	ext_redirectActionNotify[;
+				if(noun~=orBackdropEngine && (noun ofclass orBackdrop)==false){ !--this action does not reference a backdrop object, so clear out any backdrop pointers to avoid confusion later
+					orBackdropEngine._usedProperty=0;
+					orBackdropEngine._usedPos=0;
+					orBackdropEngine._usedObject=0;
+				}
 			]
 		,	ext_adjudicate[ !--when a reference to a backdrop also matches a real object
 					i o retval backdropsConsidered nonBackdropsConsidered;

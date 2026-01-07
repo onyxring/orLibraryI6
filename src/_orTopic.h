@@ -81,12 +81,12 @@ default        orTopic_STAGE  0;
 				rfalse; !topic DOES provide context, but it wasn't previously resolved; therefore, NOT in context.
 			]
 		,	isAppropriateFor[c1 c2;
-				if(self.isTellable() && self.isKnownBy(c1) && self.isInContextFor(c2) && (self.hasBeenToldTo(c2, c1) == false)) rtrue; !--tell
+				if(self.isTellable() && self.isKnownBy(c1) && self.isInContextFor(c2) && (self.hasBeenToldTo(c2, c1, true) == false)) rtrue; !--tell
 
 				if(self.isAskable() && !--an askable topic
 					self.isKnownBy(c2) && !--known by the second character
 					self.isInContextFor(c1) &&  !--in context for the first character
-					(self.hasBeenToldTo(c1, c2) == false)!--has NOT already been told to the first character by the second character already
+					(self.hasBeenToldTo(c1, c2, true) == false)!--has NOT already been told to the first character by the second character already
 					) rtrue;
 				rfalse;
 			]
@@ -107,7 +107,7 @@ default        orTopic_STAGE  0;
 		,	recordTell[p1 p2
 					t;
 
-				if(self.hasBeenToldTo(p2,p1)) return;
+				if(self.hasBeenToldTo(p2,p1, true)) return;
 				t=self.getTracePos();
 				if(t==-1) return;
 
@@ -132,12 +132,15 @@ default        orTopic_STAGE  0;
 				if(self.&dissemTrack-->0==0) rfalse;
 				rtrue;
 			]
-		,	hasBeenToldTo[pToldTo pToldBy
+		,	hasBeenToldTo[pToldTo pToldBy suppressNpcError
 					t;
 
-				if(pToldBy~=0) return self.hasBeenToldBy(pToldBy,pToldTo); !--redirect this, since the "both condition" is implemented in the variant routine
+				if(pToldBy~=0) return self.hasBeenToldBy(pToldBy,pToldTo, suppressNpcError); !--redirect this, since the "both condition" is implemented in the "hasBeenToldBy" variant routine
 				pToldTo=self._getCharacterId(pToldTo);
-				if(pToldTo==-1) "ERROR: hasBeenToldTo() takes the player objects or an orNpc instance as a parameter.";
+				if(pToldTo==-1){
+					if(suppressNpcError==false) print "ERROR: hasBeenToldTo() takes the player objects or an orNpc instance as a parameter.";
+					rfalse;
+				}
 				for(t=0:t<self.#dissemTrack:t=t+2){
 					if(self.&dissemTrack->t==0 && self.&dissemTrack->(t+1)==0) break;
 					if(self.&dissemTrack->(t+1)==pToldTo) rtrue; !
@@ -146,7 +149,7 @@ default        orTopic_STAGE  0;
 				rfalse;
 			]
 
-		,	hasBeenToldBy[pToldBy pToldTo
+		,	hasBeenToldBy[pToldBy pToldTo suppressNpcError
 					t testBoth;
 				pToldBy=self._getCharacterId(pToldBy);
 
@@ -155,8 +158,14 @@ default        orTopic_STAGE  0;
 					pToldTo=self._getCharacterId(pToldTo);
 				}
 
-				if(pToldBy==-1) "ERROR: hasBeenToldBy() takes the player objects or an orNpc instance as a parameter (FIRST parameter failed this condition).";
-				if(pToldTo==-1) "ERROR: hasBeenToldBy() takes the player objects or an orNpc instance as a parameter (SECOND parameter failed this condition).";
+				if(pToldTo==-1){
+					if(suppressNpcError==false) print "ERROR: hasBeenToldBy() takes the player object or an orNpc instance as a parameter, if supplied (SECOND parameter failed this condition).";
+					rfalse;
+				}
+				if(pToldBy==-1) {
+					if(suppressNpcError==false) print "ERROR: hasBeenToldBy() takes the player object or an orNpc instance as a parameter, if supplied (FIRST parameter failed this condition).";;
+					rfalse;
+				}
 
 				for(t=0:t<self.#dissemTrack:t=t+2){
 					if(self.&dissemTrack->t==0 && self.&dissemTrack->(t+1)==0) break;

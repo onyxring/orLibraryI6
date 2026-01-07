@@ -42,20 +42,29 @@ default        orVagueQuantity_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
 
    orInfExt orVagueQuantityController
-      with  ext_sdIsOrAre[obj quantity
+      with forcedSingular false 
+      ,    ext_sdIsOrAre[obj quantity
                idx;
             obj=self.getObj(obj);
             idx=self.findEntry(obj,quantity);
 
             if(idx<0) rfalse;
-
-            if(util.orArray.getSize(obj,vagueQuantity) > idx+2 && util.orArray.get(obj,vagueQuantity,idx+2)==true) { !--if the forceSingular indicator was set then usurp the normal "are" behavior, and print "is"...
+            if(self.forcedSingular==true) { !--if the forceSingular indicator was set then usurp the normal "are" behavior, and print "is"...
                if (_WAE_recurse_flag && (c_style & ENGLISH_BIT)) Tense(IS2__TX, WAS2__TX);
                rtrue;
             }
             rfalse;
-         ],
-         ext_wlrPluralMany[obj quantity
+         ]
+      ,  ext_forceSingular[obj quantity
+               idx;
+            obj=self.getObj(obj);
+            idx=self.findEntry(obj,quantity);
+
+            if(idx<0) rfalse;
+            
+            return self.forcedSingular; 
+         ]
+      ,  ext_wlrPluralMany[obj quantity
                idx;
 
             obj=self.getObj(obj,quantity);
@@ -71,19 +80,27 @@ default        orVagueQuantity_STAGE  0;
             return orVagueQuantityController;
          ],
          findEntry[obj quantity
-               t ptr size;
+               t ptr size q;
+            
             if(parent(obj) has specificQuantity) return -1;
             if(obj has specificQuantity) return -1;
-
+            
             ptr=-1;
 
             size=util.orArray.getSize(obj,vagueQuantity);
             for(t=0:t<size:t=t+2){
-               if(util.orArray.get(obj,vagueQuantity,t)>quantity || util.orArray.get(obj,vagueQuantity,t)==0) break;
+               q=util.orArray.get(obj,vagueQuantity,t);
+               if(q==true){
+                  self.forcedSingular=true;
+                  t--; !the next loop through will advance this forward 2, so we back up one to compensate for this
+                  continue;
+               }
+               if(q>quantity || q==0) break;
+               self.forcedSingular=false;
                ptr=t;
-
             }
             return ptr;
+
          ],
          vagueQuantity 2 "a couple of" 3 "a few" 5 "several" 10 "numerous" 0 0 0 0 0 0 0 0 0 0; !default
 #endif; !--After VERBLIB
