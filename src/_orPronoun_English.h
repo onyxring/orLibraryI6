@@ -229,6 +229,7 @@ default        orPronoun_English_STAGE  0;
 	[TheMy obj; if(CommonTheORPronounCode(obj,false)==false) print (My)obj; else print "'s";];
 	[TheMine obj; if(CommonTheORPronounCode(obj,false)==false) print (Mine)obj; else print "'s";];
 	[TheMyself obj; if(CommonTheORPronounCode(obj,false)==false) print (Myself)obj;];
+	
 	!----------------------------------------------------------
 	! UPPERCASE versions of the five sets of pronouns
 	!----------------------------------------------------------

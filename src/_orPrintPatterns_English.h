@@ -62,6 +62,8 @@ default        orPrintPatterns_English_STAGE  0 ;
 				if(pat.equalsOneOf("Me", "MeYouIt")) {CMe(obj); rtrue;}
 				if(pat.equalsOneOf("self", "myselfYourselfItself")) {Myself(obj); rtrue;}
 				if(pat.equalsOneOf("Self", "MyselfYourselfItself")) {CMyself(obj); rtrue;}
+				if(pat.equalsOneOf("theSelf", "theMyselfYourselfItself")) {theSelf(obj); rtrue;}
+				if(pat.equalsOneOf("TheSelf", "TheMyselfYourselfItself")) {cTheSelf(obj); rtrue;}
 				!possessive pronouns only.  No noun, no verb. 
 				if(pat.equalsOneOf("my","myYourIts")) { My(obj); rtrue; }
 				if(pat.equalsOneOf("My","MyYourIts")) { CMy(obj); rtrue; }
@@ -161,6 +163,9 @@ default        orPrintPatterns_English_STAGE  0 ;
 		else
 			print "This";
 	];
+	[theSelf obj;  if(obj==actor) print (Myself)obj; else print (the)obj; ];
+	[cTheSelf obj; if(obj==actor) print (CMyself)obj; else print (The)obj;]; 
+	
 #endif; !--After VERBLIB
 !======================================================================================
 ! AFTER GRAMMAR
