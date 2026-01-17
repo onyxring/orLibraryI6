@@ -54,6 +54,7 @@ default        orPrint_STAGE  0 ;
 	object orPrintEngine
 		with parametersString 0 	!parameters part of the text, not including parentheses
 		,	patternName 0		!the rule name, parsed from the tokenString
+		,	isCapitalized false
 		,	contextObject 0	!the resolved object, derived from the tokenString
 		,	objSpecifiedFirst 0
 		,	userParam1, userParam2, userParam3, userParam4 !any user-supplied parameters, passed to the orPrint routine
@@ -65,16 +66,9 @@ default        orPrint_STAGE  0 ;
 
 				self.parametersString=util.orStr.new();
 				self.patternName=util.orStr.new();
+				self.isCapitalized =false;
 
-				!orStringPool.displaySummary(); !27
-
-				!new_line;orStringPool.displaySummary();
-				!self.encodeEscapedCharacters(fullText);
-
-				!new_line;orStringPool.displaySummary();
 				fullText.set(self.encodeEscapedCharacters(fullText));
-		
-				!new_line;orStringPool.displaySummary();
 
 				!assign the userdefined parameters so they can be accessed in rules
 				self.userParam1=p1;
@@ -136,23 +130,24 @@ default        orPrint_STAGE  0 ;
 		,	printPattern[pattern
 					pr retval;
 				self.parsePattern(pattern);
+				
 				objectloop(pr ofclass orPrintPattern && pr ~= _oprDefault && retval==false){
 					!note:we are just asigning these references; since these are safe strings, the printRule versions will be safe as well
 					pr.patternName=self.patternName;
 					pr.contextObject=self.contextObject;
 					pr.objSpecifiedFirst=self.objSpecifiedFirst;
 					pr.parametersString=self.parametersString;
- 
-					retval=pr.runRule();
+					pr.isCapitalized = util.orChar.isUpper(self.patternName.getChar(0));
+ 					retval=pr.runRule();
 				}
 
-				
 				if(retval==false) {
 					_oprDefault.patternName=self.patternName;
 					_oprDefault.contextObject=self.contextObject;
 					_oprDefault.objSpecifiedFirst=self.objSpecifiedFirst;
 					_oprDefault.parametersString=self.parametersString;
-
+					_oprDefault.isCapitalized = util.orChar.isUpper(self.patternName.getChar(0));
+ 
 					retval=_oprDefault.runRule();
 				}
 				if(retval==false) pattern.print();
@@ -235,6 +230,8 @@ default        orPrint_STAGE  0 ;
 	,	parametersString 0
 	,	contextObject 0
 	,	objSpecifiedFirst 0
+	,	isCapitalized false
+	,	chooseCap[obj low cap; if(self.isCapitalized) cap(obj); else low(obj); rtrue;]
 	,	getParamEphemeral[n;
 			if(self.numParams()<=n) return -1;
 			return self._getTokenFromString(n, orPrintEngine.parametersString);
@@ -263,60 +260,71 @@ default        orPrint_STAGE  0 ;
 	;
 
 	 orPrintPattern _oprDefault
-		with runRule[;
-			if(self.patternName.equalsOneOf("bold", "b")) {
+		with runRule[tmp;
+			if(self.patternName.equalsOneOf("bold", "b",true)) {
 						style bold;
 					rtrue;
 				}
-				if(self.patternName.equalsOneOf("underline", "italics", "i")) {
+				if(self.patternName.equalsOneOf("underline", "italics", "i",true)) {
 						style underline;
 					rtrue;
 				}
-				if(self.patternName.equalsOneOf("reverse", "r")) {
+				if(self.patternName.equalsOneOf("reverse", "r",true)) {
 						style reverse;
 					rtrue;
 				}
 
-				if(self.patternName.equalsOneOf("roman", "normal", "n")) {
+				if(self.patternName.equalsOneOf("roman", "normal", "n",true)) {
 						style roman;
 					rtrue;
 				}
 
 				if(self.contextObject~=0){
-					if(self.patternName.equals("default")) {orPrintEngine.printDefaultRule(self.contextObject); rtrue;}
+					if(self.patternName.equals("default",true)) {orPrintEngine.printDefaultRule(self.contextObject); rtrue;}
 
-					if(self.patternName.equals("the")) {
-						print (the)self.contextObject;
+					if(self.patternName.equals("the",true)) {
+						if(self.isCapitalized)
+							print (The)self.contextObject;
+						else
+							print (the)self.contextObject;
 						self.conjugate();
 						rtrue;
 					}
-					if(self.patternName.equals("The")) {
-						print (The)self.contextObject;
-						self.conjugate();
-						rtrue;
-					}
+					
 					if(self.patternName.equals("a")) {
-						print (a)self.contextObject;
+						if(self.isCapitalized)
+							print (A)self.contextObject;
+						else
+							print (a)self.contextObject;
 						self.conjugate();
 						rtrue;
 					}
-					if(self.patternName.equals("A")) {
-						print (A)self.contextObject;
-						self.conjugate();
+					
+					if(self.patternName.equals("name",true)) {
+						if(self.isCapitalized){
+							tmp=util.orStr.new().capture();
+							print(name)self.contextObject;
+							tmp.release();
+							tmp.setChar(0,util.orChar.toUpper(tmp.getChar(0)));
+							tmp.print();
+							tmp.free();
+						}
+						else{
+							print (name)self.contextObject; 
+						}
 						rtrue;
 					}
-					if(self.patternName.equals("name")) {print (name)self.contextObject;rtrue;}
-					if(self.patternName.equals("numb")) {print self.contextObject;rtrue;}
-					if(self.patternName.equals("numbText")) {print (LanguageNumber)self.contextObject;rtrue;}
-					if(self.patternName.equals("hex")) { print (hex)self.contextObject; rtrue;}
-					if(self.patternName.equals("str")) { print (string)self.contextObject; rtrue;}
-					if(self.patternName.equals("s")) {if(self.contextObject~=1) print "s"; rtrue;}
-					if(self.patternName.equals("es")) {if(self.contextObject~=1) print "es"; rtrue;}
+					if(self.patternName.equals("numb",true)) {print self.contextObject;rtrue;}
+					if(self.patternName.equals("numbText",true)) {print (LanguageNumber)self.contextObject;rtrue;}
+					if(self.patternName.equals("hex",true)) { print (hex)self.contextObject; rtrue;}
+					if(self.patternName.equals("str",true)) { print (string)self.contextObject; rtrue;}
+					if(self.patternName.equals("s",true)) {if(self.contextObject~=1) print "s"; rtrue;}
+					if(self.patternName.equals("es",true)) {if(self.contextObject~=1) print "es"; rtrue;}
 				}
 
 				if(self.numParams()>0){
-					if(self.patternName.equalsOneOf("upper","up")) { self.parametersString.upper().print(); rtrue;}
-					if(self.patternName.equalsOneOf("lower","lo")) { self.parametersString.lower().print(); rtrue;}
+					if(self.patternName.equalsOneOf("upper","up",true)) { self.parametersString.upper().print(); rtrue;}
+					if(self.patternName.equalsOneOf("lower","lo",true)) { self.parametersString.lower().print(); rtrue;}
 				}
 
 				rfalse; !we could satisfy no rules

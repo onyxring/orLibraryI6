@@ -50,14 +50,19 @@ default        orPrintConjugate_English_STAGE  0;
 
    [ orPrintConjugate ptrn 
          firstParm modalVerb isModalVerb i;
+
       if(ptrn.parametersString.isEmpty()) return;
 
       print " "; !--we've aleady printed the noun, so add a space.
 		firstParm=ptrn.getParamEphemeral(0).trim();
       if(firstParm.isEmpty()) return; !--nothing to conjugate
       firstParm.lock();      
-      modalVerb=firstParm.left(firstParm.indexOf(" ")).lock();
       
+      i=firstParm.indexOf(" ");
+      if(i==-1) i=firstParm.getLength();
+      
+      modalVerb=firstParm.left(i).lock();
+
       !--Let's determine if we are dealing with a modal verb and print it out if so...
       if(modalVerb.equalsOneOf("could","would","should","might",true) || 
                modalVerb.equalsOneOf("couldn't", "wouldn't","shouldn't", "mightn't", true) || 
@@ -66,11 +71,12 @@ default        orPrintConjugate_English_STAGE  0;
                modalVerb.equalsOneOf("cannot","musn't", "shalln't",true)
             ){ 
          isModalVerb=true;
-         
+
          modalVerb.print();
          print " ";
-
-         firstParm.set(firstParm.mid(firstParm.indexOf(" "),orBUF_END).trim());    
+         i=firstParm.indexOf(" ");
+         if(i==-1) i=firstParm.getLength();
+         firstParm.set(firstParm.mid(i,orBUF_END).trim());    
          if(firstParm.startsWith("not ",true)) {
             print "not "; 
             firstParm.set(firstParm.mid(4,orBUF_END).trim()); 
@@ -78,13 +84,13 @@ default        orPrintConjugate_English_STAGE  0;
 
          if(getNarrativeTense() == PAST_TENSE) print "have ";
       }
-      
-      !Having dealt with all the modal verb stuff, now we are ready to print the actual verb.
-		!First, check and see if it has irregular conjugation, either known or specified in the pattern parameter.  Print if so...
-         
-      if(tryPrintIrregularVerbConjugation(firstParm, isModalVerb, ptrn) ==false) 
-         printRegularVerbConjugate(firstParm, isModalVerb, ptrn); !if not, then use normal conjugation rules
+      if(firstParm.isEmpty()==false){
+         !Having dealt with all the modal verb stuff, now we are ready to print the actual verb.
+         !First, check and see if it has irregular conjugation, either known or specified in the pattern parameter.  Print if so...
+         if(tryPrintIrregularVerbConjugation(firstParm, isModalVerb, ptrn) ==false) 
+            printRegularVerbConjugate(firstParm, isModalVerb, ptrn); !if not, then use normal conjugation rules
 		
+      }
       modalVerb.free();
 		firstParm.free();      
 	];
@@ -92,7 +98,6 @@ default        orPrintConjugate_English_STAGE  0;
    !--print irregular verb form if found
 	[ tryPrintIrregularVerbConjugation  vrb isModalVerb ptrn
       entryPos verbword form wordOffset; 
-
       !--identify the form we should use. If its the root form, then just exit and let the default conjugation rules take care of it
       if(getNarrativeTense() == PAST_TENSE) {
          if(isModalVerb) 
@@ -103,10 +108,9 @@ default        orPrintConjugate_English_STAGE  0;
       else{ !--present tense
          if(~isModalVerb && (ptrn.contextObject~=player ||  (ptrn.contextObject==player &&  player provides narrative_voice && player.narrative_voice == 3))) 
             form=PRES_TENSE_3RD_PERSON_SING_FORM; !flies      
-
-         rfalse;  !no special conjugation for root verbs !fly or could fly
+         else
+            rfalse;  !no special conjugation for root verbs !fly or could fly
       }
-      
       
       !--We now know our form we should be printing; check and see if a word
       !--   was specifed as a parameter for that form and use it if so

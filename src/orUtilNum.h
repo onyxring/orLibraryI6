@@ -74,6 +74,7 @@ system_file;
 				return r;
 			]
 		,	getBit[val bit; return (val & util.orNum.pow(2,bit))~=0; ]
+		,	isBitSet[val bit; return util.orNum.getBit(val,bit); ]
 		,	setBitOn[val bit; return val | util.orNum.pow(2,bit); ]
 		,	setBitOff[val bit; return val & (util.orNum.uMaxNumber - util.orNum.pow(2,bit)); ]
 		,	xor[val1 val2; return (val1 | val2) & (~(val1 & val2)); ]

@@ -111,11 +111,15 @@ default        orUtilMapPathFinder_STAGE  0;
 					}
 					return -1; !--completed search, with no possible path found
 				]
-		,		_unwindPath[pos d room r t; !--called once the search algorith has completed successfully, to find the shortest path and put it in  the property pointed to by self.path
+		,		_unwindPath[pos !--called once the search algorith has completed successfully, to find the shortest path and put it in  the property pointed to by self.path
+						d room r t retval; 
 					room=__orPathFinder_room-->(self._endPtr-1); !--locate the endroom
 					pos=self._findRoomDistance(room); !--length of path
 
-					if((self.#path/WORDSIZE)<pos) return -3; !--path too small
+					if((self.#path/WORDSIZE)<pos) {
+						retval = -3; !--path too small
+						pos=self.#path/WORDSIZE;
+					}
 					while(pos>0){
 						self.&path-->(pos-1)=room;
 						objectloop(d in compass){
@@ -131,7 +135,10 @@ default        orUtilMapPathFinder_STAGE  0;
 						room=r;
 						pos--;
 					}
-					return self.&path-->0;
+					if(retval==0)
+						return self.&path-->0; !--success: return the adjacent room
+					else
+						return retval; !--the path wan't long enough, so we only filled in the first 32 locations.
 				]
 		,		_directionOfAdjacentRoom[startRoom adjacentRoom d r;
 					objectloop(d in compass){

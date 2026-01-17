@@ -52,67 +52,99 @@ default        orPrintPatterns_English_STAGE  0 ;
 				if(pronounRoutine) pronounRoutine(self.contextObject);
 				self.conjugate();				
 			]
+		,	printVerbParamFromTense[verbword;
+				if(player provides narrative_tense && player.narrative_tense == PAST_TENSE)	
+					verbword=self.getParamEphemeral(3); 
+				else
+					verbword=self.getParamEphemeral(1); 
+				
+				verbword.print();
+				rtrue;				
+			]
 		,	runRule[ pat obj; pat=self.patternName; obj=self.contextObject;
 				if(obj<=0) rfalse; !everything below this requires a noun to be specified, even if it isn't printed...
-				!pronoun only. No noun, no verb.
 				
-				if(pat.equalsOneOf("mine", "mineYoursIts")) {Mine(obj); rtrue;}
-				if(pat.equalsOneOf("Mine", "MineYoursIts")) {CMine(obj); rtrue;}
-				if(pat.equalsOneOf("me","meYouIt")) {Me(obj); rtrue;}
-				if(pat.equalsOneOf("Me", "MeYouIt")) {CMe(obj); rtrue;}
-				if(pat.equalsOneOf("self", "myselfYourselfItself")) {Myself(obj); rtrue;}
-				if(pat.equalsOneOf("Self", "MyselfYourselfItself")) {CMyself(obj); rtrue;}
-				if(pat.equalsOneOf("theSelf", "theMyselfYourselfItself")) {theSelf(obj); rtrue;}
-				if(pat.equalsOneOf("TheSelf", "TheMyselfYourselfItself")) {cTheSelf(obj); rtrue;}
-				!possessive pronouns only.  No noun, no verb. 
-				if(pat.equalsOneOf("my","myYourIts")) { My(obj); rtrue; }
-				if(pat.equalsOneOf("My","MyYourIts")) { CMy(obj); rtrue; }
+				if(pat.equals("tense",true)) {
+					self.printVerbParamFromTense();
+					rtrue;
+				}
+				!-- Pronouns only. No conjugation -------------------------------------
+				if(pat.equalsOneOf("mine", "mineYoursItsTheirs",true)) return self.chooseCap(obj,Mine, CMine);
+				if(pat.equalsOneOf("me","meYouItThem",true)) return self.chooseCap(obj,Me, CMe);
+				if(pat.equalsOneOf("self", "myselfYourselfItselfThemselves",true)) return self.chooseCap(obj,Myself, CMyself);
+				if(pat.equalsOneOf("theSelf", "theMyselfYourselfItselfThemselves",true)) return self.chooseCap(obj,theSelf, cTheSelf);
+				if(pat.equalsOneOf("my","myYourItsTheir",true)) return self.chooseCap(obj,my, cMy);
 
-				! if(pat.equalsOneOf("my","myYourIts")) return self.doNoun(My);
-				! if(pat.equalsOneOf("My","MyYourIts")) return self.doNoun(CMy);
+				!-- Pronoun + "verbs of being" (Object suppression syntax should also work to suppress the pronoun)
+				if(pat.equalsOneOf("iAm", "iAmYouAreItIsTheyAre",true)) {
+					if(self.objSpecifiedFirst)
+						return self.chooseCap(obj,am, cAm);
+					else
+						return self.chooseCap(obj,iAm, cIAm);
+					rtrue;
+				}
+				
+				!-- Word + "verbs of being" (Object suppression syntax should also work to suppress the pronoun)
+				if(pat.equalsOneOf("theIs", "theIsTheyAre",true)) {
+					if(self.objSpecifiedFirst==false) !--if suppress object syntax
+						return self.chooseCap(obj,theIAm, cTheIAm);
+					else
+						return self.chooseCap(obj,am, cAm);
+					rtrue;
+				}
+				
+				if(pat.equalsOneOf("theIsnt", "theIsTheyArent",true)) {
+					if(self.objSpecifiedFirst==false) !--if suppress object syntax
+						return self.chooseCap(obj,theIsnt, cTheIsnt);
+					else
+						return self.chooseCap(obj,am, cAm);
+					 
+					rtrue;
+				}
+				
+				!-- Pronoun + "verbs of being" contractions (Object suppression does NOT make sense)
+				if(pat.equalsOneOf("im", "imYoureItsTheyre",true)) return self.chooseCap(obj,im, cIm);
+				if(pat.equalsOneOf("imNot", "imNotYouArentItIsntTheyArent",true)) return self.chooseCap(obj,imNot, cImNot);
+				
+				!-- Pronouns + verb (if specified) -------------------------------------
+				if(pat.equalsOneOf("i","iYouItThey",true)) {
+					self.chooseCap(obj,i, cI);
+					if(self.objSpecifiedFirst==false) self.conjugate();
+					rtrue;
+				}
+				
+				!-- Qualifying pronoun + noun + verb (if specified). Object suppression syntax should also work with these.
+				if(pat.equals("that",true)) {
+					self.chooseCap(obj,ThatOrThose, cThatOrThose);
+					if(self.objSpecifiedFirst==false) {
+						print " ",(name)obj;
+						self.conjugate();
+					}
 
-				!pronoun + verb, dont print the noun.
-				if(pat.equalsOneOf("i","iYouIt","nom","subj")) {
-					print (I)obj;
-					self.conjugate();
 					rtrue;
 				}
-				if(pat.equalsOneOf("I","IYouIt","Nom", "Subj")) {
-					print (CI)obj;
-					self.conjugate();
-					rtrue;
-				}
-				if(pat.equalsOneOf("iAm", "iAmYouAreItIs")) {
-					print (iAm)obj;
-					rtrue;
-				}
-				if(pat.equalsOneOf("IAm", "IAmYouAreItIs")) {
-					print (CIAm)obj;
-					rtrue;
-				}
-				if(pat.equalsOneOf("im", "imYoureIts")) {
-					print (Im)obj;
-					rtrue;
-				}
-				if(pat.equalsOneOf("Im", "ImYoureIts")) {
-					print (CIm)obj;
-					rtrue;
-				}
-				if(pat.equalsOneOf("imNot", "imNotYouArentItIsnt")) {
-					print (ImNot)obj;
-					rtrue;
-				}
-				if(pat.equalsOneOf("ImNot", "ImNotYouArentItIsnt")) {
-					print (CImNot)obj;
-					rtrue;
-				}
-				!qualifying pronouns.  Pronoun + Noun + verb.
-				if(pat.equals("that")) return self.printNounVerb(__ThatOrThose);
-				if(pat.equals("That")) return self.printNounVerb(__CThatOrThose);
-				if(pat.equals("this")) return self.printNounVerb(ThisOrThese);
-				if(pat.equals("This")) return self.printNounVerb(CThisOrThese);
+				if(pat.equals("this",true)) {
+					self.chooseCap(obj,ThisOrThese, cThisOrThese);
+					if(self.objSpecifiedFirst==false) {
+						print " ",(name)obj;
+						self.conjugate();
+					}
 
-
+					rtrue;
+				}
+				
+				! !--$actor:i(am)...
+				! if(pat.equalsOneOf("am", "amAreIs")) {
+				! 	print (am)obj;
+				! 	rtrue;
+				! }
+				! if(pat.equalsOneOf("Am", "AmAreIs")) {
+				! 	print (CAm)obj;
+				! 	rtrue;
+				! }
+				
+				
+				
 				! token = util.orStr.new();
 
 				! token.set(self.getToken(0));
@@ -139,18 +171,18 @@ default        orPrintPatterns_English_STAGE  0 ;
 				!rtrue;
 
 			];
-	[ __ThatOrThose obj;
-		if (obj has pluralname)	
-			print "those"; 
-		else
-			print "that";
-	];
-	[ __CThatOrThose obj;
-		if (obj has pluralname)	
-			print "Those"; 
-		else
-			print "That";
-	];
+	! [ __ThatOrThose obj;
+	! 	if (obj has pluralname)	
+	! 		print "those"; 
+	! 	else
+	! 		print "that";
+	! ];
+	! [ __CThatOrThose obj;
+	! 	if (obj has pluralname)	
+	! 		print "Those"; 
+	! 	else
+	! 		print "That";
+	! ];
 	[ ThisOrThese obj;
 		if (obj has pluralname)	
 			print "these"; 

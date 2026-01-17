@@ -34,7 +34,7 @@ default        orUtilChar_STAGE  0;
 ! BEFORE PARSER
 !--------------------------------------------------------------------------------------
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-	array __vowels string "aeiouAEIOU@:a@:o@:uo@:eo@:io@:y@:A@:O@:U@:E@:I@'a@'e@'i@'o@'u@'y@'A@'E@'I@'O@'U@'Y@`a@`e@`i@`o@`u@`A@`E@`I@`O@`U@^a@^e@^i@^o@^u@^A@^E@^I@^O@^U@oa@oA@~a@~n@~o@~A@~N@~O@ae@AE@et@Et@oe@OEC@/o@/O";
+	array __vowels string "aeiouAEIOU@:a@:o@:uo@:eo@:io@:y@:A@:O@:U@:E@:I@'a@'e@'i@'o@'u@'y@'A@'E@'I@'O@'U@'Y@`a@`e@`i@`o@`u@`A@`E@`I@`O@`U@^a@^e@^i@^o@^u@^A@^E@^I@^O@^U@oa@oA@~a@~n@~o@~A@~N@~O@ae@AE@et@Et@/o@/O";
 #endif;
 !======================================================================================
 ! AFTER VERBLIB
@@ -85,8 +85,7 @@ default        orUtilChar_STAGE  0;
 				rfalse;
 			]
 		,	isUpper[c;
-				if(c>='A' && c<='Z') rtrue; rfalse;
-
+				if(c>='A' && c<='Z') rtrue; 
 				if((c>=158 && c<=159) || (c>=167 && c<=168)) rtrue; !diaeresis
 				if(c>=175 && c<=180) rtrue; !acute 
 				if(c>=186 && c<=190) rtrue; !grave 
