@@ -42,14 +42,9 @@ default        orPrintConjugate_English_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
    constant entrySize 5;
 
-   constant PRES_TENSE_FORM 0;
-   constant PRES_TENSE_3RD_PERSON_SING_FORM 1;
-   constant PAST_TENSE_FORM 2;
-   constant PAST_PARTICIPLE_FORM 3;
-   
 
    [ orPrintConjugate ptrn 
-         firstParm modalVerb isModalVerb i;
+         firstParm firstWord hasAuxiliaryVerb i;
 
       if(ptrn.parametersString.isEmpty()) return;
 
@@ -61,65 +56,61 @@ default        orPrintConjugate_English_STAGE  0;
       i=firstParm.indexOf(" ");
       if(i==-1) i=firstParm.getLength();
       
-      modalVerb=firstParm.left(i).lock();
+      firstWord=firstParm.left(i).lock();
 
-      !--Let's determine if we are dealing with a modal verb and print it out if so...
-      if(modalVerb.equalsOneOf("could","would","should","might",true) || 
-               modalVerb.equalsOneOf("couldn't", "wouldn't","shouldn't", "mightn't", true) || 
-               modalVerb.equalsOneOf("can", "must", "will","shall", true) || 
-               modalVerb.equalsOneOf("can't", "mustn't", "won't", "shan't",true) || 
-               modalVerb.equalsOneOf("cannot","musn't", "shalln't",true)
-            ){ 
-         isModalVerb=true;
-
-         modalVerb.print();
-         print " ";
+      if(firstWord.equalsOneOf("will","can","shall","did",true) ||
+            firstWord.equalsOneOf("won't","can't","shan't","didn't",true)){ 
          i=firstParm.indexOf(" ");
          if(i==-1) i=firstParm.getLength();
-         firstParm.set(firstParm.mid(i,orBUF_END).trim());    
-         if(firstParm.startsWith("not ",true)) {
-            print "not "; 
-            firstParm.set(firstParm.mid(4,orBUF_END).trim()); 
-         }
 
-         if(getNarrativeTense() == PAST_TENSE) print "have ";
+         firstParm.set(firstParm.mid(i,orBUF_END).trim());    
+         if(firstParm.isEmpty()){ !--we found what can be used as an auxilary verb, but it isn't modifying another verb, so abort and let the non-auxilary logic handle it.
+            firstParm.set(firstWord);
+         } 
+         else{
+            hasAuxiliaryVerb=true;
+            tryPrintIrregularVerbConjugation(ptrn, firstWord, false,true); !--convert it based on tense
+            print " ";
+            if(firstParm.startsWith("not ",true)) {
+               print "not "; 
+               firstParm.set(firstParm.mid(4,orBUF_END).trim()); 
+            }
+            if(getNarrativeTense() == PAST_TENSE && hasAuxiliaryVerb) print "have "; !--only if actually acting as a auxiliary verb (e.g. simply "can't" and not "can't verb" doesn't qualify)
+         }
       }
+      
       if(firstParm.isEmpty()==false){
-         !Having dealt with all the modal verb stuff, now we are ready to print the actual verb.
+         !Having dealt with all the auxiliary verb stuff, now we are ready to print the actual verb.
          !First, check and see if it has irregular conjugation, either known or specified in the pattern parameter.  Print if so...
-         if(tryPrintIrregularVerbConjugation(firstParm, isModalVerb, ptrn) ==false) 
-            printRegularVerbConjugate(firstParm, isModalVerb, ptrn); !if not, then use normal conjugation rules
+         if(tryPrintIrregularVerbConjugation(ptrn,firstParm, hasAuxiliaryVerb) ==false) 
+            printRegularVerbConjugate(firstParm, hasAuxiliaryVerb, ptrn); !if not, then use normal conjugation rules
 		
       }
-      modalVerb.free();
+      firstWord.free();
 		firstParm.free();      
 	];
    
    !--print irregular verb form if found
-	[ tryPrintIrregularVerbConjugation  vrb isModalVerb ptrn
+	[ tryPrintIrregularVerbConjugation  ptrn vrb hasAuxiliaryVerb ignoreOverrides
       entryPos verbword form wordOffset; 
-      !--identify the form we should use. If its the root form, then just exit and let the default conjugation rules take care of it
-      if(getNarrativeTense() == PAST_TENSE) {
-         if(isModalVerb) 
-            form=PAST_PARTICIPLE_FORM; ! could have flown 
-         else
-            form=PAST_TENSE_FORM; ! flew
-      }
-      else{ !--present tense
-         if(~isModalVerb && (ptrn.contextObject~=player ||  (ptrn.contextObject==player &&  player provides narrative_voice && player.narrative_voice == 3))) 
-            form=PRES_TENSE_3RD_PERSON_SING_FORM; !flies      
-         else
-            rfalse;  !no special conjugation for root verbs !fly or could fly
-      }
-      
-      !--We now know our form we should be printing; check and see if a word
-      !--   was specifed as a parameter for that form and use it if so
-      verbword=ptrn.getParamEphemeral(form); 
-      if(verbword>0) {         
-         verbword.print();
+     
+      form = getDefaultConjugationForm(ptrn.contextObject, hasAuxiliaryVerb);     
+
+      if(form==PRES_TENSE_FORM){ 
+         vrb.print();
          rtrue;
       }
       
+      
+      if(ignoreOverrides==false){ !when we are conjugating the auxilary verb itself, we avoid the verb definition, since we'll conjugate that in a seperate call
+         !--Try to lookup the specifed as a parameter for the appropriate form and use it if found
+         verbword=ptrn.getParamEphemeral(form); 
+
+         if(verbword>0) {         
+            verbword.print();
+            rtrue;
+         }
+      }
       !--otherwise, consult our list of known irregular verbs.
       entryPos=findVerbEntryPos(vrb); 
       if(entryPos==-1) rfalse; !not found, so exit and let our regular conjugation approach handle the verb 
@@ -137,33 +128,22 @@ default        orPrintConjugate_English_STAGE  0;
       verbword.print(); 
       rtrue;
    ];
-   [ printRegularVerbConjugate vrb isModalVerb ptrn
-			didPrintIrregular endingChar lookupForm printForm;
+   [ printRegularVerbConjugate vrb hasAuxiliaryVerb ptrn
+			didPrintIrregular lastChar lookupForm printForm;
 		
-      if(isModalVerb){
-		 	if(getNarrativeTense()== PAST_TENSE) 
-               printForm=PAST_TENSE_FORM; !"could have jumped" (but modal verb already printed)
-         else
-               printForm=PRES_TENSE_FORM;  !"could jump" (but modal verb already printed)
-		}
-      else{ !--present tense
-         if (self.contextObject hasnt pluralname && (self.contextObject~=player || getNarrativePerson()==THIRD_PERSON )) 
-            printForm = PRES_TENSE_3RD_PERSON_SING_FORM;
-         else
-            printForm=PRES_TENSE_FORM;  
-      }
+      lastChar=vrb.getCharFromRight(0); !--get the last character from the verb word once, to minimize repeat calls to this routine
 
-      endingChar=vrb.getCharFromRight(0); !--get the last character once, to minimize repeat calls to this routine
-		!--past tense
-		if(printForm== PAST_TENSE_FORM){
-			if(endingChar=='y' && util.orChar.isConsonant(vrb.getCharFromRight(1))) return vrb.left(vrb.getLength()-1).append("ied").print(); !--cry = cried
-			if(endingChar=='e') return vrb.append("d").print(); !--hope = hoped
+      printForm = getDefaultConjugationForm(ptrn.contextObject, hasAuxiliaryVerb);     
+      !--past tense
+		if(printForm== PAST_TENSE_FORM or PAST_PARTICIPLE_FORM){
+			if(lastChar=='y' && util.orChar.isConsonant(vrb.getCharFromRight(1))) return vrb.left(vrb.getLength()-1).append("ied").print(); !--cry = cried
+			if(lastChar=='e') return vrb.append("d").print(); !--hope = hoped
 			
 			!--adding "ed" -------
 			vrb.print();
 			!--for words ending in a consonant - vowl - consonant pattern, double the last letter before adding "ed" (unless the last letter is w,x, or y)
-			if(endingChar~='w' or 'x' or 'y' && util.orChar.isConsonant(endingChar) && util.orChar.isVowel(vrb.getCharFromRight(1)) && util.orChar.isConsonant(vrb.getCharFromRight(2)))
-				print (char)endingChar; !--hop = hopped
+			if(lastChar~='w' or 'x' or 'y' && util.orChar.isConsonant(lastChar) && util.orChar.isVowel(vrb.getCharFromRight(1)) && util.orChar.isConsonant(vrb.getCharFromRight(2)))
+				print (char)lastChar; !--hop = hopped
 			print "ed"; 
          return;
 		}
@@ -173,10 +153,10 @@ default        orPrintConjugate_English_STAGE  0;
 				lookupForm=ptrn.getParamEphemeral(PRES_TENSE_3RD_PERSON_SING_FORM); !--zero indexed. 2nd parameter is 3rd person singular, present tense form
 				if(lookupForm~=-1 && lookupForm.isEmpty()==false) return lookupForm.print();
 
-				if(endingChar=='y' && util.orChar.isConsonant(vrb.getCharFromRight(1)))  {
+				if(lastChar=='y' && util.orChar.isConsonant(vrb.getCharFromRight(1)))  {
 					return vrb.left(vrb.getLength()-1).append("ies").print(); !fly=flies
 				}
-				if(endingChar=='s') return vrb.append("es").print(); !kiss=kisses
+				if(lastChar=='s') return vrb.append("es").print(); !kiss=kisses
 				
 				return vrb.append("s").print(); !--default: hide=hides
 			}
@@ -223,6 +203,8 @@ default        orPrintConjugate_English_STAGE  0;
    return -1; !--not match for the hash
 ];
       
+!-The 250-ish most common irregular verbs in the English language...
+
 array _irregularVerbs table [
    $0054 "get" "gets" "got" "gotten"
    $00E5 "leave" "leaves" "left" 0
@@ -235,6 +217,7 @@ array _irregularVerbs table [
    $0C18 "knit" "knits" "knit" 0
    $0C98 "dig" "digs" "dug" 0
    $0CFD "mishear" "mishears" "misheard" 0
+   $0DE6 "can" "can" "could" 0
    $0F6D "rebuild" "rebuilds" "rebuilt" 0
    $10A9 "steal" "steals" "stole" "stolen"
    $1130 "wake" "wakes" "woke" "woken"
@@ -246,6 +229,7 @@ array _irregularVerbs table [
    $17EB "sting" "stings" "stung" 0
    $18AB "put" "puts" "put" 0
    $1C02 "plead" "pleads" "pleaded" 0
+   $1CB1 "won't" "won't" "wouldn't" 0
    $1E90 "uphold" "upholds" "upheld" 0
    $1FAE "ride" "rides" "rode" "ridden"
    $2060 "stick" "sticks" "stuck" 0
@@ -312,6 +296,7 @@ array _irregularVerbs table [
    $5FCE "thrust" "thrusts" "thrust" 0
    $6023 "fly" "flies" "flew" "flown"
    $602D "sunburn" "sunburns" "sunburned" 0
+   $6262 "don't" "doesn't" "didn't" 0
    $6314 "forego" "foregoes" "forewent" "foregone"
    $6345 "sow" "sows" "sowed" "sown"
    $63A3 "show" "shows" "showed" "shown"
@@ -321,6 +306,7 @@ array _irregularVerbs table [
    $66AA "forgive" "forgives" "forgave" "forgiven"
    $66E1 "say" "says" "said" 0
    $66EF "saw" "saws" "sawed" "sawn"
+   $673B "can't" "can't" "couldn't" 0
    $67C9 "heave" "heaves" "hove" 0
    $67FE "forbid" "forbids" "forbade" "forbidden"
    $69B2 "deal" "deals" "dealt" 0
@@ -360,6 +346,7 @@ array _irregularVerbs table [
    $8B68 "flee" "flees" "fled" 0
    $8CBC "tear" "tears" "tore" "torn"
    $8E56 "swear" "swears" "swore" "sworn"
+   $9262 "shall" "shall" "should" "should"
    $9365 "misread" "misreads" "misread" 0
    $93B8 "withstand" "withstands" "withstood" 0
    $93CD "bet" "bets" "bet" 0
@@ -408,6 +395,7 @@ array _irregularVerbs table [
    $BD92 "lead" "leads" "led" 0
    $BD98 "lean" "leans" "leaned" 0
    $BDF2 "rerun" "reruns" "reran" "rerun"
+   $BE3C "shan't" "shouldn't" "shouldn't" 0
    $C2AB "hurt" "hurts" "hurt" 0
    $C3E1 "rend" "rends" "rent" 0
    $C55C "read" "reads" "read" 0
@@ -421,6 +409,7 @@ array _irregularVerbs table [
    $CC01 "sleep" "sleeps" "slept" 0
    $CC37 "withhold" "withholds" "withheld" 0
    $CC49 "strive" "strives" "strove" "striven"
+   $CD44 "will" "will" "would" 0
    $CDD8 "redo" "redoes" "redid" "redone"
    $CE8B "resell" "resells" "resold" 0
    $D0C3 "lend" "lends" "lent" 0

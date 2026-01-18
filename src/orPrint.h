@@ -27,7 +27,10 @@ default        orPrint_STAGE  0 ;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-	
+	constant PRES_TENSE_FORM 0;
+	constant PRES_TENSE_3RD_PERSON_SING_FORM 1;
+	constant PAST_TENSE_FORM 2;
+	constant PAST_PARTICIPLE_FORM 3;
 #endif; !BEFORE PARSER
 !======================================================================================
 ! AFTER PARSER
@@ -48,9 +51,29 @@ default        orPrint_STAGE  0 ;
 	constant CL_ENCODED "___:4"; !colon
 
 	[orPrint txt p1 p2 p3 p4;  orPrintEngine.parseAndPrint(txt, p1, p2, p3, p4); rtrue;];
-	! orprint("$TheActor $is giving $theNoun to $theSecond, who $is accepting $itNoun.") !note, the first $is references Actor, since that was the last noun printed; the second refrences the second for the same reason.
-	! orprint("$TheActor $actor:gave|give|gives|will-give $bold$theNoun$normal to $theSecond, who $is accepting $itNoun.") !note, the first $is references Actor, since that was the last noun printed; the second refrences the second for the same reason.
+	
+	[getDefaultConjugationForm obj isAuxiliaryVerb;
+		if(isAuxiliaryVerb){
+			if(getNarrativeTense()== PAST_TENSE) 
+				return PAST_PARTICIPLE_FORM; !"could have jumped" 
+			else
+				return PRES_TENSE_FORM;  !"could jump" 
+		}
+		
+		switch(getNarrativeTense()){
+			PRESENT_TENSE:
+				if (obj hasnt pluralname && (obj~=player || getNarrativePerson()==THIRD_PERSON )) 
+					return PRES_TENSE_3RD_PERSON_SING_FORM;
+				else
+					return PRES_TENSE_FORM;  
+			PAST_TENSE:
+					return PAST_TENSE_FORM;  
+			!TODO: in the future, future tense will be added here
+		}
 
+		!Shouldn't be able to reach this	
+	];
+	
 	object orPrintEngine
 		with parametersString 0 	!parameters part of the text, not including parentheses
 		,	patternName 0		!the rule name, parsed from the tokenString
@@ -216,13 +239,7 @@ default        orPrint_STAGE  0 ;
 
 				util.orStr.ambiguousFree(txt, amlk);
 				return retval;
-			]
-		,	printDefaultRule[obj;
-				if(metaclass(obj)==routine) return obj();
-				if(obj ofclass orString || metaclass(obj)==string) return util.orStr.print(obj);
-				if(metaclass(obj)==object) print (name)obj;
-				else print obj;  !--this will just print the number
-			]
+			]		
 	;
 
 	class orPrintPattern with runRule[; ]
@@ -232,7 +249,8 @@ default        orPrint_STAGE  0 ;
 	,	objSpecifiedFirst 0
 	,	isCapitalized false
 	,	chooseCap[obj low cap; if(self.isCapitalized) cap(obj); else low(obj); rtrue;]
-	,	getParamEphemeral[n;
+	,	getParamEphemeral[n
+				x wrd;
 			if(self.numParams()<=n) return -1;
 			return self._getTokenFromString(n, orPrintEngine.parametersString);
 		]
@@ -261,7 +279,7 @@ default        orPrint_STAGE  0 ;
 
 	 orPrintPattern _oprDefault
 		with runRule[tmp;
-			if(self.patternName.equalsOneOf("bold", "b",true)) {
+				if(self.patternName.equalsOneOf("bold", "b",true)) {
 						style bold;
 					rtrue;
 				}
@@ -280,7 +298,17 @@ default        orPrint_STAGE  0 ;
 				}
 
 				if(self.contextObject~=0){
-					if(self.patternName.equals("default",true)) {orPrintEngine.printDefaultRule(self.contextObject); rtrue;}
+					if(self.patternName.equals("default",true)) {
+						if(metaclass(self.contextObject)==routine) self.contextObject();
+						else if(self.contextObject ofclass orString || metaclass(self.contextObject)==string) util.orStr.print(self.contextObject);
+						else if(metaclass(self.contextObject)==object) {
+							print (name)self.contextObject;
+							self.objSpecifiedFirst=false; !--TODO: detect and differentiate $actor:() vs $actor()
+							self.conjugate(); !--if we are printing the name, also support verb conjugation
+						}
+						else print self.contextObject;  !--this will just print the number
+						rtrue;
+					}
 
 					if(self.patternName.equals("the",true)) {
 						if(self.isCapitalized)
@@ -291,7 +319,7 @@ default        orPrint_STAGE  0 ;
 						rtrue;
 					}
 					
-					if(self.patternName.equals("a")) {
+					if(self.patternName.equals("a", true)) {
 						if(self.isCapitalized)
 							print (A)self.contextObject;
 						else
@@ -312,6 +340,7 @@ default        orPrint_STAGE  0 ;
 						else{
 							print (name)self.contextObject; 
 						}
+						self.conjugate();
 						rtrue;
 					}
 					if(self.patternName.equals("numb",true)) {print self.contextObject;rtrue;}
@@ -362,12 +391,20 @@ default        orPrint_STAGE  0 ;
 ! AFTER VERBLIB 
 #iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
 	#ifndef orPrintConjugate;
-	!if we don't have a conjugation pattern in place, then use this fallback which 
-	!	prints the first element in the parameters string.  
-	[ orPrintConjugate ptrn;
+	!if we don't have a conjugation handler in place, use this fallback which 
+	!	prints the appropriate word from the list of verbs forms, if supplied
+	[ orPrintConjugate ptrn 
+			lookUpWord;
+
 		if(ptrn.parametersString.isEmpty()) return;
-		print " "; ptrn.getParamEphemeral(0).print(); 
+		
+		lookUpWord=ptrn.getParamEphemeral(getDefaultConjugationForm(ptrn.contextObject));
+		if(lookUpWord~=-1 && lookUpWord.isEmpty()==false) {
+			if(ptrn.objSpecifiedFirst==false) print " "; !--we've aleady printed the noun, so seperate with a space.			
+			lookUpWord.print();
+		}
 	];
+
 	#endif; 
 #endif; !AFTER_GRAMMAR
 !======================================================================================

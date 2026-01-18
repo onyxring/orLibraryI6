@@ -53,21 +53,21 @@ default        orPrintPatterns_English_STAGE  0 ;
 				self.conjugate();				
 			]
 		,	printVerbParamFromTense[verbword;
-				if(player provides narrative_tense && player.narrative_tense == PAST_TENSE)	
-					verbword=self.getParamEphemeral(3); 
-				else
+				if(getNarrativeTense() == PAST_TENSE)	
 					verbword=self.getParamEphemeral(1); 
+				else
+					verbword=self.getParamEphemeral(0); 
 				
 				verbword.print();
 				rtrue;				
 			]
 		,	runRule[ pat obj; pat=self.patternName; obj=self.contextObject;
-				if(obj<=0) rfalse; !everything below this requires a noun to be specified, even if it isn't printed...
-				
 				if(pat.equals("tense",true)) {
 					self.printVerbParamFromTense();
 					rtrue;
 				}
+				
+				if(obj<=0) rfalse; !everything below this requires a noun to be specified, even if it isn't printed... 
 				!-- Pronouns only. No conjugation -------------------------------------
 				if(pat.equalsOneOf("mine", "mineYoursItsTheirs",true)) return self.chooseCap(obj,Mine, CMine);
 				if(pat.equalsOneOf("me","meYouItThem",true)) return self.chooseCap(obj,Me, CMe);
