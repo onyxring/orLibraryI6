@@ -249,8 +249,7 @@ default        orPrint_STAGE  0 ;
 	,	objSpecifiedFirst 0
 	,	isCapitalized false
 	,	chooseCap[obj low cap; if(self.isCapitalized) cap(obj); else low(obj); rtrue;]
-	,	getParamEphemeral[n
-				x wrd;
+	,	getParamEphemeral[n;
 			if(self.numParams()<=n) return -1;
 			return self._getTokenFromString(n, orPrintEngine.parametersString);
 		]

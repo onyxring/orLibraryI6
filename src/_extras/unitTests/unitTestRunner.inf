@@ -25,64 +25,64 @@ Constant orUnitTestAutoRun true;
 !---------------------------------------------------------------------------------------------------
 ! Include unit tests here...
 
-! !--Chapter 4 "Narrative Flexibility" --------------------------------------------------------------------
-! #include "utorFirstImpressions";
-! #include "utorStateDescriptors";
-! #include "utorCantGoOdd";
-! #include "utorUniqueMultiMessage"; 
-! #include "utorVagueQuantity"; 
+!--Chapter 4 "Narrative Flexibility" --------------------------------------------------------------------
+#include "utorFirstImpressions";
+#include "utorStateDescriptors";
+#include "utorCantGoOdd";
+#include "utorUniqueMultiMessage"; 
+#include "utorVagueQuantity"; 
 
-! !--Chapter 5 "Parsing and Disambiguation" --------------------------------------------------------------------
-! #include "utorAdjective";   
-! #include "utorBetterChoice"; 
-! #include "utorPrefixSuffix";
-! #include "utorRecogName";
+!--Chapter 5 "Parsing and Disambiguation" --------------------------------------------------------------------
+#include "utorAdjective";   
+#include "utorBetterChoice"; 
+#include "utorPrefixSuffix";
+#include "utorRecogName";
 
-! !--Chapter 6 "Modeling and Mechanics" --------------------------------------------------------------------
-! #include "utorBackdrop";
-! #include "utorImplicitCommands"; 
-! #include "utorParentChildRelationship"; 
-! #include "utorRemoteLook";
+!--Chapter 6 "Modeling and Mechanics" --------------------------------------------------------------------
+#include "utorBackdrop";
+#include "utorImplicitCommands"; 
+#include "utorParentChildRelationship"; 
+#include "utorRemoteLook";
 
-! !--Chapter 7 "Miscellaneous Enhancements" --------------------------------------------------------------------
+!--Chapter 7 "Miscellaneous Enhancements" --------------------------------------------------------------------
 
-! !--Chapter 8 "Additonal Verbs" --------------------------------------------------------------------
-! #include "utorDistinctRead";
-! #include "utorExits";
-! #include "utorReview";
-! #include "utorGotoLocation";
+!--Chapter 8 "Additonal Verbs" --------------------------------------------------------------------
+#include "utorDistinctRead";
+#include "utorExits";
+#include "utorReview";
+#include "utorGotoLocation";
 
-! !--Chapter 9 "World Mapping" --------------------------------------------------------------------
-! #include "utorDoor"; 
-! #include "utorDynamicMap"; 
+!--Chapter 9 "World Mapping" --------------------------------------------------------------------
+#include "utorDoor"; 
+#include "utorDynamicMap"; 
 
-! !--Chapter 10 "Miscellaneous Game Objects" --------------------------------------------------------------------
-! #include "utorNameable"; 
-! #include "utorReferByContents";  
+!--Chapter 10 "Miscellaneous Game Objects" --------------------------------------------------------------------
+#include "utorNameable"; 
+#include "utorReferByContents";  
 
-! !--Chapter 11 "Text Routines" -------------------------------------------------------------------
+!--Chapter 11 "Text Routines" -------------------------------------------------------------------
 
-! !--Chapter 12 "Dynamic Text" --------------------------------------------------------------------
-! #include "utorString";
-! #include "utorPrint";
+!--Chapter 12 "Dynamic Text" --------------------------------------------------------------------
+#include "utorString";
+#include "utorPrint";
 #include "utorPrintConjugate";  
 
-! !--Chapter 13 "Knowledge and Conversation" --------------------------------------------------------------------
-! #include "utorDialogue"; 
+!--Chapter 13 "Knowledge and Conversation" --------------------------------------------------------------------
+#include "utorDialogue"; 
 
-! !--Chapter 14 "Autonomous NPCs"
-! #include "utorNpc";
-! #include "utorNpcSkillMove"; 
-! #include "utorNpcSkillDialogue";
+!--Chapter 14 "Autonomous NPCs"
+#include "utorNpc";
+#include "utorNpcSkillMove"; 
+#include "utorNpcSkillDialogue";
 
-! !--Chapter 15 "Additional NPC extensions"
-! #include "utorDistinctMeSelf";
+!--Chapter 15 "Additional NPC extensions"
+#include "utorDistinctMeSelf";
 
-! !--Chapter 16 "The util Object"
-! #include "utorUtilLoopArray";
+!--Chapter 16 "The util Object"
+#include "utorUtilLoopArray";
 
-! !--Chapter 17 "A Few Additional Utilities"
-! #include "utorDeque";
+!--Chapter 17 "A Few Additional Utilities"
+#include "utorDeque";
 !---------------------------------------------------------------------------------------------------
 #include "#parser";
 #include "#verblib"; 

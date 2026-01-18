@@ -168,7 +168,7 @@ default        orUnitTest_STAGE   0;
           tmpCatch.release(); !--stop capturing so the status line isn't captured too.
           testResult.set(testResult.append(tmpCatch)); !--add the input this turn to our running memory, since restarting the capture after the status line will reset our capture buffer
         ]
-      , ext_keyboardPrimitiveNotify[ c t; !--this runs just before player input
+      , ext_keyboardPrimitiveNotify[; !--this runs just before player input
           if(_orTestHooks.areUnitTestsRunning==true && playerCommands.getLength()>0){
              tmpCatch.capture();              
           }

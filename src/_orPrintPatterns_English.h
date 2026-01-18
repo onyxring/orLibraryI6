@@ -81,7 +81,6 @@ default        orPrintPatterns_English_STAGE  0 ;
 						return self.chooseCap(obj,am, cAm);
 					else
 						return self.chooseCap(obj,iAm, cIAm);
-					rtrue;
 				}
 				
 				!-- Word + "verbs of being" (Object suppression syntax should also work to suppress the pronoun)
@@ -90,7 +89,6 @@ default        orPrintPatterns_English_STAGE  0 ;
 						return self.chooseCap(obj,theIAm, cTheIAm);
 					else
 						return self.chooseCap(obj,am, cAm);
-					rtrue;
 				}
 				
 				if(pat.equalsOneOf("theIsnt", "theIsTheyArent",true)) {
@@ -98,8 +96,6 @@ default        orPrintPatterns_English_STAGE  0 ;
 						return self.chooseCap(obj,theIsnt, cTheIsnt);
 					else
 						return self.chooseCap(obj,am, cAm);
-					 
-					rtrue;
 				}
 				
 				!-- Pronoun + "verbs of being" contractions (Object suppression does NOT make sense)

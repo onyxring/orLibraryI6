@@ -71,6 +71,7 @@ default        orUtilBuf_STAGE  0;
    #ifndef orExtensionFrameworkBrief; message "   orUtilBuf...";#endif;
 
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
+	system_file;
 	#ifdef TARGET_ZCODE;
 		constant orSizedBufferOffset 6;
 	#ifnot;

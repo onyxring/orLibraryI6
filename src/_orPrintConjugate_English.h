@@ -129,7 +129,7 @@ default        orPrintConjugate_English_STAGE  0;
       rtrue;
    ];
    [ printRegularVerbConjugate vrb hasAuxiliaryVerb ptrn
-			didPrintIrregular lastChar lookupForm printForm;
+			lastChar lookupForm printForm;
 		
       lastChar=vrb.getCharFromRight(0); !--get the last character from the verb word once, to minimize repeat calls to this routine
 
@@ -180,7 +180,8 @@ default        orPrintConjugate_English_STAGE  0;
 
 
 !perform a binary search against the array, returs the number of the element in the array 
-[findVerbEntryPos str hsh lo hi mid el count;
+[findVerbEntryPos str 
+      hsh lo hi mid el;
    hsh=hashString(str);
    lo=0;
    hi=(util.orArray.getSize(_irregularVerbs)/entrySize)-1; !last element 

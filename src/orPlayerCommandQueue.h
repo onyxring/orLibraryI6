@@ -59,6 +59,7 @@ default        orPlayerCommandQueue_STAGE  0;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
+	system_file;
 	[redirectCommand cmd;
         playerCommands.preemptCommand(cmd, false, true);
         meta=true;
