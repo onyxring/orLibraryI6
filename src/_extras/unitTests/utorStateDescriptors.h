@@ -34,6 +34,22 @@ default        utorStateDescriptors_STAGE  0;
     description "The box is impossible to ignore." 
     has container openable light blessed;
 
+    class marbleSD
+	with	name 'marble' 'marbles//p',
+			short_name "marble",
+			plural "marbles";
+
+    Object bowlSD "bowl" utorStateDescriptorsStart
+	with	name 'bowl'
+	has		open container;
+
+        MarbleSD "" bowlSD;
+        MarbleSD "" bowlSD;
+        MarbleSD "" bowlSD;
+        MarbleSD "" bowlSD;
+        MarbleSD "" bowlSD;
+        MarbleSD "" bowlSD;
+
     [sdBlessed obj suppress;
         if(suppress==false && obj has blessed) 
             print "glowing with purity";
@@ -48,7 +64,8 @@ default        utorStateDescriptors_STAGE  0;
             playerCommands.pushCommand("look");
             playerCommands.pushCommand("take box");
         ]  "(closed, providing light and glowing with purity)" 
-        "i" "(closed, providing light and glowing with purity)"   
+        "i" "(closed, providing light and glowing with purity)"  
+        "l" "!(which is empty)"
         [; 
             orStateDescriptors.removeRoomDescriptionHandler(sdLight);
             playerCommands.pushCommand("drop box");

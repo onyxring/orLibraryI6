@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 2024.07.03 orStateDescriptors
+! 2026.01.19 orStateDescriptors
 ! A framework for implementing text that describes object state, such as "(providing light)".
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
@@ -20,6 +20,8 @@
 ! Revision History
 ! 2003.03.15	Initial Creation (ORWAE_Formatting)
 ! 2024.07.03	Refactored for the orLibrary version 2.
+! 2026.01.19	Fixed bug where a container with content was displaying  the message
+!				"(which is empty)" before displaying other attributes, like its content.
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
@@ -63,9 +65,7 @@ orInfExt with ext_messages[;
 				if(count==0) rfalse;
 				orStateDescriptors.setCount(count);
 				print " (";
-
 				if(orStateDescriptors.suppressSingleItemWhich==0 && count==1) print (string)WHICH__TX,(isorare)o," ";
-
 				orStateDescriptors.runAccumulate(waePartRoutines, o);
 				print ")";
 				rtrue;
@@ -85,7 +85,6 @@ orInfExt with ext_messages[;
 				if(count==0) rfalse;
 				orStateDescriptors.setCount(count);
 				print " (";
-
 				if(orStateDescriptors.suppressSingleItemWhich==0 && count==1) print (string)WHICH__TX,(isorare)o," ";
 				orStateDescriptors.runAccumulate(waeFullRoutines, o);
 				print ")";
@@ -158,14 +157,15 @@ orRoutineList orStateDescriptors
 	return retval;
 ];
 [sdEmptyContainer obj suppress c retval;
+	retval=false;
 	if(obj has container && obj has open or transparent){
-	    objectloop(c in obj) {
+		retval=true;
+		objectloop(c in obj) {
 			if (c hasnt concealed && c hasnt scenery) {
-				retval = true; break;
+				retval = false; break;
 			}
 		}
 	}
-
 	if(suppress==false && retval==true) L__M(##ListMiscellany, 2);
 	return retval;
 ];
