@@ -47,15 +47,10 @@ orInfExt with ext_messages[;
 	}
 	util.orMap.pathFinder.convertPathToDirections(location);
 	
-	print "^[one: ",playerCommands.getLength(),"]";
-
-	!for(i=0: i < util.orArray.getLength(util.orMap.pathFinder,path) : i++){ 
 	for(i=0: i < util.orMap.pathFinder.getPathLength() : i++){ 
 		if(util.orArray.get(util.orMap.pathFinder,path,i)<0) continue; !-- a -1 is creeping in during path determination.  This ignores it for now, but... TODO: look into why this is happening.
-		print "pushing action...";
 		playerCommands.pushAction(##go, util.orArray.get(util.orMap.pathFinder,path,i));
-	}
-	print "^[final: ",playerCommands.getLength(),"]";
+	}	
 ];
 
 [VisitedRoom o;
