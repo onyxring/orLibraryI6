@@ -23,6 +23,8 @@ default        orParentChildRelationship_STAGE  0;
 ! INCLUDE DEPENDENCIES
 #include "_orHookWriteAfterEntry";
 #include "_orHookVerbs";
+#include "_orHookParser";
+#include "_orInfExt";
 #include "orString";
 !--------------------------------------------------------------------------------------
 #ifnot;
@@ -87,7 +89,9 @@ default        orParentChildRelationship_STAGE  0;
 			orSuppressNewlineAfterDescription = false;
 			if (location == thedark) return L__M(##Examine, 1, noun); !too dark to see
 			displayState=true; ! by default, display contents of relationship providing objects, such as containers and supporters
+	
 			if(noun.description~=0) { ! if there is  a description, then print it
+
 				if(LibraryExtensions.RunWhile(ext_preDescription,false)~=false) return;
 				displayState = PrintOrRun(noun, description,true); !return false to suppress displaying additional state (such as content or swichable)
 				didOutput=true;
@@ -95,14 +99,14 @@ default        orParentChildRelationship_STAGE  0;
 				if(orSuppressNewlineAfterDescription == false) new_line; !do the newline feed that normally goes after the description, here.
 			}
 			if (displayState > 0) {
-				if(describeContents(noun, true)) didOutput=true;
+				if(describeContents(noun, true, didOutput)) didOutput=true;
 				if (noun has switchable) {
 					didOutput=true;
 					L__M(##Examine, 3, noun);
 				}
 			}
 			if(AfterRoutines()) didOutput=true;
-			!--after we did all the checking, if we didn't print anything, inform the player there's nothing to see here and move along please...l
+			!--after we did all the checking, if we didn't print anything, inform the player there's nothing to see here and move along please...
 			if(didOutput==0) L__M(##Examine, 2, noun); !nothing special
 			return true;
 		],
@@ -253,7 +257,6 @@ default        orParentChildRelationship_STAGE  0;
 			],
 			describeContentsWith[p;
 				if(self.numVisibleChildrenWith(p)==0) rfalse;
-				print "^";
 				print (cap)self.preposition," ",(the) p;
 				self.listChildrenWithPcr(p);
 				print ".^";
@@ -328,11 +331,15 @@ default        orParentChildRelationship_STAGE  0;
 		objectloop(r ofclass orParentChildRelationship && r.isAppliedTo(c)) r.removeFrom(c);
 	];
 	!list the contents of a parent object, grouped by their relationships
-	[describeContents p hideDesignatedPcrs c r count; c=c;
-		objectloop(r ofclass orParentChildRelationship && r.numVisibleChildrenWith(p)>0){
+	[describeContents p hideDesignatedPcrs addInitialLF
+			c r count; c=c;
+		
+		objectloop(r ofclass orParentChildRelationship && matched_pcr==0 or r && r.numVisibleChildrenWith(p)>0){ !--matched_pcr happens when the user has specified a specific pcr
 			if(hideDesignatedPcrs==true && r.includeContentsInExamine==false) continue; !--support the default behavior of the standard library
+			if(count>0 || (count==0 && addInitialLF)) print "^";
 			count = count + r.describeContentsWith(p);
 		}
+		
 		return count;
 	];
 	!same, but in the short, parenthetical form used by the standard library when describing an object in the room description
@@ -541,8 +548,6 @@ default        orParentChildRelationship_STAGE  0;
 		rtrue;
 	];
 
-
-
 	[ RemoveSub p;
 		p = parent(noun);
 		if(isContained(noun) && p hasnt open && ImplicitOpen(p)) return L__M(##Remove, 1, p); !special case for containers: try to open it
@@ -552,6 +557,7 @@ default        orParentChildRelationship_STAGE  0;
 
 	[ GenericInsertSub receiveAction orPcr ancestor;
 		_pcr_libEx.lm_r=orPcr;
+
 		receive_action = receiveAction;
 		if (second == d_obj || actor in second) <<Drop noun, actor>>;
 		if (parent(noun) == second && orPcr.isAppliedTo(noun)) {
@@ -562,7 +568,6 @@ default        orParentChildRelationship_STAGE  0;
 		ancestor = CommonAncestor(noun, second);
 		if (ancestor == noun) return L__M(##GenericInsert, 2, noun);
 		if (ObjectIsUntouchable(second)) return;
-
 		if (second ~= ancestor) {
 			action = ##Receive;
 			if (RunRoutines(second, before)) { action = receiveAction; return; }
@@ -570,19 +575,14 @@ default        orParentChildRelationship_STAGE  0;
 			if(orPcr.prepareToApply(noun,second)==false) return;
 		}
 		if (orPcr.isProvidedBy(second)==false) return L__M(##GenericInsert, 3, noun, second);
-
 		if (noun has worn && no_implicit_actions) return L__M(##Disrobe, 4, noun);
 		if (noun has worn && ImplicitDisrobe(noun)) return;
-
 		if (ObjectDoesNotFit(noun, second) ||
 			LibraryExtensions.RunWhile(ext_objectdoesnotfit, false, noun, second)) return;
 		if (AtFullCapacity(noun, second)) return L__M(##GenericInsert, 4, noun, second);
-
 		move noun to second;
 		orPcr.applyTo(noun);
-
 		if (AfterRoutines()) return;
-
 		if (second ~= ancestor) {
 			action = ##Receive;
 			if (RunRoutines(second, after)) { action = receiveAction; return; }
@@ -651,7 +651,9 @@ default        orParentChildRelationship_STAGE  0;
 		if (numPcrsProvidedBy(noun)==0) return L__M(##Search,4,noun); !--find nothing of interest
 
 		!--at this point we are guaranteed at least one form of containment..
+		_currentPcrContext=matched_pcr;
 		f = VisibleContents(noun);
+		_currentPcrContext=0;
 
 		if(f==0){ !--no visible children, so which message?
 				!if supported, we treat containment as the preferred intended choice, even though other forms of containment may also be possible
@@ -665,7 +667,7 @@ default        orParentChildRelationship_STAGE  0;
 		if (AfterRoutines()==1) rtrue;
 		!--actually contains something
 		DescribeContents(noun);
-		print "^";
+		
 		rtrue;
 	];
 
@@ -710,6 +712,37 @@ default        orParentChildRelationship_STAGE  0;
 extend only 'put' 
     * multiexcept pcrPreposition noun     -> putOn
 ;
+extend only 'look' 
+    * pcrPreposition noun -> Search
+;
+
+[takeChildSub; 
+	if(second~=0 && parent(noun)~=second) print_ret (The)noun," isn't there.";
+	<<take noun>>;
+];
+[pcrChildInScope p c r;
+	switch(scope_stage){
+		1: 	rtrue;
+		2: 	objectloop(p in parent(player)){
+				objectloop(c in p){
+					objectloop(r ofclass orParentChildRelationship){ 		
+						if(r.isAppliedTo(c)) PlaceInScope(c); !--At this point we don't know what we are removing it from, so start with everything 
+					}
+				}
+			}
+			rtrue;
+		3:  "That doesn't seem to be anything there.";
+	}
+];
+extend 'take' 
+ 	* scope=pcrChildInScope -> takeChild
+	* scope=pcrChildInScope 'from' noun ->takeChild	
+;    
+extend 'remove' 
+ 	* scope=pcrChildInScope -> takeChild
+	* scope=pcrChildInScope 'from' noun ->takeChild	
+;    
+
 #endif;
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE

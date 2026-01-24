@@ -127,7 +127,7 @@ Constant bdDescr	1;
 		,	short_name "your surroundings"
 		,	found_in [;rtrue;] !-always present
 		,   chooseobject[code;
-				if(code<2) return 2; !--exclude backdrops from "all" check			
+				if(code~=ASKING_FOR_HINT) return FORCE_EXCLUDE; !--exclude backdrops from "all" check			
 				return 0; !--prefer other real objects
 			]
 		,   description[; return self._sayDescription(location);  ]
@@ -147,7 +147,7 @@ Constant bdDescr	1;
 	!--a class, from which to create actual objects which proffer the same backdrops property and behavior. This is useful if you
 	!  want to create floating backdrops which span multiple rooms, or if you exceed the maximum size of the property array (32 for Z5)
 	class orBackdrop has scenery
-		with chooseobject[; return -1;],
+		with chooseobject[; return DEFER_CHOICE;],
 		description[; return orBackdropEngine._sayDescription(self); ],
 		before[; return orBackdropEngine.before(self);]
 	;

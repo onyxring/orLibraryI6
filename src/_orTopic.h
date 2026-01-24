@@ -100,7 +100,7 @@ default        orTopic_STAGE  0;
 				rtrue;
 			]
 		,	chooseobject[code;
-				if(code<2) return -1;
+				if(code~=ASKING_FOR_HINT) return DEFER_CHOICE; !--return default for "all" check
 				if(self.isInContextFor(advance_warning)) return 3; !-- by default, advance_warning will not be resolved; however, some verbs (e.g., sayTopic) need it.
 				return util.orParser.excludeObjFromDisambiguation(self);
 			]

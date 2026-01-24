@@ -34,19 +34,29 @@ default        orBetterChoice_STAGE  0;
    #ifdef      orBetterChoice_STAGE  ; #endif;
    #ifndef orExtensionFrameworkBrief; message "   orBetterChoice..."; #endif;
 !======================================================================================
+! BEFORE PARSER
+#iftrue (LIBRARY_STAGE == BEFORE_PARSER);
+	Constant FORCE_PARSER -1;
+#endif;
+!======================================================================================
 ! AFTER PARSER
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 	  property individual chooseobject;
 
 	  orInfExt with ext_chooseobjects[ obj code val retval;
 
-		if(obj provides chooseobject) {
-			retval = obj.chooseobject(code);  !--return -1 to continue to normal logic
-			if(retval~=-1) return retval;
+		if(obj provides chooseobject) { !--if the object provides the chooseobj property, then lets consult that
+			retval = obj.chooseobject(code);  
+			if(code~=ASKING_FOR_HINT){ !--logic if looking to include or exclude items from consideration...
+				if(retval==FORCE_PARSER) return DEFER_CHOICE; !--chooseobject indicated that it wanted to abort this "better" logic, and just use the parser's default logic
+				if(retval~=DEFER_CHOICE) return retval; !--if either FORCE_INCLUDE or FORCE_EXCLUDE, then do pass that along
+			}
+			!at this point, the only possible value when asking for a hint is DEFER_CHOICE (meaning, use the default "better" logic below)
 		}
 
-		if(code<2) return 0; !--return default for "all" check
-		!--parser is looking for a hint...
+		if(code~=ASKING_FOR_HINT) return DEFER_CHOICE; !--use the parser's default logic if we are not asking for a hint, since that's all this routine does
+		
+		!--we are looking for a hint...
 		for(val=0:val<pcount:val++) if(pattern-->val==obj) return util.orParser.excludeObjFromDisambiguation(obj); !--lets defer to another object if this one was already referred to in the input (avoids "PUT WATER IN WATER")
 
 		switch(action_to_be){

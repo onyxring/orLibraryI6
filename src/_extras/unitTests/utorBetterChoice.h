@@ -45,8 +45,8 @@ default        utorBetterChoice_STAGE  0;
    object torch "fixed torch" with name 'torch' 'fixed',
       description "It's a torch on the wall.",
       chooseObject[code;
-      if (code == 1 && action_to_be == ##Take or ##Remove) return 2;
-      return -1;
+         if (code == PLANNING_INCLUDE && action_to_be == ##Take or ##Remove) return FORCE_EXCLUDE;
+         return DEFER_CHOICE;
       ];
 
 orUnitTest "utorBetterChoice" 
