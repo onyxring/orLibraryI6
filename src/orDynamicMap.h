@@ -64,13 +64,17 @@ default        orDynamicMap_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-
+	system_file;
+	constant ALLOW_UNIDIRECTIONAL_PATH 0;
+	constant OVERWRITE_RETURN_PATH 1;
+	constant DISALLOW 2; !--undocumented.  TODO: this approach needs some work, since it creates confusing logic for the player. (e.g., GO EAST from room x is disallowed for one "next room", but allowed with different "next room".)
 #endif; !--Before Parser
 !======================================================================================
 ! AFTER PARSER
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 system_file;
-	class	orDynamicMapRoom
+	class	orDynamicMapRoom 
+		has light
 		with	n_to , s_to, e_to, w_to
 		,		ne_to, nw_to, se_to, sw_to
 		,		u_to, d_to
@@ -80,25 +84,48 @@ system_file;
 	class orDynamicMap
 		has		concealed
 		private	_fi_ptr 0
-		with	found_in 0 !TODO does this have to be found_in or can it be another property name?
+		with	found_in 0 
 		,		cant_go	0
 		,		complete false
-		,		react_before[curloc destroom;
+		,		handleAllocatedReturn ALLOW_UNIDIRECTIONAL_PATH
+		,		react_before[
+						curloc destroom startingPtr;
+						startingPtr=self._fi_ptr;
+
 					go: if(actor~=player) rfalse; !TODO: can we allow NPCs to create the map?
 						curloc=scopeceiling(player);
+						if((curloc provides (noun.door_dir))==false) rfalse; !--property to set in that direction
+						if(curloc.(noun.door_dir)~=0) rfalse; !--if that direction is already mapped, abort
+
 						do{
-							!if(self._fi_ptr>=(self.#found_in/WORDSIZE)) rfalse;
 							if(self.complete==true) rfalse;
-							destroom=self.&found_in-->(self._fi_ptr);
-							self._fi_ptr++;
-							if(self.cant_go~=0 && destroom provides cant_go && destroom.cant_go==0) destroom.cant_go=self.cant_go;
-						}until(destroom~=curloc);
-						if(curloc provides (noun.door_dir) && curloc.(noun.door_dir)==0){
-							curloc.(noun.door_dir)=destroom;
-							destroom.(util.orMap.reverseDirProp(noun.door_dir))=curloc;
+							destroom=self.&found_in-->(self._fi_ptr); 	!--identify the next room in the list 
+							self._fi_ptr++; 							!	and advance the pointer
+							if(self.cant_go~=0 && destroom provides cant_go && destroom.cant_go==0) destroom.cant_go=self.cant_go; !--propogate the cant_go message to the next room, if it doesn't aready have one defined
+						}until(destroom~=curloc); !--if we are already in the "next" location, skip forward
+
+						!--We now know the next location in our list.  Let's make sure we can actually go that way and tie the locations together if so				
+						if((destroom provides (util.orMap.reverseDirProp(noun.door_dir)))==false){ !--the return property doesn't exist in the destination room...
+							if(self.handleAllocatedReturn~=ALLOW_UNIDIRECTIONAL_PATH) { !--so we can only do this if we are allowing one-way paths to be created
+								self._fi_ptr=startingPtr; !otherwise, rewind and abort
+								rfalse; 
+							}
 						}
-						else self._fi_ptr--; !--wasnt able to go that way, undo the previous incremented counter for next attempt
-						if(self._fi_ptr>=(self.#found_in/WORDSIZE)) self.complete=true;
+						else{ !--the return property exists...
+							if(destroom.(util.orMap.reverseDirProp(noun.door_dir))~=0 or curloc){ !--but its already linked to a different location
+								if(self.handleAllocatedReturn==DISALLOW){ !in this mode, we don't allow for this, so rewind and abort
+									self._fi_ptr=startingPtr;
+									rfalse; 
+								}
+								if(self.handleAllocatedReturn==OVERWRITE_RETURN_PATH) !--In this mode, we overwrite the return path that exists already
+									destroom.(util.orMap.reverseDirProp(noun.door_dir))=curloc;
+							}
+							else{ !--not already pointing to a different room, so record the return path
+								destroom.(util.orMap.reverseDirProp(noun.door_dir))=curloc;
+							}
+						}
+						curloc.(noun.door_dir)=destroom; !record the new outgoing path
+						if(self._fi_ptr>=(self.#found_in/WORDSIZE)) self.complete=true; !have we gone through all of our locations?
 				]
 	;
 	

@@ -33,6 +33,7 @@ default        orUtilParser_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
+	system_file;
 	!The parser's ChooseObject entrypoint accepts some hard-coded values.  These can be 
 	!	a little confusing.  Below are enumerations meant to make implementation code 
 	!	a little easier to understand
@@ -43,7 +44,7 @@ default        orUtilParser_STAGE  0;
 	Constant ASKING_FOR_HINT 2;
 
 	! for return values
-	Constant DEFER_CHOICE 0;  !--for the EntryPoint, this would mean defer to the parser; for the ext_chooseObjects hook, these means "defer to whatever other hook has an oppinion on this, then fall back to the parser if none do.""
+	Constant DEFER_CHOICE 0;  !--for the EntryPoint, this would mean defer to the parser; for the ext_chooseObjects hook, these means "defer to whatever other hook has an opinion on this, then fall back to the parser if none do."
 	Constant FORCE_INCLUDE 1;
 	Constant FORCE_EXCLUDE 2;
 

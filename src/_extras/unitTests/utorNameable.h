@@ -24,13 +24,20 @@ default        utorNameable_STAGE  0;
    Constant    utorNameable_STAGE  LIBRARY_STAGE;
    #ifdef      utorNameable_STAGE  ; #endif;
    #ifndef orExtensionFrameworkBrief; message "   utorNameable...";#endif;
+
+#iftrue (LIBRARY_STAGE == AFTER_PARSER);
+object myMsgs LibraryExtensions with ext_messages[;
+	Name: switch(lm_n){
+	          4: " (which you have named ~", (nop)lm_o._customName(),"~)";
+	      }];
+#endif;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
    object utorNameableStart "orNameable Room" has light with description "Where orNameable tests are run.";
    orNameable -> sword "sword" with name 'sword', 
       description "Sharp and pointy.";
-
+         
 orUnitTest "utorNameable" 
    with tests [; PlayerTo(utorNameableStart, 3); ] noTest
       "name the sword ~Excaliber~" "begin to think"
@@ -38,6 +45,8 @@ orUnitTest "utorNameable"
       "refer to the sword as Durandal" "begin to think" 
       "x Excaliber" "can't see any such"
       "x Durandal" "Sharp and pointy"
+      "name the sword ~Bob~" "as ~Bob.~"
+      "name the sword Bob" "as ~Bob.~"
 ;
 
 #endif; !--After VERBLIB

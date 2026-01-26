@@ -2,6 +2,11 @@
 ! 2024.07.30 orInfExt
 ! A simple helper which saves just a few characters of code, keeping you from actually
 ! having to place extension objects as children of the LibraryExtension object.
+!
+! TODO: add a priority property to the orInfExt class and have the add routines 
+!   sort by this, providing a programatic way of determining which hooks 
+!   occur first during LibrayExtensions resolution.
+!
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -

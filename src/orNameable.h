@@ -49,6 +49,7 @@ default        orNameable_STAGE  0;
    Constant    orNameable_STAGE  LIBRARY_STAGE;
    #ifdef      orNameable_STAGE  ; #endif;
    #ifndef orExtensionFrameworkBrief; message "   orNameable...";#endif;
+
 !======================================================================================
 ! AFTER PARSER
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
@@ -64,11 +65,9 @@ default        orNameable_STAGE  0;
 		,	short_name[; if(self._afterDescription==false){
 							self._afterDescription=true;
 							print (name)self;
-							if(self.&custom_name->0~=0){
-								print " (named ~";
-								self._customName();
-								print "~)";
-							}
+							if(self.&custom_name->0~=0)
+								L__M(##Name,4,self);
+
 							self._afterDescription=false;
 							rtrue;
 						}
@@ -139,7 +138,15 @@ default        orNameable_STAGE  0;
 				rtrue;
 			]
 	;
-	orInfExt with ext_messages[n x1 x2; x1=lm_o; x2=lm_s; n=lm_n;
+
+#endif; !--AFTER PARSER
+!======================================================================================
+! AFTER GRAMMAR
+!-- isolate a single word, possibly quoted (name knife "stinger")
+!-- and possibly beginning with an article (refer to the knife as a sword)
+#iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
+object _orNamableDefaultMessages LibraryExtensions 
+		with ext_messages[n x1 x2; x1=lm_o; x2=lm_s; n=lm_n;
 			Name:
 				switch(n){
 					1 :	x1._afterDescription=true;
@@ -155,15 +162,11 @@ default        orNameable_STAGE  0;
 					3:	!bkt_o();
 						print (nop)CIVerb(actor,"forgot","forget")," any name ",(I)actor," may have given ",(the)x1,".^";
 						!bkt_c();
+					4:	print " (named ~", (nop)x1._customName(),"~)";
+						
 				}
+				rtrue;
 		];
-
-#endif; !--AFTER PARSER
-!======================================================================================
-! AFTER GRAMMAR
-!-- isolate a single word, possibly quoted (name knife "stinger")
-!-- and possibly beginning with an article (refer to the knife as a sword)
-#iftrue (LIBRARY_STAGE == AFTER_GRAMMAR);
 	[single_word addr;
 		named_wn=wn++;
 		namedArticle=0;
