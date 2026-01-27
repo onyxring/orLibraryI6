@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorBackdrop_STAGE;
 default        utorBackdrop_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orBackdrop";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorBackdrop_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorBackdrop_STAGE  < LIBRARY_STAGE);

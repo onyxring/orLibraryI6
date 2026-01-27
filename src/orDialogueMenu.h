@@ -13,16 +13,18 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orDialogueMenu_STAGE;
 default        orDialogueMenu_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-!#include "_orInfExt";
+#include "_orInfExt";
 #include "orUtilArray";
 #include "_orTopicPool";
 #include "orMenu";
 #include "orPlayerCommandQueue";
 #include "orUtilBuf";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orDialogueMenu_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orDialogueMenu_STAGE  < LIBRARY_STAGE);

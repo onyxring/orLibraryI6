@@ -43,6 +43,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orCenter_STAGE;
 default        orCenter_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -50,6 +51,7 @@ default        orCenter_STAGE  0;
 	#include "orUtilBuf";
 	!TODO: use the orUI tools and perhaps orBuf for this code.
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orCenter_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orCenter_STAGE  < LIBRARY_STAGE);

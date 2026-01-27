@@ -25,12 +25,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orTransition_STAGE;
 default        orTransition_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orCenter";
 #include "orUtilUi";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orTransition_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orTransition_STAGE  < LIBRARY_STAGE);

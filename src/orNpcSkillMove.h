@@ -13,6 +13,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orNpcSkillMove_STAGE;
 default        orNpcSkillMove_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -21,6 +22,7 @@ default        orNpcSkillMove_STAGE  0;
 #include "orUtilMapPathFinder";
 #include "_orPronoun_English";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orNpcSkillMove_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orNpcSkillMove_STAGE  < LIBRARY_STAGE);

@@ -54,7 +54,8 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef orExtensionFramework_STAGE;
-default        orUtilBuf_STAGE  0;
+#ifndef orUtilBuf_STAGE;
+default orUtilBuf_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";
@@ -62,6 +63,7 @@ default        orUtilBuf_STAGE  0;
 #include "orUtilNum";
 #include "orUtilChar";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUtilBuf_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUtilBuf_STAGE  < LIBRARY_STAGE);

@@ -18,12 +18,17 @@
 ! 2024.03.09	Updated the module stucture to use features of the the 6/12 library
 !				Added support for orString object
 !======================================================================================
-! INCLUDE DEPENDENCIES
-
-!======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
-default        orStylePrintRules_STAGE  0; 	#ifnot;
+#ifndef        orStylePrintRules_STAGE;
+default        orStylePrintRules_STAGE  0; 	
+system_file;
+!--------------------------------------------------------------------------------------
+! INCLUDE DEPENDENCIES
+
+!--------------------------------------------------------------------------------------
+#endif;
+#ifnot;
 #ifndef        orStylePrintRules_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orStylePrintRules_STAGE  < LIBRARY_STAGE);
    #undef      orStylePrintRules_STAGE  ;

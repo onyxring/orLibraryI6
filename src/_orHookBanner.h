@@ -20,11 +20,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orHookBanner_STAGE;
 default        orHookBanner_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orHookBanner_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orHookBanner_STAGE  < LIBRARY_STAGE);

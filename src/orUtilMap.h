@@ -17,12 +17,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orUtilMap_STAGE;
 default        orUtilMap_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";
 #include "orUtilRef";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUtilMap_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUtilMap_STAGE  < LIBRARY_STAGE);

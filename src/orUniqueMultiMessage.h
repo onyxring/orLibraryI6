@@ -34,12 +34,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orUniqueMultiMessage_STAGE;
 default        orUniqueMultiMessage_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orString";
 #include "_orHookInformLibrary";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUniqueMultiMessage_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUniqueMultiMessage_STAGE  < LIBRARY_STAGE);

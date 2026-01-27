@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorPrint_STAGE;
 default        utorPrint_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orPrint";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorPrint_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorPrint_STAGE  < LIBRARY_STAGE);

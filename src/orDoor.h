@@ -44,12 +44,15 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orDoor_STAGE;
 default        orDoor_STAGE 0;
-!======================================================================================
+system_file;
+!--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orString";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orDoor_STAGE	; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orDoor_STAGE < LIBRARY_STAGE);

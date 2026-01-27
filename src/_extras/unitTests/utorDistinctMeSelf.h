@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorDistinctMeSelf_STAGE;
 default        utorDistinctMeSelf_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orDistinctMeSelf";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorDistinctMeSelf_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorDistinctMeSelf_STAGE  < LIBRARY_STAGE);

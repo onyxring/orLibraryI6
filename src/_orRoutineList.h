@@ -25,11 +25,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orRoutineList_STAGE;
 default        orRoutineList_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilArray";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orRoutineList_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orRoutineList_STAGE  < LIBRARY_STAGE);

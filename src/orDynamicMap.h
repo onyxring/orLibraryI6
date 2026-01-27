@@ -49,11 +49,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orDynamicMap_STAGE;
 default        orDynamicMap_STAGE  0;
-!======================================================================================
+!--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilMap";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orDynamicMap_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orDynamicMap_STAGE  < LIBRARY_STAGE);

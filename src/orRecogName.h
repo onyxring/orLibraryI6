@@ -39,13 +39,15 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orRecogName_STAGE;
 default        orRecogName_STAGE  0;
 !--------------------------------------------------------------------------------------
-! INCLUDED DEPENDENCIES
+! INCLUDE DEPENDENCIES
 #include "orUtilBuf";
 #include "_orInfExt";
 #include "_orHookStandardLibrary";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orRecogName_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orRecogName_STAGE  < LIBRARY_STAGE);

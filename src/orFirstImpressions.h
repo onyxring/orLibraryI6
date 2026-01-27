@@ -23,6 +23,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orFirstImpressions_STAGE;
 default        orFirstImpressions_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -30,6 +31,7 @@ default        orFirstImpressions_STAGE  0;
 #include "_orTrackSeen";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orFirstImpressions_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orFirstImpressions_STAGE  < LIBRARY_STAGE);

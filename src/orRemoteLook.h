@@ -61,11 +61,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orRemoteLook_STAGE;
 default        orRemoteLook_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilMap";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orRemoteLook_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orRemoteLook_STAGE  < LIBRARY_STAGE);

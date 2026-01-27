@@ -11,12 +11,15 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orPrint_STAGE;
 default        orPrint_STAGE  0 ;
+system_file;
 !--------------------------------------------------------------------------------------
-! INCLUDED DEPENDENCIES
+! INCLUDE DEPENDENCIES
 #include "orString";
 #include "orUtilNum";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orPrint_STAGE	; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orPrint_STAGE  	< LIBRARY_STAGE);

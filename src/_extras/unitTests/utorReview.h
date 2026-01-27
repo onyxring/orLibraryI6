@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorReview_STAGE;
 default        utorReview_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orReview";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorReview_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorReview_STAGE  < LIBRARY_STAGE);

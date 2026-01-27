@@ -19,6 +19,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orBetterChoice_STAGE;
 default        orBetterChoice_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -26,6 +27,7 @@ default        orBetterChoice_STAGE  0;
 #include "orUtilParser";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orBetterChoice_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orBetterChoice_STAGE  < LIBRARY_STAGE);

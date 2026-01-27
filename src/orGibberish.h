@@ -15,11 +15,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orGibberish_STAGE;
 default        orGibberish_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orGibberish_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orGibberish_STAGE  < LIBRARY_STAGE);

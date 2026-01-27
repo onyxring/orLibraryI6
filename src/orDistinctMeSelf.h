@@ -27,11 +27,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orDistinctMeSelf_STAGE;
 default        orDistinctMeSelf_STAGE  0;
-!======================================================================================
+!--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orHookParseToken";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orDistinctMeSelf_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orDistinctMeSelf_STAGE  < LIBRARY_STAGE);

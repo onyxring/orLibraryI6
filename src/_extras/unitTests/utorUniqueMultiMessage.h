@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorUniqueMultiMessage_STAGE;
 default        utorUniqueMultiMessage_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orUniqueMultiMessage";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorUniqueMultiMessage_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorUniqueMultiMessage_STAGE  < LIBRARY_STAGE);

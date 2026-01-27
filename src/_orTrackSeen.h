@@ -17,6 +17,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orTrackSeen_STAGE;
 default        orTrackSeen_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -25,6 +26,7 @@ default        orTrackSeen_STAGE  0;
 #include "_orHookInformLibrary";
 #include "_orHookVerbs";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orTrackSeen_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orTrackSeen_STAGE  < LIBRARY_STAGE);

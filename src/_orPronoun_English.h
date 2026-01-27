@@ -37,11 +37,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orPronoun_English_STAGE;
 default        orPronoun_English_STAGE  0;
 !--------------------------------------------------------------------------------------
-! INCLUDED DEPENDENCIES
+! INCLUDE DEPENDENCIES
 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orPronoun_English_STAGE	; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orPronoun_English_STAGE  < LIBRARY_STAGE);

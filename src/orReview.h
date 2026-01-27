@@ -32,11 +32,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orReview_STAGE;
 default        orReview_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orTrackSeen";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orReview_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orReview_STAGE  < LIBRARY_STAGE);

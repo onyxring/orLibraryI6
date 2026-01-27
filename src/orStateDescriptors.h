@@ -25,6 +25,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orStateDescriptors_STAGE;
 default        orStateDescriptors_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -32,6 +33,7 @@ default        orStateDescriptors_STAGE  0;
 #include "_orRoutineList";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orStateDescriptors_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orStateDescriptors_STAGE  < LIBRARY_STAGE);

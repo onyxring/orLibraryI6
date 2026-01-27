@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorBetterChoice_STAGE;
 default        utorBetterChoice_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orBetterChoice";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorBetterChoice_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorBetterChoice_STAGE  < LIBRARY_STAGE);

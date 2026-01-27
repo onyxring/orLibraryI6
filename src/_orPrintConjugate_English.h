@@ -15,11 +15,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orPrintConjugate_English_STAGE;
 default        orPrintConjugate_English_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orPrintConjugate_English_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orPrintConjugate_English_STAGE  < LIBRARY_STAGE);

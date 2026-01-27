@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorPrefixSuffix_STAGE;
 default        utorPrefixSuffix_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orPrefixSuffix";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorPrefixSuffix_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorPrefixSuffix_STAGE  < LIBRARY_STAGE);

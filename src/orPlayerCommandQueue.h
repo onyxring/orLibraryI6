@@ -33,6 +33,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orPlayerCommandQueue_STAGE;
 default        orPlayerCommandQueue_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -42,6 +43,7 @@ default        orPlayerCommandQueue_STAGE  0;
 #include "_orHookKeyboard";
 #include "_orHookVerbs";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orPlayerCommandQueue_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orPlayerCommandQueue_STAGE  < LIBRARY_STAGE);

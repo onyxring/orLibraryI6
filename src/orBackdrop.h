@@ -26,6 +26,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orBackdrop_STAGE;
 default        orBackdrop_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -34,6 +35,7 @@ default        orBackdrop_STAGE  0;
 #include "orUtilRef";
 #include "orBetterChoice";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orBackdrop_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orBackdrop_STAGE  < LIBRARY_STAGE);

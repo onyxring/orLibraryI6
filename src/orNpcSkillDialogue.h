@@ -15,6 +15,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orXNSorNPCSkillDialogue_STAGETAGE;
 default        orNPCSkillDialogue_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -22,6 +23,7 @@ default        orNPCSkillDialogue_STAGE  0;
 #include "orDialogue";
 #include "_orTopicPool";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orNPCSkillDialogue_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orNPCSkillDialogue_STAGE  < LIBRARY_STAGE);

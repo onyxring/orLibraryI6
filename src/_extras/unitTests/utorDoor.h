@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorDoor_STAGE;
 default        utorDoor_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orDoor";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorDoor_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorDoor_STAGE  < LIBRARY_STAGE);

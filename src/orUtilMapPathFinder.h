@@ -42,12 +42,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orUtilMapPathFinder_STAGE;
 default        orUtilMapPathFinder_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilMap";
 #include "_orDeque";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUtilMapPathFinder_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUtilMapPathFinder_STAGE  < LIBRARY_STAGE);

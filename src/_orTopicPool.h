@@ -13,6 +13,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orTopicPool_STAGE;
 default        orTopicPool_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -20,6 +21,7 @@ default        orTopicPool_STAGE  0;
 #include "orUtilArray";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orTopicPool_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orTopicPool_STAGE  < LIBRARY_STAGE);

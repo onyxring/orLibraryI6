@@ -16,6 +16,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orVagueQuantity_STAGE;
 default        orVagueQuantity_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -24,6 +25,7 @@ default        orVagueQuantity_STAGE  0;
 #include "_orHookWriteList";
 #include "_orHookWriteAfterEntry";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orVagueQuantity_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orVagueQuantity_STAGE  < LIBRARY_STAGE);

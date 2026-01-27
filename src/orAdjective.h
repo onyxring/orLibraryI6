@@ -66,12 +66,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orAdjective_STAGE;
 default        orAdjective_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orHookStandardLibrary";
 #include "orUtilParser";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orAdjective_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orAdjective_STAGE  < LIBRARY_STAGE);

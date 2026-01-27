@@ -18,8 +18,9 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orParentChildRelationship_STAGE;
 default        orParentChildRelationship_STAGE  0;
-!======================================================================================
+!--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orHookWriteAfterEntry";
 #include "_orHookVerbs";
@@ -27,6 +28,7 @@ default        orParentChildRelationship_STAGE  0;
 #include "_orInfExt";
 #include "orString";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orParentChildRelationship_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orParentChildRelationship_STAGE  < LIBRARY_STAGE);

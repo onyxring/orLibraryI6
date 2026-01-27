@@ -35,12 +35,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orCantGoOdd_STAGE;
 default        orCantGoOdd_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orHookVerbs";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orCantGoOdd_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orCantGoOdd_STAGE  < LIBRARY_STAGE);

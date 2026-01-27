@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorDistinctRead_STAGE;
 default        utorDistinctRead_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orDistinctRead";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorDistinctRead_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorDistinctRead_STAGE  < LIBRARY_STAGE);

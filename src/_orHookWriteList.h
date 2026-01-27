@@ -15,11 +15,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orHookWriteList_STAGE;
 default        orHookWriteList_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDED DEPENDENCIES
 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orHookWriteList_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orHookWriteList_STAGE  < LIBRARY_STAGE);

@@ -16,11 +16,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orExits_STAGE;
 default        orExits_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orExits_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orExits_STAGE  < LIBRARY_STAGE);

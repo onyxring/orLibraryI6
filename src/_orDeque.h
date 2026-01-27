@@ -19,11 +19,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orDeque_STAGE;
 default        orDeque_STAGE 0;
 !--------------------------------------------------------------------------------------
 ! INCLUDED DEPENDENCIES
 #include "orUtilArray";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orDeque_STAGE	; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orDeque_STAGE < LIBRARY_STAGE);

@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorRecogName_STAGE;
 default        utorRecogName_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orRecogName";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorRecogName_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorRecogName_STAGE  < LIBRARY_STAGE);

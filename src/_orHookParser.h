@@ -15,11 +15,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orHookParser_STAGE;
 default        orHookParser_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orHookParser_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orHookParser_STAGE  < LIBRARY_STAGE);

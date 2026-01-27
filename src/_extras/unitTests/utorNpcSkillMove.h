@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorNpcSkillMove_STAGE;
 default        utorNpcSkillMove_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orNpcSkillMove";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorNpcSkillMove_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorNpcSkillMove_STAGE  < LIBRARY_STAGE);

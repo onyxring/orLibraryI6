@@ -16,6 +16,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orPrintConjugate_STAGE;
 default        orPrintConjugate_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -25,6 +26,7 @@ default        orPrintConjugate_STAGE  0;
                         !     there are limitations on what they can and cannot 
                         !     include)
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orPrintConjugate_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orPrintConjugate_STAGE  < LIBRARY_STAGE);

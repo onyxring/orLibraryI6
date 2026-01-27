@@ -23,6 +23,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orStatusLine_STAGE;
 default        orStatusLine_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -31,6 +32,7 @@ default        orStatusLine_STAGE  0;
 #include "orUtilRef";
 #include "orUtilUi";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orStatusLine_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orStatusLine_STAGE  < LIBRARY_STAGE);

@@ -36,12 +36,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orNameable_STAGE;
 default        orNameable_STAGE  0;
-!======================================================================================
+!--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orPronoun_English";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orNameable_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orNameable_STAGE  < LIBRARY_STAGE);

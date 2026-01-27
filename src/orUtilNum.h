@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 2024.07.09 orNum
+! 2024.07.09 orUtilNum
 ! Tools for managing property arrays.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
@@ -17,12 +17,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef		   orUtilNum_STAGE;
 default        orUtilNum_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUtilNum_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUtilNum_STAGE  < LIBRARY_STAGE);

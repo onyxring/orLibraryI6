@@ -29,11 +29,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orPrefixSuffix_STAGE;
 default        orPrefixSuffix_STAGE 0;
+system_file;
 !--------------------------------------------------------------------------------------
-! INCLUDED DEPENDENCIES
+! INCLUDE DEPENDENCIES
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orPrefixSuffix_STAGE	; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orPrefixSuffix_STAGE < LIBRARY_STAGE);

@@ -18,11 +18,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orUtilUI_STAGE ;
 default        orUtilUI_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUtilUI_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUtilUI_STAGE  < LIBRARY_STAGE);

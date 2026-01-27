@@ -11,6 +11,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orGotoLocation_STAGE;
 default        orGotoLocation_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -18,6 +19,7 @@ default        orGotoLocation_STAGE  0;
 #include "orUtilMapPathFinder";
 #include "orPlayerCommandQueue";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orGotoLocation_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orGotoLocation_STAGE  < LIBRARY_STAGE);

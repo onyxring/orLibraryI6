@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorDeque_STAGE;
 default        utorDeque_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "_orDeque";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorDeque_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorDeque_STAGE  < LIBRARY_STAGE);

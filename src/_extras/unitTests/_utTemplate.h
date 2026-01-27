@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        ut<REPLACEWITHNAME>_STAGE;
 default        ut<REPLACEWITHNAME>_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "<REPLACEWITHNAME>";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        ut<REPLACEWITHNAME>_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       ut<REPLACEWITHNAME>_STAGE  < LIBRARY_STAGE);

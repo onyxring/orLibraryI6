@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorVagueQuantity_STAGE;
 default        utorVagueQuantity_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orVagueQuantity";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorVagueQuantity_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorVagueQuantity_STAGE  < LIBRARY_STAGE);

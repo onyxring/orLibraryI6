@@ -37,6 +37,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orImplicitCommands_STAGE;
 default        orImplicitCommands_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -45,6 +46,7 @@ default        orImplicitCommands_STAGE  0;
 #include "_orHookStandardLibrary";
 #include "orPlayerCommandQueue";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orImplicitCommands_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orImplicitCommands_STAGE  < LIBRARY_STAGE);

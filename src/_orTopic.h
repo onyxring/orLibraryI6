@@ -16,12 +16,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orTopic_STAGE;
 default        orTopic_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilArray";
 #include "orUtilParser";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orTopic_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orTopic_STAGE  < LIBRARY_STAGE);

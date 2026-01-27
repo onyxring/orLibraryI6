@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorFirstImpressions_STAGE;
 default        utorFirstImpressions_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orFirstImpressions";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorFirstImpressions_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorFirstImpressions_STAGE  < LIBRARY_STAGE);

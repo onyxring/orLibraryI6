@@ -11,6 +11,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorDialogue_STAGE;
 default        utorDialogue_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -18,6 +19,7 @@ default        utorDialogue_STAGE  0;
 #include "orDialogue";
 #include "orNpc"; 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorDialogue_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorDialogue_STAGE  < LIBRARY_STAGE);

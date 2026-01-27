@@ -16,13 +16,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef		   orString_STAGE;
 default        orString_STAGE  	0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilBuf";
-!#ifndef orStringPool_STAGE; #include "_orStringPool"; #endif; !circular dependency
-#ifndef orUtilStr_STAGE; #include "orUtilStr"; #endif; !circular dependency
+#ifndef orUtilStr_STAGE; #include "orUtilStr"; #endif; !avoid warning
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orString_STAGE	; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orString_STAGE  	< LIBRARY_STAGE);

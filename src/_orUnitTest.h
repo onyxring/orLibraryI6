@@ -12,12 +12,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orUnitTest_STAGE;
 default        orUnitTest_STAGE   0;
 !--------------------------------------------------------------------------------------
 ! INCLUDED DEPENDENCIES
   #include "orString";
   #include "orPlayerCommandQueue";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUnitTest_STAGE   ; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUnitTest_STAGE   < LIBRARY_STAGE);

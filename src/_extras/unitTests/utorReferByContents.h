@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorReferByContents_STAGE;
 default        utorReferByContents_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orReferByContents";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorReferByContents_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorReferByContents_STAGE  < LIBRARY_STAGE);

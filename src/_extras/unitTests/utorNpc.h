@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorNpc_STAGE;
 default        utorNpc_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orNpc";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorNpc_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorNpc_STAGE  < LIBRARY_STAGE);

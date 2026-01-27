@@ -25,11 +25,13 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orDistinctRead_STAGE;
 default        orDistinctRead_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orDistinctRead_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orDistinctRead_STAGE  < LIBRARY_STAGE);

@@ -11,12 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        utorPrintConjugate_STAGE;
 default        utorPrintConjugate_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUnitTest";
 #include "orPrintConjugate";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        utorPrintConjugate_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       utorPrintConjugate_STAGE  < LIBRARY_STAGE);

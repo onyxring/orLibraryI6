@@ -11,11 +11,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orPrintPatterns_English_STAGE;
 default        orPrintPatterns_English_STAGE  0 ;
+system_file;
 !--------------------------------------------------------------------------------------
-! INCLUDED DEPENDENCIES
+! INCLUDE DEPENDENCIES
 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orPrintPatterns_English_STAGE	; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orPrintPatterns_English_STAGE  	< LIBRARY_STAGE);

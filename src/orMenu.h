@@ -57,6 +57,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orMenu_STAGE;
 default        orMenu_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -66,6 +67,7 @@ default        orMenu_STAGE  0;
 #include "orUtilRef";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orMenu_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orMenu_STAGE  < LIBRARY_STAGE);

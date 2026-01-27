@@ -17,6 +17,7 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orDialogue_STAGE;
 default        orDialogue_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
@@ -27,6 +28,7 @@ default        orDialogue_STAGE  0;
 #include "_orHookParser";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orDialogue_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orDialogue_STAGE  < LIBRARY_STAGE);

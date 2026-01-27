@@ -13,12 +13,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef        orUtilLoopArray_STAGE;
 default        orUtilLoopArray_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";
 #include "orUtilArray";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUtilLoopArray_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUtilLoopArray_STAGE  < LIBRARY_STAGE);

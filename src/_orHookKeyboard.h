@@ -26,12 +26,16 @@
 ! ...			History from orLibrary v1 snipped away.
 ! 2024.04.29	Refactored for the orLibrary version 2.
 !======================================================================================
-! INCLUDE DEPENDENCIES
-
-!======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
-default        orHookKeyboard_STAGE  0; #ifnot;
+#ifndef        orHookKeyboard_STAGE;
+default        orHookKeyboard_STAGE  0; 
+!--------------------------------------------------------------------------------------
+! INCLUDE DEPENDENCIES
+
+!--------------------------------------------------------------------------------------
+#endif;
+#ifnot;
 #ifndef        orHookKeyboard_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orHookKeyboard_STAGE  < LIBRARY_STAGE);
    #undef      orHookKeyboard_STAGE  ;

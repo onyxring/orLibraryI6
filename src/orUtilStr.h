@@ -12,14 +12,16 @@
 ! use and supplies no specific story features by itself.
 !======================================================================================
 ! Extension Framework management
-#ifndef        orExtensionFramework_STAGE	;
+#ifndef        orExtensionFramework_STAGE;
+#ifndef        orUtilStr_STAGE;
 default        orUtilStr_STAGE  	0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";
 #include "orUtilRef";
-#ifndef orString_STAGE; #include "orString"; #endif; !circular dependency
+#ifndef orString_STAGE; #include "orString";  #endif; !avoid warning 
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUtilStr_STAGE	; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUtilStr_STAGE  	< LIBRARY_STAGE);
@@ -27,7 +29,6 @@ default        orUtilStr_STAGE  	0;
    Constant    orUtilStr_STAGE  	LIBRARY_STAGE;
    #ifdef      orUtilStr_STAGE  	; #endif;
    #ifndef orExtensionFrameworkBrief; message "   orUtilStr...";#endif;
-
 !======================================================================================
 ! AFTER PARSER
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);

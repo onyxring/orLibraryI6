@@ -19,12 +19,14 @@
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
+#ifndef		   orUtilArray_STAGE;
 default        orUtilArray_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";
-
+#include "orUtilNum";
 !--------------------------------------------------------------------------------------
+#endif;
 #ifnot;
 #ifndef        orUtilArray_STAGE; message fatalerror orXFErrorInclude; #endif;
 #iftrue(       orUtilArray_STAGE  < LIBRARY_STAGE);
@@ -36,6 +38,8 @@ default        orUtilArray_STAGE  0;
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
 constant orArrayNoProp = 0;
+[numAscending x y; if(x>y) return 1; if(x<y) return -1; return 0;];
+[numDescending x y; return numAscending(x,y)*-1;];
 object _orArray
 		with clear[obj prop !--remove everything from the list
 					t;
@@ -51,16 +55,18 @@ object _orArray
 					return obj-->0;
 				}
 			]
-		,	getLength[obj prop
+		,	getLength[obj prop endVal
 					t sz;
 
-				if(metaclass(obj)~=object && prop ~= orArrayNoProp)
+				if(metaclass(obj)~=object && prop ~= orArrayNoProp) {
+					endVal=prop;
 					prop = orArrayNoProp;
-
+				}
+				
 				sz=self.getSize(obj,prop);
 
 				for(t=0:t<sz:t++){
-					if(util.orArray.get(obj,prop,t)==0) return t;
+					if(util.orArray.get(obj,prop,t)==endVal) return t;
 				}
 				return sz;
 			]
@@ -187,8 +193,8 @@ object _orArray
 		,	insert[obj prop pos val  !--add an option and associated value to the first position
 					 t;
 				if(metaclass(obj)~=object && prop ~= orArrayNoProp) {
-					pos=val;
-					val=prop;
+					val=pos;
+					pos=prop;
 					prop = orArrayNoProp;
 				}
 
@@ -210,7 +216,37 @@ object _orArray
 				self.insert(obj,prop, 0, val);
 				rtrue;
 			]
-	;
+		,	swap[obj prop pos1 pos2
+				tmp;
+				if(metaclass(obj)~=object && prop ~= orArrayNoProp) {
+					pos2=pos2;
+					pos1=prop; 
+					prop = orArrayNoProp;
+				}
+				tmp=self.get(obj,prop,pos1);
+				self.set(obj,prop,pos1,self.get(obj,prop,pos2));
+				self.set(obj,prop,pos2,tmp);
+			]
+		,	sort[obj prop func!--simple bubble sort
+					f l i;
+				
+				if(metaclass(obj)~=object && prop ~= orArrayNoProp) {
+					func=prop;
+					prop = orArrayNoProp;
+				}
+				
+				if(func==0) func=numAscending;
+
+				f=0; l=self.getLength(obj, prop, orMinEnd);
+				while(f<l){
+					for(i=f:i<l-1:i++){
+						if(func(self.get(obj,prop,i), self.get(obj,prop,i+1))>0) 
+							self.swap(obj,prop,i,i+1);						
+					}
+					l--;
+				}
+			]
+		;
 #ifdef DEBUG;
 	[debugDumpArray obj prop
 			t sz o;
