@@ -20,13 +20,14 @@
 default        orString_STAGE  	0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
+#include "_orInfExt";
 #include "orUtilBuf";
 #ifndef orUtilStr_STAGE; #include "orUtilStr"; #endif; !avoid warning
 !--------------------------------------------------------------------------------------
 #endif;
 #ifnot;
 #ifndef        orString_STAGE	; message fatalerror orXFErrorInclude; #endif;
-#iftrue(       orString_STAGE  	< LIBRARY_STAGE);
+#iftrue(       orString_STAGE  	< LIBRARY_STAGE); 
    #undef      orString_STAGE  	;
    Constant    orString_STAGE  	LIBRARY_STAGE;
    #ifdef      orString_STAGE  	; #endif;
@@ -410,7 +411,8 @@ default        orString_STAGE  	0;
 	array __dsbuf buffer orStringDefaultSize*orBufferPoolReserve; !--a big buffer which we chop up and assign as individual blocks to the memory manager
 	class orBufferWrapper(orBufferPoolReserve) with buf 0; ! wrapper for buffers as objects, so we can move them around the object tree
 
-	orInfExt with ext_initialise[
+	orInfExt with priority 1
+		, ext_initialise[
 				i obj;
 			for(i=0:orBufferWrapper.remaining()>0:i++){
 				obj=orBufferWrapper.create();

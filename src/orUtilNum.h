@@ -22,7 +22,7 @@ default        orUtilNum_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";
-#include "_orInfExt";
+#ifndef orInfExt_STAGE; #include "_orInfExt"; #endif; !suppress warning
 !--------------------------------------------------------------------------------------
 #endif;
 #ifnot;
