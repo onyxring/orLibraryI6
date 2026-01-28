@@ -132,9 +132,9 @@ system_file;
 						if(p>pri){
 							pri=p;
 							util.orArray.clear(tmpArray);
-							util.orArray.insert(tmpArray, act);
+							util.orArray.insert(tmpArray,orArrayNoProp, 0, act);
 						}
-						if(p==pri) util.orArray.insert(tmpArray, act);
+						if(p==pri) util.orArray.insert(tmpArray, orArrayNoProp, 0, act);
 					}
 
 					if(util.orArray.getLength(tmpArray)>0){

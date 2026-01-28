@@ -206,10 +206,18 @@ object _orArray
 				if(self.getSize(obj,prop)==self.getLength(obj,prop)){
 					"Error (orArray): ",(property)prop," array is out of space.  Cannot append new value.";
 				}
+				if(metaclass(obj)~=object && prop ~= orArrayNoProp) {
+					val=prop;
+					prop = orArrayNoProp;
+				}
 				self.insert(obj,prop, self.getLength(obj,prop), val);
 				rtrue;
 			]
 		,	prepend[obj prop val;
+				if(metaclass(obj)~=object && prop ~= orArrayNoProp) {
+					val=prop;
+					prop = orArrayNoProp;
+				}
 				if(self.getSize(obj,prop)==self.getLength(obj,prop)){
 					"Error (orArray): ",(property)prop," array is out of space.  Cannot prepend new value.";
 				}
@@ -219,7 +227,7 @@ object _orArray
 		,	swap[obj prop pos1 pos2
 				tmp;
 				if(metaclass(obj)~=object && prop ~= orArrayNoProp) {
-					pos2=pos2;
+					pos2=pos1;
 					pos1=prop; 
 					prop = orArrayNoProp;
 				}
