@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 2024.03.11 orNameable
+! 2026.01.31 orNameable
 ! Gives an object the ability to be named and then be referred to by that name.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
@@ -170,16 +170,19 @@ object _orNamableDefaultMessages LibraryExtensions
 				rtrue;
 		];
 	[single_word addr;
-		named_wn=wn++;
+		if(wn>num_words) wn=num_words;  !--this happens when a name commands is issued with the current name.  For example, "name show bob" works the first time, because bob is not recognized, but the second time, the parser interprets "sword bob" as two words for the sword, leaving nothing for the name.  So we back wn up to point to the last word and accept it as the name.
+		
+		named_wn=wn++; !--accept the word, and advance the pointer
 		namedArticle=0;
-		if(WordAddress(named_wn)->0=='"')named_wn=wn++; !--strip out quotes
+		if(WordAddress(named_wn)->0=='"')named_wn=wn++; !--if the word was a quote, advance the pointer again to skip over it
 		addr=WordAddress(named_wn);
 		if(WordLength(named_wn)==3 && addr->0=='t' && addr->1=='h' && addr->2=='e') namedArticle='the';
 		if(WordLength(named_wn)==2 && addr->0=='a' && addr->1=='n') namedArticle='an';
 		if(WordLength(named_wn)==1 && addr->0=='a') namedArticle='a';
-		if(namedArticle~=0) named_wn=wn++; !--strip out article
-		if(WordAddress(named_wn+1)->0=='"') wn++;
+		if(namedArticle~=0) named_wn=wn++; !--if the word was an article, advance the pointer again to skip over it (but we've saved it)
+		if(WordAddress(named_wn+1)->0=='"') wn++; !--skip over the closing quote as well 
 		rtrue;
+		!return GPR_PREPOSITION; !--not really a preposition, but not a fail either
 	];
 
 	[NameSub; 	L__M(##Name,2);];
@@ -190,7 +193,7 @@ object _orNamableDefaultMessages LibraryExtensions
 
 	Verb 'name'
 		* noun single_word->Name
-		* noun 'as'/'to' single_word ->Name
+		* noun 'as'/'to' single_word ->Name 
 	;
 	Verb 'unname'
 		* noun -> Unname

@@ -86,7 +86,7 @@ Constant orUnitTestAutoRun true;
 !---------------------------------------------------------------------------------------------------
 #include "#parser";
 #include "#verblib"; 
-object monkey "monkey";
+
 [Initialise; ]; 
 #Include "#grammar"; 
 end;

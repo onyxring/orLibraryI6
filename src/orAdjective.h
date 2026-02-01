@@ -95,7 +95,8 @@ default        orAdjective_STAGE  0;
 	attribute	noun_ref;
 
 	object orAdjective LibraryExtensions
-		with mode PREFER_NOUN
+		with priority 15 !--perform later, letting extensions like orReferByContents and orImplicitCommands run first
+		,	mode PREFER_NOUN
 		, ext_parsenoun [ obj
 				a n f savWn objRequiresNoun; 
 			

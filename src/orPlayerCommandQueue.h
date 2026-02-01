@@ -140,17 +140,17 @@ default  orQueuedActionPrompt "^>>";
 							98: print "[Queued actions are no longer possible.]^";
 						   }
 			]
-		,	ext_keyboardPrimitive[ a_buffer a_table;
-				if(doQueuedAction(a_buffer)){
-					Tokenise__(a_buffer,a_table); !TODO does this do anything?
-					return true;
-				}
-				rfalse;
-			]
 		,	ext_beforePrompt[;
 				orActionFlags=0;
 				!if(playerCommands.getLength()>0 && playerCommands.get(0).keepSilent==true) rtrue;
 				if(playerCommands.getLength()>0) rtrue; !--the queued action processor will print its own prompt
+				rfalse;
+			]
+		,	ext_keyboardPrimitive[ a_buffer a_table;
+				if(doQueuedAction(a_buffer)){
+					Tokenise__(a_buffer,a_table); 
+					return true;
+				}
 				rfalse;
 			]
 		;

@@ -50,7 +50,7 @@ class orReferByContents
 					rfalse;
 				]
 		,		discount[w o i;w=w;o=o;i=i;
-	#ifdef orAdjective_STAGE;
+	#ifdef orAdjective_STAGE;  !--todo: there should be an alternative to hard-coding references to unrelated extensions
 					if((o provides adjective)==false) rfalse;
 					i=WordInProperty(w,o,adjective);
 					return i;
@@ -59,7 +59,7 @@ class orReferByContents
 	#endif;
 				]
 		,		match_short_name[w swn o; w=w;o=o; swn=swn;
-	#ifdef orRecogName_STAGE;
+	#ifdef orRecogName_STAGE; !--todo: there should be an alternative to hard-coding references to unrelated extensions
 						if(MatchAgainstShortName(self,swn)==true && self.discount(w,self)==false)
 							rtrue;
 						else{

@@ -37,7 +37,11 @@ default        orUtilArray_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-constant orArrayNoProp = 0;
+	constant orArrayNoProp = 0;
+	global _sortHNdx;
+	global _sortHVal;
+	global _sortLNdx;
+	global _sortLVal;
 [numAscending x y; if(x>y) return 1; if(x<y) return -1; return 0;];
 [numDescending x y; return numAscending(x,y)*-1;];
 object _orArray
@@ -235,8 +239,27 @@ object _orArray
 				self.set(obj,prop,pos1,self.get(obj,prop,pos2));
 				self.set(obj,prop,pos2,tmp);
 			]
-		,	sort[obj prop func!--simple bubble sort
-					f l i;
+		! ,	sort[obj prop func!--simple bubble sort
+		! 			f l i;
+				
+		! 		if(metaclass(obj)~=object && prop ~= orArrayNoProp) {
+		! 			func=prop;
+		! 			prop = orArrayNoProp;
+		! 		}
+				
+		! 		if(func==0) func=numAscending;
+
+		! 		f=0; l=self.getLength(obj, prop, orMinEnd);
+		! 		while(f<l){
+		! 			for(i=f:i<l-1:i++){
+		! 				if(func(self.get(obj,prop,i), self.get(obj,prop,i+1))>0) 
+		! 					self.swap(obj,prop,i,i+1);						
+		! 			}
+		! 			l--;
+		! 		}
+		! 	]
+			,	sort[obj prop func !--a slightly more sophisticated version of the bubble sort, reducing the number of times memory is written to and read from
+					end i pass val;
 				
 				if(metaclass(obj)~=object && prop ~= orArrayNoProp) {
 					func=prop;
@@ -244,17 +267,30 @@ object _orArray
 				}
 				
 				if(func==0) func=numAscending;
+				end=self.getLength(obj, prop, orMinEnd);
 
-				f=0; l=self.getLength(obj, prop, orMinEnd);
-				while(f<l){
-					for(i=f:i<l-1:i++){
-						if(func(self.get(obj,prop,i), self.get(obj,prop,i+1))>0) 
-							self.swap(obj,prop,i,i+1);						
+				while(pass<end-pass){ !--bring the range we scan in each pass, moving the start forward one, and the end back one (because pass increase each interation)
+					_sortHVal=0; _sortLVal=0; _sortHNdx=-1; _sortLNdx=-1; !--reset the highest and lowest markers
+
+					for(i=pass:i<end-pass:i++){ !--scan through each element in the array
+						val=self.get(obj,prop,i);
+						if(_sortLNdx==-1 || func(val, _sortLVal)<0){ !--keep track of the lowest value and its index
+							_sortLVal=val;
+							_sortLNdx=i;
+						}
+						if(_sortHNdx==-1 || func(val, _sortHVal)>0){  !--also keep track of the highest value and its index
+							_sortHVal=val;
+							_sortHNdx=i;
+						}
 					}
-					l--;
+					
+					if(_sortLNdx>0) self.swap(obj,prop,pass,_sortLNdx); !--take the lowest value found, if it is actually lower than the current low bounds and swap it in
+					if(_sortHNdx>0 && _sortHNdx~=pass) self.swap(obj,prop,end-pass-1, _sortHNdx); !--do the same with the highest, but with a little extra logic: if we are targeting the same memory location that we just swapped above, then don't do it again or we'll undo what we just did
+					pass++;
 				}
 			]
 		;
+		
 #ifdef DEBUG;
 	[debugDumpArray obj prop
 			t sz o;

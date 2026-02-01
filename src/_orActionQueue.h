@@ -239,8 +239,8 @@ default        orActionQueue_STAGE  0;
 
 	class orActionQueue
 		class orDeque
-		private
 		with _queuedActions 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+		,	push[; "[orActionQueue: Error! push() is not available for Action Queues.  Use pushCommand() or pushAction() instead.]";] !--override the base implementaion 
 		,	arrayPropName _queuedActions
 		,	preemptAction[v n s displayText meta silent
 					actn;

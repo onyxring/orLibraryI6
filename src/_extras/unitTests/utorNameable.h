@@ -47,8 +47,8 @@ orUnitTest "utorNameable"
       "refer to the sword as Durandal" "begin to think" 
       "x Excaliber" "can't see any such"
       "x Durandal" "Sharp and pointy"
-      "name the sword ~Bob~" "as ~Bob.~"
-      "name the sword Bob" "as ~Bob.~"
+      "name sword ~bob~" "as ~Bob.~"
+      "name sword bob" "as ~Bob.~"      
 ;
 
 #endif; !--After VERBLIB

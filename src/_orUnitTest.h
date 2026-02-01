@@ -94,7 +94,7 @@ default        orUnitTest_STAGE   0;
             val;
           val=util.orArray.get(self,self.getPropFromIndex(self.ptr),self.getPropIndexFromIndex(self.ptr));
           if(metaclass(val)==routine) return val();
-          return playerCommands.push(val);          
+          return playerCommands.pushCommand(val);          
         ]
       , validate[str
             val retval;

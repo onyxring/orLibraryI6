@@ -68,7 +68,10 @@ default        orInfExt_STAGE  0;
                 util.orArray.insert(usedPriorities,orArrayNoProp,0,pri);
             }
         }
-        util.orArray.sort(usedPriorities,numDescending);
+        util.orArray.sort(usedPriorities,numDescending); !--sort decending, so higher numbers are inserted first lower numbers last
+                                                         !  pushing down the higher priority values.  The net effect is that lower 
+                                                         !  priority values are executed first when resolved by the LibraryExtension object
+
         for(o=0:o<util.orArray.getLength(usedPriorities):o++){
             pri=util.orArray.get(usedPriorities,o);
             obj=child(LibraryExtensions);

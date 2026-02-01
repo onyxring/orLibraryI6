@@ -37,6 +37,20 @@ default        orUtilUI_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
    constant ORUI_MAIN	99;
 	constant ORUI_STATUS	98;
+   
+
+   #ifdef TARGET_GLULX;
+   constant inlineUp imagealign_InlineUp;
+   constant inlineDown imagealign_InlineDown;
+   constant inlineCenter imagealign_InlineCenter;
+   constant marginLeft imagealign_MarginLeft;
+   constant marginRight imagealign_MarginRight;
+   constant marginCenter 6;
+   constant originalSize -1;
+
+   #endif;
+   
+   object _tmpImageInfo with width, height;
 
    object   _orUI
      with   getScreenWidth[w;  !--mode is not relevant for Z-Machine
@@ -143,6 +157,51 @@ default        orUtilUI_STAGE  0;
                util.orUI.getChar();
                util.orUI.activateMain(); !restore it to the main screen
             ]
+         #ifdef TARGET_GLULX;
+         ,  _pixelFontWidth 13
+         ,  drawImage[img alignment w h
+                  imgInfo i; 
+                  !img=img; !--suppress warning
+                  !print "[ERROR:orUI does not suppprt images in Z-Code.]";
+               !#ifnot;
+                  if(alignment==0) alignment=marginCenter;
+                  imgInfo=util.orUi.getImageSize(img);
+                  
+                  if(imgInfo==0) "[ERROR:orUI unable to determine image dimentions.]";
+                  if(h==0 && w==0){
+                     w=h=originalSize; 
+                  }else{
+                     if(h~=0)
+                        w=(imgInfo.width * w) / imgInfo.height;
+                     else
+                        h=(imgInfo.height * w)/imgInfo.width;
+                  }
+                  if(h==originalSize) h=imgInfo.height;
+                  if(w==originalSize)  w=imgInfo.width;
+
+                  if(alignment==marginCenter){
+                     style fixed;
+                     i=(util.orUI.getScreenWidth()/2)-(w/self._pixelFontWidth);
+                     spaces(i);
+                     style roman;
+                     alignment=inlineCenter;
+                  }
+                  
+
+                  glk_image_draw_scaled(gg_mainwin,img,alignment,0,w,h);
+               !#endif;
+            ]
+         ,  getImageSize[img 
+                  retval;
+               retval=glk_image_get_info(img, gg_arguments, gg_arguments+WORDSIZE);
+	            if(retval==true) {
+                  retval=_tmpImageInfo;
+                  retval.width=gg_arguments-->0;
+                  retval.height=gg_arguments-->1;
+               }
+               return retval; 
+            ]
+         #endif;
    ;
 
 #endif; !--BEFORE Parser
