@@ -44,6 +44,8 @@ default        <REPLACEWITHNAME>_STAGE  0;
    Constant    <REPLACEWITHNAME>_STAGE  LIBRARY_STAGE;
    #ifdef      <REPLACEWITHNAME>_STAGE  ; #endif;
    #ifndef orExtensionFrameworkBrief; message "   <REPLACEWITHNAME>...";#endif;
+   !--uncomment the follwing to make this a Glulx-only extension
+   !#ifndef  TARGET_GLULX; message fatalerror "<REPLACEWITHNAME>: ERROR! This extension is specific to the Glulx platform and will not compile for Z-Code."; #endif;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);

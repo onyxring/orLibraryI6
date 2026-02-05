@@ -91,11 +91,8 @@ default        orUtilMap_STAGE  0;
             }
             return a;
          ]
-      , pathFinder _pathStub
+      , pathFinder 0   
    ;
-   object _pathStub with determinePath[; #ifdef Debug; print "WARNING! Path features are not enabled.  Include ~_orMapPath~ to enable."; #endif; return -2;];
-
-
 #endif; !--Before Parser
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE

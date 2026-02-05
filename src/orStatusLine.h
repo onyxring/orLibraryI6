@@ -66,7 +66,7 @@ default        orStatusLine_STAGE  0;
 #ifndef orStatusRight;
 	[ orStatusRight
 			width;
-		width=util.orUI.getScreenWidth();
+		width=util.orUI.getStatusWidth();
 
 		if (sys_statusline_flag) {
 			if (width > 29) { !this mimics the standard library logic.  Strange that it prints NOTHING in time mode when less then 30 character screen width.
@@ -110,17 +110,17 @@ default        orStatusLine_STAGE  0;
 
 		!Now lets draw the status line...
 		util.orUI.activateStatus();
-		util.orUI.setStatusHeight(1);
+		util.orUI.setStatusHeight(gg_statuswin_cursize);
 
 		style reverse;
 		font off;
 
 		util.orUI.position(0,0);
-		spaces(util.orUI.getScreenWidth());
+		spaces(util.orUI.getStatusWidth());
 		!util.orUI.eraseStatus();
 
 		!drawing right to left, first we align the Right string, based on the width of the screen, minus the length of our string
-		util.orUI.position(util.orUi.getScreenWidth()-strR.getLength(),0);
+		util.orUI.position(util.orUi.getStatusWidth()-strR.getLength(),0);
 		strR.print();
 
 		!reposition our cursor to the start and Center the "Middle" aligned text (this does NOT overwrite the right most text)

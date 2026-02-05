@@ -37,7 +37,7 @@ default        orUtilArray_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-	constant orArrayNoProp = 0;
+	constant orArrayNoProp = -1;
 	global _sortHNdx;
 	global _sortHVal;
 	global _sortLNdx;

@@ -35,107 +35,78 @@ default        orUtilUI_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
-   constant ORUI_MAIN	99;
-	constant ORUI_STATUS	98;
-   
-
-   #ifdef TARGET_GLULX;
-   constant inlineUp imagealign_InlineUp;
-   constant inlineDown imagealign_InlineDown;
-   constant inlineCenter imagealign_InlineCenter;
-   constant marginLeft imagealign_MarginLeft;
-   constant marginRight imagealign_MarginRight;
-   constant marginCenter 6;
-   constant originalSize -1;
-
-   #endif;
-   
-   object _tmpImageInfo with width, height;
+   global winMain	   0;  !--note: orUtilUiGlulx extension turns these into objects. 
+	global winStatus	1;
 
    object   _orUI
-     with   getScreenWidth[w;  !--mode is not relevant for Z-Machine
-         if(w==0) w=ORUI_STATUS;
+     with getStatusWidth[w;    
+      #ifdef orUtilUiGlulx_STAGE;
+            return util.orUi.glulx.getStatusTextWidth();
+      #ifnot;
+            return util.orUi.getScreenWidth();
+      #endif;         
+         ]
+   ,   getScreenWidth[w; 
+   #ifdef orUtilUiGlulx_STAGE;
+         return util.orUi.glulx.getScreenTextWidth();
+   #endif;
+         if(w==0) w=winStatus;
 
          #ifdef TARGET_ZCODE;
             return ScreenWidth();
          #ifnot;
-            switch(w){
-               ORUI_MAIN:
-                  glk_window_get_size(gg_mainwin, gg_arguments, 0);
-               ORUI_STATUS:
-                  glk_window_get_size(gg_statuswin, gg_arguments, 0);
-               default:
-                  glk_window_get_size(w, gg_arguments, 0);
-            }
+            if(w==winMain) glk_window_get_size(gg_mainwin, gg_arguments, 0);
+            else if(w==winStatus) glk_window_get_size(gg_statuswin, gg_arguments, 0);
+            else glk_window_get_size(w, gg_arguments, 0);
+            
             return gg_arguments-->0;
          #endif;
-     ]
-		,	   getScreenHeight[; 
-               #ifdef TARGET_ZCODE; 
-                  return ScreenHeight(); 
-               #ifnot;
-                  return ScreenHeight() + __getStatusHeight(); 
-               #endif;
-            ]
-      ,	   getStatusHeight[; return __getStatusHeight();]
-      ,	   setStatusHeight[h;
-               StatusLineHeight(h);
-               #ifdef TARGET_ZCODE; @split_window h; #endif;
-            ]
-      ,	   activateMain[; self.activateWindow(ORUI_MAIN); ]
-      ,	   activateStatus[; self.activateWindow(ORUI_STATUS); ]
+      ]
+	   ,  getScreenHeight[; 
+            #ifdef TARGET_ZCODE; 
+               return ScreenHeight(); 
+            #ifnot;
+               return ScreenHeight() + __getStatusHeight(); 
+            #endif;
+         ]
+      
+      ,	getStatusHeight[; return __getStatusHeight();]
+      ,	setStatusHeight[h;
+            StatusLineHeight(h);
+            #ifdef TARGET_ZCODE; @split_window h; #endif;
+         ]
+      ,	   activateMain[; self.activateWindow(winMain); ]
+      ,	   activateStatus[; self.activateWindow(winStatus); ]
       ,	   activateWindow[w;!--set the current window
                #ifdef TARGET_GLULX;
-                  switch(w){
-                     ORUI_MAIN:
-                        glk_set_window(gg_mainwin);
-                     ORUI_STATUS:
-                        glk_set_window(gg_statuswin);
-                     default:
-                        glk_set_window(w);
-                  }
+                  if(w==winMain) glk_set_window(gg_mainwin);
+                  else if(w==winStatus) glk_set_window(gg_statuswin);
+                  else glk_set_window(w);
                #ifnot;
-                  switch(w){
-                     ORUI_MAIN:
-                        @set_window 0;
-                     ORUI_STATUS:
-                        @set_window 1;
-                     default:
-                        @set_window(w);
-                  }
+                  if(w==winMain) @set_window 0;
+                  else if(w==winStatus) @set_window 1;
+                  else @set_window(w);
                #endif;
 			]
          , getChar[; return KeyCharPrimitive(); ]
          , eraseWindow[w;
             #ifdef TARGET_ZCODE;
-               switch(w){
-                  ORUI_MAIN:
-					      @erase_window 0;
-                  ORUI_STATUS:
-                     @erase_window 1;
-                  default:
-                     @erase_window w;
-               }
-               !@set_cursor 1 1;
+                  if(w==winMain)    @erase_window 0;
+                  else if(w==winStatus)    @erase_window 1;
+                  else    @erase_window w;
 				#ifnot;
-               if(w==0) w=ORUI_MAIN;
-               switch(w){
-                  ORUI_MAIN:
-					      glk_window_clear(gg_mainwin);
-                  ORUI_STATUS:
-                     glk_window_clear(gg_statuswin);
-                  default:
-                     glk_window_clear(w);
-               }
-					!glk_window_move_cursor(gg_mainwin,0,0);
+               if(w==0) w=winMain;
+               if(w==winMain) glk_window_clear(gg_mainwin);
+               else if(w==winStatus) glk_window_clear(gg_statuswin);
+               else glk_window_clear(w);
 				#endif;
          ]
-         ,  eraseMain[; self.eraseWindow(ORUI_MAIN); ]
-         ,  eraseStatus[; self.eraseWindow(ORUI_STATUS); ]
+         ,  eraseMain[; self.eraseWindow(winMain); ]
+         ,  eraseStatus[; self.eraseWindow(winStatus); ]
          ,  eraseScreen[;
                #ifdef TARGET_ZCODE;
                   @erase_window -1;
-               #ifnot;
+               #ifnot; !TODO: where's the Glulx code?
                #endif;
                !self.position(0,0);
          ]
@@ -152,61 +123,18 @@ default        orUtilUI_STAGE  0;
                self.activateStatus();
                self.position(self.getScreenWidth()-1, self.getStatusHeight()-1);
             ]
-         ,  pauseForInput[;
+         , glulx 0
+         , pauseForInput[;
                util.orUI.hideCursor(); !hide the blinking cursor
                util.orUI.getChar();
                util.orUI.activateMain(); !restore it to the main screen
             ]
-         #ifdef TARGET_GLULX;
-         ,  _pixelFontWidth 13
-         ,  drawImage[img alignment w h
-                  imgInfo i; 
-                  !img=img; !--suppress warning
-                  !print "[ERROR:orUI does not suppprt images in Z-Code.]";
-               !#ifnot;
-                  if(alignment==0) alignment=marginCenter;
-                  imgInfo=util.orUi.getImageSize(img);
-                  
-                  if(imgInfo==0) "[ERROR:orUI unable to determine image dimentions.]";
-                  if(h==0 && w==0){
-                     w=h=originalSize; 
-                  }else{
-                     if(h~=0)
-                        w=(imgInfo.width * w) / imgInfo.height;
-                     else
-                        h=(imgInfo.height * w)/imgInfo.width;
-                  }
-                  if(h==originalSize) h=imgInfo.height;
-                  if(w==originalSize)  w=imgInfo.width;
-
-                  if(alignment==marginCenter){
-                     style fixed;
-                     i=(util.orUI.getScreenWidth()/2)-(w/self._pixelFontWidth);
-                     spaces(i);
-                     style roman;
-                     alignment=inlineCenter;
-                  }
-                  
-
-                  glk_image_draw_scaled(gg_mainwin,img,alignment,0,w,h);
-               !#endif;
-            ]
-         ,  getImageSize[img 
-                  retval;
-               retval=glk_image_get_info(img, gg_arguments, gg_arguments+WORDSIZE);
-	            if(retval==true) {
-                  retval=_tmpImageInfo;
-                  retval.width=gg_arguments-->0;
-                  retval.height=gg_arguments-->1;
-               }
-               return retval; 
-            ]
-         #endif;
-   ;
+      
+      ;
 
 #endif; !--BEFORE Parser
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
-   [__getStatusHeight; return gg_statuswin_cursize; ];
+   [__getStatusHeight; return gg_statuswin_cursize; ];!so status height can be used by routines declared before parser
 #endif; !--AFTER Parser
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE

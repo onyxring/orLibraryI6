@@ -79,6 +79,7 @@
 #ifdef orUtilRef_STAGE; #include "orUtilRef"; #endif;
 #ifdef orUtilStr_STAGE; #include "orUtilStr"; #endif;
 #ifdef orUtilUI_STAGE; #include "orUtilUi"; #endif;
+#ifdef orUtilUiGlulx_STAGE; #include "orUtilUiGlulx"; #endif;
 #ifdef orVagueQuantity_STAGE; #include "orVagueQuantity"; #endif;
 
 #include "#orExtensionRegistryStub"; !--pull in personal extenstions, if defined.  If not, this will reference the blank file in this folder.

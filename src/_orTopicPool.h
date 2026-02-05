@@ -45,7 +45,7 @@ default        orTopicPool_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 
 	[playerTakeNoticeOfTopic topic;
-         if(util.orArray.find(playerDialoguePool, topic)==-1) util.orArray.insert(playerDialoguePool,topic);
+         if(util.orArray.find(playerDialoguePool, topic)==-1) util.orArray.insert(playerDialoguePool,0,topic);		 
     ];
 
 	[imprintRelatedTopics top c1 c2
