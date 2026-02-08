@@ -46,7 +46,7 @@
 ! the comments too.
 !---------------------------------------------------------------------------------------------------
 ! 2002.04.14	0100	Initial release for ORLibrary 1.
-! 2025.11.22	0200	Updated to the 2.0 version of the orLibrary; expanded content slightly.
+! 2026.02.08	0200	Updated to the 2.0 version of the orLibrary.
 !--------------------------------------------------------------------------------------------------
 !Includes
 !orLib: These are all the orLibrary extensions explicitly included; however most of these also
@@ -220,7 +220,7 @@ orMenu HelpSys "Medusa"; 	!orLib: orMenus are defined in a hierarchy of objects.
 			orInset("~Medusa~ is an example of modeling conversations between the player character (PC) and non-player characters (NPCs) using modules found in the orLibrary collection of extensions for Inform 6.^^Its source code is publicly available from:");
 			
 			!orLib:	orCenter also counts up embedded newlines and applies word wraping, but centers the output.  In these examples, there is no difference between orCenter and centre.
-			orCenter("^https://github.com/onyxring/orLibraryI6/blob/main/src/_extras/examples/medusa/_medusa.inf"); 
+			orCenter("^https://github.com/onyxring/orLibraryI6/blob/main/src/_extras/examples/medusa/medusa.inf"); 
 			orInset ("^The source was designed for review by those seeking to understand how to implement such conversations in their own games and is well documented.^^A map of the primary knowledge nodes which the PC and NPC traverse can be found here:");
 			orCenter("^https://github.com/onyxring/orLibraryI6/blob/main/src/_extras/examples/medusa/medusaConversationMap.png");
 			orInset("^Although ~Medusa~ is a demonstration of its technology underpinnings, it is meant to be an interesting experience for all players, regardless of their interest in programming.");
