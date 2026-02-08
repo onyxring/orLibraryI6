@@ -49,10 +49,10 @@ default        orDialogueMenu_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
   object amsDialog LibraryExtensions
       with ext_beforePrompt[;
-         if(playerCommands.getLength()>0) rfalse; !--the player has queued actions; don't interupt these to display a dialogue menu
-         
+         if(playerCommands.getLength()>0) rtrue; !--the player has queued actions; don't interupt these to display a dialogue menu
          if(autoMenuSpeak==true && orDialogueMenu.initForDisplay()>0) {
             orDialogueMenu.show(orMenuTopOnly);
+            if(playerCommands.getLength()>0) rtrue; 
          }
          rfalse;
       ]
@@ -102,7 +102,6 @@ default        orDialogueMenu_STAGE  0;
    ];
    [queuePlayerTopic selected talkingTo;
       talkingTo = resolveActorTalkingTo(); 
-
       if(talkingTo>0){
          if(selected.isKnownBy(player)) {
             !<tellTopic talkingTo selected>;

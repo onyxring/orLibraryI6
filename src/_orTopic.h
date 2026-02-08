@@ -98,8 +98,12 @@ default        orTopic_STAGE  0;
 			]
 		,	isTellable[;
 				if(util.orArray.getSize(self,quip)==0) rfalse; !--if quip is not defined, then it is not tellable.
-				if(util.orArray.getSize(self,quip)>1 && util.orArray.getSize(self,quip,1)==ORDIA_RESPONSE_ONLY) rfalse;
+				if(self.isResponseOnly()) rfalse;
 				rtrue;
+			]
+		,	isResponseOnly[;
+				if(util.orArray.getSize(self,quip)>1 && util.orArray.get(self,quip,1)==ORDIA_RESPONSE_ONLY) rtrue;
+				rfalse;
 			]
 		,	chooseobject[code;
 				if(code~=ASKING_FOR_HINT) return DEFER_CHOICE; !--return default for "all" check

@@ -5,7 +5,7 @@
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-! License:
+! License: Public Domain
 !--------------------------------------------------------------------------------------
 ! This extension, classified as a "hook", provides tooling for other extensions to
 ! use and provides no specific features by itself.

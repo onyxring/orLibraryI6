@@ -4,7 +4,7 @@
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-! License:
+! License: Public Domain
 !--------------------------------------------------------------------------------------
 ! During inventory and room descriptions, the standard library interogates objects and
 ! prints qualifying text such as "(providing light)" or "(closed, empty and providing

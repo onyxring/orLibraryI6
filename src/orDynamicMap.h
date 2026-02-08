@@ -5,7 +5,7 @@
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-! License:
+! License: Public Domain
 !--------------------------------------------------------------------------------------
 ! To use, create  an instance of the orDynamicMap class with the found_in property
 ! listing the rooms which  are to be arranged,  in the order they are to appear.  The

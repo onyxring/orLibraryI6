@@ -4,7 +4,7 @@
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-! License:
+! License: Public Domain
 !--------------------------------------------------------------------------------------
 ! Several identical messages are often generated when a player performs an action that
 ! affects multiple objects.  Consider the following normal transcript:

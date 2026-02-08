@@ -91,7 +91,7 @@ default        orStatusLine_STAGE  0;
 #endif;
 	[ DrawStatusLine
 			strL  strM  strR ;
-
+	if(gg_statuswin_cursize==0) gg_statuswin_cursize=1;
     #Ifdef TARGET_GLULX;
         if (gg_statuswin == 0) rfalse;
     #Endif;
@@ -116,6 +116,7 @@ default        orStatusLine_STAGE  0;
 		font off;
 
 		util.orUI.position(0,0);
+		
 		spaces(util.orUI.getStatusWidth());
 		!util.orUI.eraseStatus();
 

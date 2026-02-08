@@ -1,6 +1,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 2026.02.01 orUtilUiGlulx
 ! Provides UI-centric utilities specific to Glulx.
+! NOTE: This is an EXPERIMENTAL extension and subject to change.
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -47,7 +48,7 @@ default        orUtilUiGlulx_STAGE  0;
    constant uiOriginalSize -1;
    
    object _tmpSizeStruct with width, height;
-   constant GLULX_WINDOWS_MAX=10;
+   constant GLULX_WINDOWS_MAX=20;
    
 #endif; !--Before Parser
 !======================================================================================
@@ -57,6 +58,7 @@ default        orUtilUiGlulx_STAGE  0;
    class _glulxWindow(GLULX_WINDOWS_MAX)
       with  id 0
       ,  arrangement 0
+      ,  winType 0
       ,  create[;
             self.supports=_glulxWindowSupport.create(self);
          ]
@@ -66,6 +68,7 @@ default        orUtilUiGlulx_STAGE  0;
             retval=_glulxWindow.create();
             retval.arrangement=winmethod_Left | scale | winmethod_NoBorder;
             retval.id=util.orUi.glulx._splitWindow(self.id, retval.arrangement, width, type);
+            retval.winType=type;
             return retval;
          ]
       ,  splitRight[type width scale 
@@ -74,6 +77,7 @@ default        orUtilUiGlulx_STAGE  0;
             retval=_glulxWindow.create();
             retval.arrangement=winmethod_Right | scale | winmethod_NoBorder;
             retval.id=util.orUi.glulx._splitWindow(self.id, retval.arrangement, width, type);
+            retval.winType=type;
             return retval;
          ]
       ,  splitUp[type height scale 
@@ -82,6 +86,7 @@ default        orUtilUiGlulx_STAGE  0;
             retval=_glulxWindow.create();
             retval.arrangement=winmethod_Above | scale | winmethod_NoBorder;
             retval.id=util.orUi.glulx._splitWindow(self.id, retval.arrangement, height, type);
+            retval.winType=type;
             return retval;
          ]
       ,  splitDown[type height scale 
@@ -90,10 +95,39 @@ default        orUtilUiGlulx_STAGE  0;
             retval=_glulxWindow.create();
             retval.arrangement=winmethod_Below | scale | winmethod_NoBorder;
             retval.id=util.orUi.glulx._splitWindow(self.id, retval.arrangement, height, type);
+            retval.winType=type;
             return retval;
          ]
-      ,  drawImage[imgId alignment w h; 
-            util.orUi.glulx._drawImage(self.id, imgId, alignment, w, h);
+      ! ,  moveUp[height scale 
+      !          par;
+      !       if(scale==0) scale=uiFixed;
+      !       self.arrangement=winmethod_Above | scale | winmethod_NoBorder;
+      !       par = glk_window_get_parent(self.id);
+      !       glk_window_set_arrangement(par, self.arrangement, height, self.id);            
+      !    ]
+      ! ,  moveDown[height scale 
+      !          par;
+      !       if(scale==0) scale=uiFixed;
+      !       self.arrangement=winmethod_Below | scale | winmethod_NoBorder;
+      !       par = glk_window_get_parent(self.id);
+      !       glk_window_set_arrangement(par, self.arrangement, height, self.id);            
+      !    ]
+      ! ,  moveLeft[width scale 
+      !          par;
+      !       if(scale==0) scale=uiFixed;
+      !       self.arrangement=winmethod_Left | scale | winmethod_NoBorder;
+      !       par = glk_window_get_parent(self.id);
+      !       glk_window_set_arrangement(par, self.arrangement, height, self.id);            
+      !    ]
+      ! ,  moveRight[width scale 
+      !          par;
+      !       if(scale==0) scale=uiFixed;
+      !       self.arrangement=winmethod_Right | scale | winmethod_NoBorder;
+      !       par = glk_window_get_parent(self.id);
+      !       glk_window_set_arrangement(par, self.arrangement, height, self.id);            
+      !    ]
+      ,  drawImage[imgId xOrAlignment yOrW wOrH hOrIgnore; 
+            util.orUi.glulx._drawImage(self, imgId, xOrAlignment, yOrW, wOrH, hOrIgnore);
          ]
       ,  getSize[retval;
             glk_window_get_size(self.id, gg_arguments, gg_arguments+WORDSIZE);
@@ -103,16 +137,20 @@ default        orUtilUiGlulx_STAGE  0;
             return retval; 
          ]
       ,  close[;
+            if(self.id==0) return;
             glk_window_close(self.id, 0); 
-            _glulxWindowSupport.destroy(self.supports);
+            if(self.supports ofclass _glulxWindowSupport) _glulxWindowSupport.destroy(self.supports);
+            
             _glulxWindow.destroy(self);
          ]
       ,  supports 0
-      ,  resize[dim 
+      ,  resize[dim key
                p v;
-             !void glk_window_get_arrangement(winid_t win, glui32 *methodptr, glui32 *sizeptr, winid_t *keywinptr);
+            if(key==0) key=self.id;
+            
              p=glk_window_get_parent(self.id);
-             glk_window_set_arrangement(p, self.arrangement, dim, self.id);
+             glk_window_get_arrangement(p, gg_arguments, gg_arguments+WORDSIZE, gg_arguments+(WORDSIZE*2));
+             glk_window_set_arrangement(p, gg_arguments-->0, dim, key);
           ]
    ;
    
@@ -129,8 +167,25 @@ object   _orUIGlulx LibraryExtensions
       with _screenTextWidthSizer 0 !which may or may not be different than the statusbar width, depending on if the status bar has been split
       ,   _screenPixelWidthSizer 0
       ,   _screenPixelHeightSizer 0
-      ,   _drawImage[win img alignment w h 
-      a b c
+      ,   _drawImage[win img xOrAlignment yOrW wOrH hOrScale; 
+               if(win.winType==uiText) self._drawImageInTextBuffer(win.id, img, xOrAlignment, yOrW, wOrH);
+               if(win.winType==uiGraphics) self._drawImageInGraphicsWindow(win.id, img, xOrAlignment, yOrW, wOrH, hOrScale);
+            ]
+      ,   _drawImageInGraphicsWindow[win img x y w h
+                  imgInfo;
+               imgInfo=self.getImageSize(img);
+               if(imgInfo==0) "[ERROR:orUI unable to determine image dimentions.]";
+               
+               if(h==0 or uiScaled && w==0 or uiScaled) w=h=uiOriginalSize; !--both dimentions are undefined, so no way to keep these proportional
+               if(w~=0 or uiScaled && h==0 or uiScaled) h=(imgInfo.height * w) /imgInfo.width;
+               if(h~=0 or uiScaled && w==0 or uiScaled) w=(imgInfo.width * h) / imgInfo.height;
+               
+               if(h==uiOriginalSize) h=imgInfo.height;
+               if(w==uiOriginalSize) w=imgInfo.width;   
+               
+               glk_image_draw_scaled(win,img,x,y,w,h);               
+            ]
+      ,   _drawImageInTextBuffer[win img alignment w h 
             imgInfo i; 
             if(alignment==0) alignment=uiCentered;
             
@@ -185,23 +240,35 @@ object   _orUIGlulx LibraryExtensions
          ]
       ,	getMonoFontPixelHeight[n; return self._screenPixelHeightSizer.getSize().height/util.orUi.getScreenHeight(); ]
       ,  supports _glulxSupport
-      
+      ,  makeWinFromId[winid type
+               p;
+            winStatus=_glulxWindow.create(); !--expand the winStatus variable just like we did winMin in the last pass
+            !p = glk_window_get_parent(d);
+
+            glk_window_get_arrangement(p, gg_arguments, gg_arguments+WORDSIZE, gg_arguments+(WORDSIZE*2));
+               winStatus.id=winid;
+               winStatus.winType=type;
+               winStatus.arrangement=gg_arguments-->0;
+         ]
       ,  ext_InitGlkWindow[rck; !--called multiple times by the library...
             if(rck==GG_STATUSWIN_ROCK){ !--the library has just initialized the main window which is the entire screen, but has not yet initialized the status bar
                _orUi.glulx=self; !install this into the orUi object, where it belongs
             
                winMain=_glulxWindow.create(); !--associate the winMin variable, defined in orUtilUi, as an actual, uable object, rather than an enumerated value.  The effect is the same for switch statements, but allows us to use the variable in other ways
                   winMain.id=gg_mainwin;
+                  winMain.winType=uiText;
+                  winMain.arrangement=winmethod_Below|winmethod_Proportional;
             
-               !--now we create zero width windows to allow us to get sizes which aren't normally available to us...
-               self._screenPixelWidthSizer=winMain.splitUp(uiGraphics,0); !--the width of the screen in pixels
+               ! !--now we create zero width windows to allow us to get sizes which aren't normally available to us...
+               self._screenTextWidthSizer=winMain.splitDown(uiText,0); !--the width of the screen in fixed width font (for z-code, this is the same as the width of the status bar, but we can split windows which means this isn't always the case)
+               self._screenPixelWidthSizer=winMain.splitDown(uiGraphics,0); !--the width of the screen in pixels
                self._screenPixelHeightSizer=winMain.splitLeft(uiGraphics,0); !--the height of the screen in pixels
-               self._screenTextWidthSizer=winMain.splitUp(uiText,0); !--the width of the screen in fixed width font (for z-code, this is the same as the width of the status bar, but we can split windows which means this isn't always the case)
-               
             }
             if(rck==1){ !--the last call by the parser
                winStatus=_glulxWindow.create(); !--expand the winStatus variable just like we did winMin in the last pass
                   winStatus.id=gg_statuswin;
+                  winStatus.winType=uiGrid;
+                  winStatus.arrangement=winmethod_Above|winmethod_Fixed;
             }
            rfalse;
       ]

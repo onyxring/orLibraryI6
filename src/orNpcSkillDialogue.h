@@ -72,7 +72,6 @@ default        orNPCSkillDialogue_STAGE  0;
             r=util.orArray.get(npc, dialoguePool,random(util.orArray.getLength(npc, dialoguePool))-1);
             util.orArray.removeValue(npc, dialoguePool,r);
             new_line;
-
             if(r.isKnownBy(npc))
                <tellTopic player r, npc>;
             else
@@ -82,7 +81,9 @@ default        orNPCSkillDialogue_STAGE  0;
 	;
 
 object _handleAutoAnswer LibraryExtensions
-with ext_topicAsked[top actor talkingTo;
+with priority 15 !--run after other stuff has had a chance to run
+,  ext_topicAsked[top actor talkingTo; !--support AutoAnswer being turned off
+      if(top.isResponseOnly()) rfalse; !--regardless of the auto answer being turned of, we will still auto answer topics which are designated as response only (via ORDIA_RESPONSE_ONLY)
       if(talkingTo==player && orDialogueAutoAnswer==false && actor provides pendingQuestion) {
          actor.pendingQuestion=top;
          rtrue;

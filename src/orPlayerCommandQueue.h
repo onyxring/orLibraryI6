@@ -73,7 +73,6 @@ default        orPlayerCommandQueue_STAGE  0;
 
 	[doQueuedAction inputBuffer
 			a iqa t;
-
 		if(playerCommands.getLength()==0 ||  just_undone~=0){ !--no queued actions, or there ARE queued actions, but they were restored from the last undo, so lets not do them...
 			playerCommands.clear();
 			rfalse;

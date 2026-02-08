@@ -109,7 +109,6 @@ default        orDialogue_STAGE  0;
 
 		talkingTo=noun;
 		topic=second;
-
 		if(talkingTo==0 && topic == 0)	 {
 			print "[To ask something of someone, use: ASK ";
 			style underline;
@@ -137,13 +136,11 @@ default        orDialogue_STAGE  0;
 		talkingTo=noun;
 		topic=second;
 		if(LibraryExtensions.RunUntil(ext_topicAsk, true, topic, actor, talkingTo)==true) return;
-
 		if(actor provides interactingWith && metaclass(actor.interactingWith~=routine)) actor.interactingWith=talkingTo;
 
 		if(actor==player) playerInteractingWith=talkingTo;
-
 		!Ask
-		if(util.orArray.get(topic,quip,1)~=-1){ !--if ask is different than tell
+		if(util.orArray.get(topic,quip,1)~=-1){ !--if ask is different than tell if(-1 is returned, it either means that the second quip doesn't exist, or was defined at ORDIA_RESPONSE_ONLY)
 			s=util.orArray.get(topic,quip,0);
 
 			if(util.orRef.isRoutine(s)){
@@ -155,9 +152,7 @@ default        orDialogue_STAGE  0;
 				print (string)s;
 			print "^^";
 		}
-
 		if(LibraryExtensions.RunUntil(ext_topicAsked, true, topic, actor, talkingTo)==true) return;
-
 		<tellTopic actor topic,noun>;  !ask/tell are wrapped together.  Let the tellTopic sub handle both.
 
 		rtrue;
@@ -210,10 +205,9 @@ default        orDialogue_STAGE  0;
 
 		if(LibraryExtensions.RunUntil(ext_topicTell, true, topic, actor, talkingTo)==true) return;
 		if(actor provides interactingWith && metaclass(actor.interactingWith~=routine)) actor.interactingWith=talkingTo;
-		if(util.orArray.getSize(second,quip)>1)
-			s=util.orArray.get(topic,quip,1);
-		else
-			s=util.orArray.get(topic,quip,0);
+		s=0;
+		if(util.orArray.getSize(second,quip)>1) s=util.orArray.get(topic,quip,1);
+		if(s==0 || s==ORDIA_RESPONSE_ONLY) s=util.orArray.get(topic,quip,0);		
 
 		if(util.orRef.isRoutine(s)){
 			saveSelf=self;
@@ -272,11 +266,15 @@ default        orDialogue_STAGE  0;
 		if(actor==player && playerInteractingWith~=0) obj=playerInteractingWith;
 		if(obj==0 && actor provides interactingWith) obj=valueorrun(actor,interactingWith);
 		if(obj>0 && ScopeCeiling(obj)==ScopeCeiling(actor)) return obj; !--we're already talking to someone, lets assume them.
-
 		!--we aren't having a conversation with someone already, so lets make an arbitrary decision on who we should talk to...
 		if(currentOnly==false){
-			objectloop(o in  location && o~=actor){
-				if(o~=0 && o has animate or talkable) return o; !arbitrarily return first possible
+			objectloop(o in location && o~=actor){
+				if(o~=0 && o has animate or talkable) {
+#ifdef orBackdrop_STAGE;
+					if(o==orBackdropEngine ||o ofclass orBackdrop) continue;
+#endif;		
+					return o; !arbitrarily return first possible
+				}
 			}
 		}
 

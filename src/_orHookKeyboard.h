@@ -6,7 +6,7 @@
 !--------------------------------------------------------------------------------------
 ! Created by Jim Fisher
 !-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-! License:
+! License: Public Domain
 !--------------------------------------------------------------------------------------
 ! This extension, classified as a "hook", provides tooling for other extensions to
 ! use and provides no specific features by itself.
@@ -81,7 +81,6 @@ property individual ext_keyboardHandleOops;
 			a_buffer->0 = INPUT_BUFFER_LEN - WORDSIZE;
 			a_table->0  = MAX_BUFFER_WORDS; ! Allow to split input into this many words
 			#Endif; ! TARGET_
-
 
 			retval=LibraryExtensions.RunWhile(ext_beforePrompt, false);
 			if(retval==false){!  Print the prompt, and read in the words and dictionary addresses

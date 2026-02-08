@@ -1,0 +1,503 @@
+!% -E1								!--Microsoft Style Error Msgs, needed so VisualStudio and IFIDE can jump to error
+!% -d 								!--convert double spaces after periods to single space
+!% $ZCODE_FILE_END_PADDING=0 		!--eliminate extra padding; so the output size is more precise
+!% $OMIT_UNUSED_ROUTINES=1
+!% +include_path=./inform6/lib,./orLibraryI6/src !--ORLib: the path to your orLibrary install must be included here
+!---------------------------------------------------------------------------------------------------
+! Medusa
+! A one-room example of NPC conversations using select orLibrary modules.
+!---------------------------------------------------------------------------------------------------
+! Created by Jim Fisher
+!---------------------------------------------------------------------------------------------------
+! License: Public domain
+!---------------------------------------------------------------------------------------------------
+! This is an example of using the orLibrary's NPC dialogue extensions. It implements three models 
+! of player-to-NPC conversation:
+! 	
+!	1.	Traditional Ask/Tell - This is the time-honored "guess the topic" approach, where the player 
+!		attempts to guess which topics the author has implemented, based on information presented in
+!		the narative, then types something like:
+!
+!			> ask girl about snakes
+!
+!		or
+!		
+!			> tell girl about costume
+!
+!	2. 	Menu based dialogue - This model tracks a pool of relevant topics, usually related to those
+!		already discussed, and presents them in a menu for the player to choose from.  As the player
+!		selects dialogue choices from the menu, the equivilent "ASK/TELL" command is generated and 
+!		performed on the player's behalf, as though the player had typed it, and new related topics
+!		are added to the player and NPC topic pools for subsequent dialogue.
+! 
+!	3. 	Talk - In this model, the player converses without specifying a topic, letting the game 
+!		choose an option from the player's current pool of relevant topics, arbitrarily.  It is 
+!		equivilent to selecting a random choice from the Menu's dialogue options from the previous
+!		model. 
+!		
+!			> talk to girl
+!	
+! This example also implements an NPC-to-player model of conversation, where the NPC initiates 
+! dialogue with the player from their own pool of relevant topics.  This is equivilent to the NPC
+! initiating their own TALK command.
+!
+! Although Medusa is primarily intended to demonstrate the orLibrary's dialogue extensions, it
+! also includes a handful of other extensions from the library and attempts describe these in 
+! the comments too.
+!---------------------------------------------------------------------------------------------------
+! 2002.04.14	0100	Initial release for ORLibrary 1.
+! 2025.11.22	0200	Updated to the 2.0 version of the orLibrary; expanded content slightly.
+!--------------------------------------------------------------------------------------------------
+!Includes
+!orLib: These are all the orLibrary extensions explicitly included; however most of these also
+!	depend on other extensions which they will automatically include as well.  This is
+!	why the final compiler output declares quite a few more.
+!
+#include "orPrint";				!Support inline text formatting
+#include "orTransition";		!Pause for player keypress
+#include "orDialogueMenu";		!An expanding menu to display conversation choices
+#include "orNpcSkillDialogue";	!Provides NPCs with the ability to choose their own dialogue topics and initiate them
+#include "orBackdrop";			!Convenient Scenery objects
+#include "orUtilLoopArray";		!Provides the ability to loop over several options without repeating them
+!--------------------------------------------------------------------------------------------------
+!Constants
+Release	200;
+Constant DEBUG true;
+Constant Story "Medusa";
+Constant Headline "^An Example in NPC Conversations^Copyright (c) 2002 - 2026: Jim Fisher^";
+Constant DIALECT_US;		
+Constant FLOOR_COUNT 20;				!change this to make the conversation go longer (or shorter)
+
+Constant orStringDefaultSize 1100;		!orLib: I use orPrint to format some pretty long strings (>1K),
+										!	lets make sure we've sized orStrings to handle this.  
+										!	Note: I could have just used multple orPrint statements with 
+										!	smaller lines of text (default is 500 bytes) but space isn't
+										!	an issue with this game, so let's expand it and forget it.
+
+!Constant orExtensionFrameworkBrief; 	!orLib: if you don't want the compiler listing all included
+										!	framework extensions, you can define this constant to silence it.  
+
+!---------------------------------------------------------------------------------------------------
+[DeathMessage; print "Game Over";]; !--define here before parser stubs it out.
+
+#Include "#parser"; !orLib: note the prefix here, which includes "#parser" instead of "parser".
+					!	This includes the framework's extension wrapper, which in turn includes the
+					!	standard "parser" file for you. The same needs to be done for the other two
+					!	standard library includes.
+!---------------------------------------------------------------------------------------------------
+#Include "#verblib"; !orLib: note the prefix here, which includes the extension framework.
+
+object hooks LibraryExtensions !--hooks are supported in the standard library
+	with ext_bannerText [; orPrint("$i;Type HELP to access the Online Help System.$n");],	!orLib: this is a new hook, which adds a message to the game's banner
+		ext_messages[; !normal hook, not introduced by the orLibrary
+			Wait: "The feeling of added weight marks the passage of time.  And floors.";
+		]
+	;
+
+!---------------------------------------------------------------------------------------------------
+! Maps (Just the elevator and a few scenery objects)
+object elevator "Elevator" has light
+	with description "An elevator; pretty much like any other elevator you've ever been in. Your increased weight conveys the sensation of movement and the floor indicator above the closed doors changes as the elevator passes floors. Next to the elevator doors, several dozen buttons are arranged in two rows.^^All the walls in this elevator are mirrored and reflect a matrix of identical vampires and gorgons stretching to infinity in all directions."
+	,	n_to	"The elevator doors are closed."
+	,	d_to	"No. Gary's apartment is up."
+	,	u_to	"Already going that way."
+	,	out_to  "You'll have to wait until the elevator stops."
+	,	in_to	"You're in the elevator already."
+	,	cant_go	"Your way is blocked in all directions by an army of vampires and gorgons. No way your going anywhere."
+	,	backdrops 'light' 'lighting' 'dim' 																	!orLib: backdrops appear on the location, as a list of dictionary words...
+				"It's slightly dimmer than it was outside the elevator, but not enough to hinder vision." 	!	...followed by a description
+				"It's light. Insubstantial." 																!	...followed by an alternate message to print if the player attempts
+																											!		to interact with the prop in some way.
+				bdEnd																						!	...followed by the required marker indicating the backdrop definition is complete
+			'monsters' 'hoard' 'army' 'vampires' 'gorgons' 													!	More than one backdrop may be defined, so repeat the pattern as needed; however,
+			"Not so strangly, the hoard of monsters all look like you and your companion." 					!		keep in mind that Z-code has a more number of property elements than Glulx.  To
+			"No. They're just reflections." bdEnd															!		accomodate longer chains of backdrop elements, new backdrops may be defined on
+																											!		the properties backdrops1, backdrops2, backdrops3, and backdrops4
+	,	each_turn[;
+			if(turns>FLOOR_COUNT){
+				deadflag=3;
+				print "^^Butterflies momentarily flutter around in your stomach as the elevator slows to a stop and the doors open. Beyond is the party with dozens of people dressed in creative costumes.";
+				HandleEnding();
+			}
+		]
+;
+object -> "elevator door"
+	has scenery openable ~open
+	with before[;
+			open: orPrint("You can't open the elevator doors in the conventional manner. It'll open itself when you reach floor $1.", FLOOR_COUNT); !orLib: orPrint substitutes the first parameter into 
+																																					!	the $1 print pattern. No print rule is specified for the
+																																					!	pattern, so the default pattern is used, which examines 
+																																					!	the passed in value. Since its not an object or a string,
+																																					!	it prints it as a number.
+		]
+	,	name 'door' 'elevator' 'doors'
+;
+object -> "floor indicator"
+	has scenery
+	with description[;
+			orPrint("The flashing indicator currently displays the number $1. Only $2 floor$s:2 until you arrive at Gary's party.", turns+1, FLOOR_COUNT-turns);	!orLib: Similar to the above example, print patterns $1 and $2 output the first and second
+																																									!	parameters as numbers using the default print rule; however, the next print 
+																																									!	pattern, $s:2 specifies the $s print rule be applied to the second parameter, which 
+																																									!	will print "s" if the value of that paramter is not one.  (There's also an $es print rule, BTW.
+		]
+	,	name 'floor' 'indicator' 
+;
+object -> "buttons"
+	has scenery pluralname
+	with description [; orPrint("There's just shy of a bazillion buttons.  This is, after all, a $i;really$n tall building.  One button in particular, number $1, is lit.",FLOOR_COUNT);] !orLib: here the $i and $n print rules are used to switch between italicized an normal style text, respectively.
+	,	name 'button' 'buttons' 'row' 'rows' 'of'
+	,	before[;
+			push: "No. Floor number ",FLOOR_COUNT," has already been selected. Selecting anymore floors would delay arrival at the party.";
+		]
+;
+object -> "mirrors"
+	has scenery pluralname
+	with description "The mirrors on each of the four walls cast infinite reflections. Endless lines of Draculas and Medusas stretch to the vanishing point in all directions."
+	,	name 'mirror' 'mirrors' 'reflection' 'reflections' 'infinity' 'infinite'
+;
+!---------------------------------------------------------------------------------------------------
+! Characters
+!----------------------
+! Medusa
+orNpc medusa "woman" elevator 	!orLib: the orNpc class is the foundation for NPCs. It provides a plugin framework for new "NPC Skills" to be inserted, enabling NPCs to act of their own accord.
+	has female 
+	class orNpcSkillDialogue	!orLib: this is an NPC skill. Specifying it here means Medusa can initiate dialogue on her own, rather than being forced to wait for the player to do so.
+	with name 'woman' 'medusa' 'gorgon' 'girl' 'young' 'red-haired' 'red' 'headed' 'red-headed' 'redhead' 'beautiful' 'pretty' 'female' 'slender'
+	,	description "Beautiful, just as the Greek myths describe her. Her toga accentuates her curves, not unpleasantly. A dozen or so thin rubber snakes, painted red to blend almost unnoticeably with her long curls, bounce around her head and face as she moves. Her blue eyes glint in the dim lighting of the elevator."
+	,	add_to_scope toga hair snakes
+	,	initial "A slender, red-headed young woman, dressed as Medusa, stands beside you."
+	,	uncomfortableSilence 0 																		!orLib: Here we define a "loopArray", where the first value is used to track which elements have been previously returned. This is used in the doNothing routine below.
+			"There is a brief moment of uncomfortable silence."										!	LoopArrays don't have to be strings, its up to the code useing it to interpret values.
+			"The woman turns to the mirror for a moment and arranges her snakes."
+			"The woman gives a barely audible sigh and brushes some previously unnoticed lent off of her toga."
+			"With a faint glimmer of boredom, the young woman seems to develop an intense interest in some invisible, far away object well beyond the mirrors of this elevator."
+	,	doNothing[; 	!orLib: doNothing is called when it's an orNPC's turn to act, but there is nothing to do (i.e., when no "npc skills" make sense in the current situation).
+			if(random(3)==1) print "^",(string) util.orLoopArray.getAny(self,uncomfortableSilence),"^"; !orLib: here we retrieve a random element from the above defined loopArray, which tracks it to make sure subsequent retrievals from the same array don't return the same value until they have all been returned 
+		]
+	;
+	!--orLib: since this is a one-room game, we could have implemented her possessions as backdrops, but this is cleaner...
+	object  toga "toga" medusa
+		has	worn
+		with	description "Nothing special.  If you've seen one white toga wrapped around a beautifully tanned gorgon, you've seen them all."
+		,	name 'toga' 'white' 'clothes' 'costume' 'her' 'clothing'
+		,	article "her"
+	;
+	object  hair "hair" medusa
+		has	worn
+		with	description	"Pretty, with tiny scarlet serpents intertwined in the long, red, curled locks."
+		,	name 'hair' 'red'
+		,	article "her"
+	;
+	object snakes "snakes" medusa
+		has		pluralname worn
+		with	name 'snake' 'snakes' 'serpents'
+		,	description"Rubber, dyed red to match her hair color. The tiny snakes curl about, interwoven with natural curls. The affect is really quite stunning."
+		,	article "her"
+	;
+!----------------------
+! Player
+object dracula elevator
+	with	description "Just you, all dressed up in the Dracula costume your brother helped to make."
+	,	name 'dracula' 'vampire'
+;
+	object costume "your costume" dracula
+		has proper worn
+		with name 'costume' 'cape' 
+		,	description "Black, of course."
+	;
+!------------------------------------------------
+! Help System
+orMenu HelpSys "Medusa"; 	!orLib: orMenus are defined in a hierarchy of objects.  This one is the starting node.  When shown in full screen mode, its printed name appears as
+										!	the menu title, and is immediate children are presented as options for the player to choose from.  
+										!	Don't confuse this help menu with the dialogue menu also used in this game.  Although both leverage the the orMenu extension
+										!	they are seperate and serve different purposes.  
+	orMenu -> "About this Game" 		!orLib: The printed name is printed in a list when the parent object is displayed.
+		with description[;				!orLib: The description is printed when their are no children to display, otherwise it is ignored. 
+										!	The description can be a literal string or a routine, as it is here. The description is usually centered on the screen by the orMenu extension.
+										!	Note though, that we are also centering text within this routine.  So we can return true to tell orMenu to NOT center the output, because
+										!	attempting to center test which has already been centered breaks things (it centers text already padded with starting spaces). 
+			!orLib:	orInset adjusts the margin on either side of the text, counting up embedded newlines and applying word wraping appropriately, but keeping it left-justified.
+			orInset("~Medusa~ is an example of modeling conversations between the player character (PC) and non-player characters (NPCs) using modules found in the orLibrary collection of extensions for Inform 6.^^Its source code is publicly available from:");
+			
+			!orLib:	orCenter also counts up embedded newlines and applies word wraping, but centers the output.  In these examples, there is no difference between orCenter and centre.
+			orCenter("^http://www.github.com/onyxring/orLibraryI6/src/_extras/examples/medusa/medusa.inf"); 
+			orInset ("^The source was designed for review by those seeking to understand how to implement such conversations in their own games and is well documented.^^A map of the primary knowledge nodes which the PC and NPC traverse can be found here:");
+			orCenter("^http://www.github.com/onyxring/orLibraryI6/src/_extras/examples/medusa/medusaConversationMap.png");
+			orInset("^Although ~Medusa~ is a demonstration of its technology underpinnings, it is meant to be an interesting experience for all players, regardless of their interest in programming.");
+			rtrue; 							!orLib: tell orMenu to NOT attempt to center this output as it normally would.
+		];
+	orMenu -> "This update" with description "Medusa was originally released in 2002. In this current version, most of the original narrative has remained unchanged; however, the code has been revised to sit on the latest iteration of the orLibrary.";
+	orMenu -> "NPC Conversations" with description "The NPCs in this game (and the PC for that matter) have been designed with a conversation system which attempts to mimic normal conversation in humans.  Each topic of discussion relates to other topics which, in turn, relate to still other topics.  As one subject is addressed, additional points of dialogue accumulate in a ~potential topics~ pool.^^At any given point in the game, each character will have a list of topics which they can either ASK or TELL the other character.  The player is not restricted to these related topics, as an NPC would be, and is free to ASK or TELL anything which comes to mind; however, a menu system has been built on top of this ASK/TELL Topic-pool paradigm and will display the related topics most recently accumulated.  The entire game can be played via this menu system, or it can be turned off in favor of explicit ASK/TELL commands.^^Also, there are few topics, hidden in the corners of this game, which cannot be reached via the menu system and are only available via ASK/TELL.";
+	orMenu -> "Special Commands";	!orLib: Notice there is no description here, only children, making this a submenu.
+		orMenu ->-> "A & T" with description "For convenience, the normal ASK and TELL commands may be abbreviated as the letters A and T, respectively.  In addition, the character to whom you are referring can also be inferred, so commands such as:^^     ~ASK GIRL ABOUT COSTUME~ or ~TELL GIRL ABOUT MOTHER~^^can be abbreviated as:^^     ~A COSTUME~ or ~T MOTHER~";
+		orMenu ->-> "Talk" with description "As discussed in ~NPC Conversations,~ each character in the game has a pool of potential conversation topics.  For the player character, these are normally displayed in the conversation menu; however, a topic from this pool can also be selected at random with the TALK command which is issued in the following format:^^     TALK TO GIRL^^TALK and TELL both share the same abbreviation (~T~) as well as the ability to infer to whom the player is speaking.  As such:^^     T^^Is the same as ~TALK TO GIRL~ (about some random topic) which is different than:^^     T COSTUME^^which means ~TELL GIRL ABOUT COSTUME~.";
+		orMenu ->-> "MenuSpeak" with description "The MenuSpeak command (abbreviated MS) turns on the conversation menu if there are conversation topics to display.  This is useful when the conversation menu has been exited or AutoMenuSpeak has been turned off.";
+		orMenu ->-> "AutoMenuSpeak" with description "The AutoMenuSpeak command (or AMS for short) is used to turn the automatic conversation menu on or off with the following syntax:^^     AMS ON^^Or^^     AMS OFF^^By default it is ON.";
+	orMenu -> "About the Author" with description "Jim Fisher, also known as OnyxRing, is the author of a handful of Interactive Fiction titles.~";
+	orMenu -> "About the ~orLibrary~" with description "The orLibrary, or the ~OnyxRing Library,~ is a framework of extensions to Inform 6's standard library.  It contains a spectrum of usable entries which do everything from centering wrapped text to enabling NPCs to walk around and talk with one another.^^If you are an Inform author and are interested in finding out more of the orLibrary, point your browser to: github.com/onyxring/orLibraryI6.";
+
+!---------------------------------------------------------------------------------------------------
+!	Topics known by Dracula
+
+!orLib: orTopics represent nuggets of information which are used to mimic characters learning information from a book or, as is the case in this example, have conversations.
+orTopic drac_t with knownBy dracula; 	!orLib: orTopics must be "known" by characters before they can speak of them. If the knownBy property 
+										!	isn't defined, an orTopic will inherit the value of its parent orTopic (if there is one).  In this case, all children of drac_t, which
+										!	do not specify their own knownBy properties, are automatically known by, and can be spoken of by, the dracula character.
+	orTopic -> d_mother_t "mother" 
+		with name 'mother'
+		,	quip 	"~What about your mother?  What does she do?~" 																						!orLib: quips can come in pairs. If there are two, then the first is used when someone ASKs about the topic.  In this case, Medusa would ask Dracula about his mother.
+					"~My mother's the president of Securities Bank and Trust over in Milhelm.~^^I used to live in Milhelm. I know where that bank is." 	!	The second quip is used when the character is about TELLing the topic.  Here, Dracula is telling about his mother.  
+																																						!	The two are not always linked.  Dracula might offer up the topic of his mother without being asked about here.
+		,	menuDisplay "My mother's the president of"	!orLib: when topics are listed as options in the menu, this is the text displayed.  If not defined, the printed name is used instead (in this case "mother").
+		,	relatedTopics m_familydoeswell_t			!orLib: generally, relatedTopics are added to the topic pools of both characters if appropriate, so a character might tell the other about it, if they know of it, or they can ask about it if they don't.
+	;
+	orTopic -> d_grandmother_t "grandmother" 
+		with quip "~So what other 'Great women' are in that 'long line' you come from?~" 
+				"~My grandmother makes the best blackberry cobbler on the planet.~^^She smiled at that.  ~That's certainly great if you like blackberry cobbler.~"
+		,	menuDisplay "My grandmother makes the best"
+		,	name 'grandmother' 'grandma'
+	;
+	orTopic -> d_sister_t "sister" 
+		with quip "~My sister is a neurosurgeon.~^^~Wow! Very impressive.~ she responds.^^You nod. ~Except it carries more weight when she tells me I'm messed up in the head.~" 	!orLib: if there is only one quip defined, then it cannot be ASKed about, only volunteered with TELL.  
+																																													!	So this topic will appear as an option in the player's dialogue menu, but Medusa will never inquire about it directly. 
+		,	menuDisplay "My sister is a neurosurgeon."
+		,	name 'sister'
+	;
+	orTopic -> d_theater_t "theater" 
+		with quip "~I took theater for a couple of semesters and also remember Dr. Davidson being particularly budget conscious,~ you say." !orLib: one quip, cannot be ASKed after, only told via tell
+		,	name 'theater' 'classes' 'creative' 'arts'
+		,	menuDisplay "I took theater"
+		,	RelatedTopics d_sewing_t d_macbeth_t
+	;
+	orTopic -> d_macbeth_t "macbeth" 
+		with quip "~You were in theater?~ She pauses as though having difficulty believing that. ~I've seen you around campus a few times; never would have pegged you for an actor. Play in anything traditional, or are you a full time vampire?~" 
+				"~I played Macbeth.~^^~You're kidding. Macbeth?~^^You nod and dig deep into your memories for a quote. ~Had I but died an hour before this chance, I had lived a blessed time; for, from this instant, There's nothing serious in mortality.~ You strike a melodramatic pose for a moment, then smile at her, baring your fangs.^^She bursts out laughing."
+		,	menuDisplay "I played Macbeth."
+		,	name 'macbeth'
+		,	RelatedTopics d_lawyer_t
+	;
+	orTopic -> d_lawyer_t "Harvard" 
+		with quip "~So you want to be an actor?~^^You shake your head at this." 
+			"~I only took theater as an elective. I'll be transferring to Harvard Law after next year.~^^~A lawyer! You're taking this bloodsucking theme a little far aren't you?~^^~Hey, not all lawyers are bad!~^^~Okay.~ She rolls her eyes, unconvinced."
+		,	name 'lawyer'
+		,	menuDisplay "I only took theater as an elective."
+		,	RelatedTopics m_major_t m_lawyer_t 
+	;
+	orTopic -> d_aunt_t "aunt" 
+		with quip "~My aunt is an accountant. You remind me of her actually.~^^~I'm not sure how to take that,~ she replies with a queer look upon her face.^^~Take it well,~ you say.  ~She's a great woman. In fact, I come from a long line of great women.~"
+		,	menuDisplay "My aunt is an accountant."
+		,	name 'aunt'
+		,	RelatedTopics d_grandmother_t d_mother_t d_sister_t
+	;
+	orTopic -> d_costume_t "Dracula costume"
+		with quip "~So you chose Dracula,~ she arches her eyebrows and gives a look of ridicule. ~Any significance to that?~" 
+				"~Dracula was always my favorite monster,~ you say, glancing at one of your many reflections." 
+		,	menuDisplay "Dracula was always my favorite"
+		,	name	'dracula' 'costume'
+		,	RelatedTopics m_costume_t m_vampire_t
+	;
+	orTopic -> d_sewing_t "sewing"
+		with quip "~So you came out of acting class with some experience making theater costumes,~ she says.  You watch her eyes look over your costume as though assessing your skills.^^~Some,~ You say, then on impulse: ~It isn't the most important thing you can know; but if the world falls apart, at least you can sew.~^^She looks at you with a strange expression. ^^~Dr. Dave used to say that.  He had a bunch of corny rhymes which seemed to come out of his mouth non-stop.~"
+			ORDIA_RESPONSE_ONLY !orLib: orTopics with the "tell quip" set to ORDIA_RESPONSE_ONLY don't make sense when voluteered, only with ASKed about. This is the opposite 
+							!	of a single quip property which can only told, not asked about. Here, Dracula won't offer up his teacher's corny rhymes unless Medusa broaches 
+							!	the topic first.  Also notice that there are no names supplied for this topic.  Since the player cannot TELL it, there is no need.  On the other 
+							!	hand, response-only topics which are known by Medusa would require name properties for the player to ASK about them.
+		
+		,	relatedTopics d_rhyme_t
+	;
+	orTopic -> d_rhyme_t "teacher's rhymes"
+		with relatedTopics d_frost_t
+		,	quip "She thinks for a moment, and then says ~Now that you mention it I vaguely remember Lisa telling me about the stupid rhymes her teacher spouts.  There was one she told me about when trying to make a point.  It was something about falling over if you forget your lines.~^^~'You can stand back up if you happen to fall, but forget your lines and make fools of us all.'  Yes, I think he makes them up himself.  We used to cringe when someone would mess up on their lines in rehearsal, knowing it was coming.~^^~Sounds like he considers himself a poet.~^^~He's no Robert Frost.~"
+				ORDIA_RESPONSE_ONLY
+	;
+	orTopic -> d_frost_t "frost"
+		with quip "~You like Frost, then?~" 
+				"You smile.  ~My mother used to stay up late and read poetry to me to me as a child.  'The Road Not Taken' stands out most in my memories.~"
+		,	relatedTopics m_vampire_t d_mother_t
+		,	menuDisplay "My mother used to read Frost to me"
+		,	name 'robert' 'frost'
+	;
+	orTopic -> d_mummies_t "mummies"
+		with quip "~Mummies always scared me.~^^A look of concern crosses her face. ~That's sad,~ she says. ~It's okay to be scared of monsters, but no child should be scared of mommies.~^^You start to shake your head at her misunderstanding but see her smile and realize she was joking."
+		,	relatedTopics d_childfear_t
+		,	menuDisplay "Mummies scared me"
+		,	name 'mummies' 'mummy' 'fear'
+	;
+	orTopic -> d_childfear_t "childhood fears"
+		with quip "~So what other things scare you?~ she asks." 
+				"~As a child, I was scared to death of Grover.~^^~Grover?  You mean from Sesame Street?~^^~Yes,~ you say, nodding. ~He used to give me nightmares.~^^She chuckles at that.  ~I think he sounds like Yoda.~"
+		,	relatedTopics	m_starwars_t d_adultfear_t
+		,	menuDisplay "Grover scared me"
+		,	name 'grover' 'child' 'fear' 'fears' 'childhood'
+	;
+	orTopic -> d_adultfear_t "adult fears"
+		with quip "~Okay, as a child you were afraid of a Muppet.  What scares you now?~ she inquires.^^~Being trapped in an elevator with Medusa,~ you answer.^^~What, with those fangs?~^^~Fangs won't do me any good if I'm a statue.~^^~Well if you turn to stone I'll give you a nice home in my garden,~ she says. ~You can scare away the birds.~" ORDIA_RESPONSE_ONLY
+		,	relatedTopics m_garden_t
+		,	name 'adult' 'fears' 'fear'
+	;
+	orTopic -> d_flashgordon_t "Flash Gordon"
+		with quip "~I always liked Flash Gordon.~^^~That's a little before my time,~ she responds with a smirk.^^~Not the original,~ you laugh.  ~They remade it into new movie some time back.~^^~A few decades ago,~ she says.^^~Well yeah, I guess.~ you admit grudgingly.^^She nods, ~I repeat, that's a little before my time.~"
+		,	menuDisplay "I always liked Flash Gordon"			
+		,	relatedTopics m_buckrogers_t
+		,	name 'flash' 'gordon'
+	;
+	orTopic -> d_vegetarian_t "vegetarian"
+		with quip "~So I bet you're a meat-eater, huh?~" "~I could never be a vegetarian.  Nothing is better than a juicy, tender steak.~ You say.^^She cringes. ~I just can't eat anything that once had a face.~^^~Chocolate bunnies have faces.~^^She laughs at this. ~Okay, chocolate bunnies are the exception to the rule.~"
+		,	menuDisplay "I could never be a vegetarian"
+		,	name 'vegetarian'
+	;
+	orTopic -> d_cousingarden_t "cousin's garden" 
+		with quip "~I have a cousin who grows a flower garden for a living,~ you say.^^~For a living?~^^~Uh-hmm.  He has a big green house and supplies flower shops around his town with their inventory.~^^~Hmmm,~ she thinks for a moment, then: ~I never really thought about where floral shops get what they sell.  Flowers don't live very long.~"
+		,	menuDisplay "I have a cousin who grows a flower garden"
+		,	name 'cousin'
+	;
+	orTopic -> d_capitalpunishment_t "death penalty"
+		with quip "~You don't agree with our position?~ she asks, knowing the answer already from your expression."
+				[; 
+					print "~I'm actually a firm believer in capital punishment,~ you say.^^She seems disappointed to hear you say this and responds, as though reading from a well-rehearsed script: ~Murdering another person won't change what they did.~^^~It isn't murder, its justice,~ you respond.  ~And the mindset of a murderer is cancerous.  Cutting it out of society is the only way to ensure it doesn't grow.~^^She reacts visibly to this, actually turning to face you. ~You can remove it from society without...~  Then she stops, closes her eyes and turns back to face the doors.  She takes a deep breath and exhales.  Then she opens her eyes.  ~Let's just agree to disagree,~ she says.^^You remain agreeably silent.^^For a moment there is an uncomfortable pause.  Then she looks at you with serious expression on her face.  ~I'm glad you care one way or the other.  Apathy kills a person from the inside out, so it's good to have strong opinions.~^^You stand there for a moment, unsure what to say, conscious of the invisible wall between you now.  Then she speaks again with that sly smile on her face. ~Even though you're wrong,~ she says.";
+					!--In a game tracking NPC affinity toward the player character, this would be a good place to take points away; althrough, it might sense to have it a volunteer-only quip
+				]
+		,	menuDisplay "I'm a firm believer in capital punishment"
+		,	name 'capital' 'punishment' 'death' 'penalty'
+	;
+!---------------------------------------------------------------------------------------------------
+!	Topics known by Medusa
+!---------------------------------------------------------------------------------------------------
+orTopic medus_t with knownBy medusa; 
+	orTopic -> m_costume_t "costume" 
+		with quip "~I like your costume,~ You say, conscious of how lame you sound." "She smiles at you. ~I've always been fascinated with Greek mythology.~ She glances at her reflection in the mirror. ~My roommate helped me make this.  She's a theatrical major and gets a lot of experience working with costumes.  I understand her professor is a little on the cheap side so they often just have to make do.~^^That rings true to your ears, having taken some creative arts classes before."
+		,	menuDisplay "I like your costume."
+		,	name 'costume' 'medusa' 'toga'
+		,	relatedTopics d_theater_t d_costume_t
+	;
+	orTopic -> m_lawyer_t "lawyers" 
+		with quip "~What's the root of this aversion to lawyers, you seem to have?~" "~I dated a lawyer for a while.~ She shrugs her shoulders. ~He argued with me about everything.  I don't think he cared which side of an argument he was on, just as long as we disagreed. It was frustrating.~^^~I refer you to my previous statement: 'Not all lawyers are bad.'~^^~I'm sorry, but are you arguing with me?~ she asks with a smirk on her face."
+		,	menuDisplay "Why do you dislike lawyers?"
+		,	name 'lawyer' 'lawyers'
+	;
+	orTopic -> m_major_t "major" 
+		with quip "~What about you? What do you want to be when you grow up?~ You ask jovially.^^~An astronaut,~ she answers.^^You start to chuckle but stop when you see her straight face.^^~Really?~^^She smiles. ~No.~" "~I've been majoring in accounting. I was thinking it would be a good fall back career in case my space faring ambitions don't pan out.~ Hmmm. You like her dry humor. It reminds you of your aunt who, incidentally is also an accountant."
+		,	menuDisplay "What about you? What do you"
+		,	name 'major'
+		,	RelatedTopics d_aunt_t m_accountant_t
+	;
+	orTopic -> m_accountant_t "accounting" 
+		with quip "~You want to be an accountant? Math has just never been my thing.~^^She nods." "~I want to be a CPA.  I've been fascinated with numbers most of my life. I think I find comfort in the clear-cut, logical rules.~"
+		,	menuDisplay "You want to be an accountant?"
+		,	name 'accountant'
+	;
+	orTopic -> m_familydoeswell_t "Milhelm" 
+		with quip "~Milhelm is an expensive area of town. Your family must live pretty comfortably.~^^~We do okay. My father's a workaholic.~"
+		,	menuDisplay "Milhelm is an expensive area"
+		,	name 'milhelm' 'finances' 'family'
+		,	RelatedTopics m_father_t
+	;
+	orTopic -> m_father_t "father" 
+		with quip "~What does he do?  Your father, I mean.~^^~I'm not sure to be honest.  Something with computers, I think.~^^You nod. ~I hear some people think those things have potential.~^^She giggles."
+		,	menuDisplay "What does your father do?"
+		,	name 'father'
+	;
+	orTopic -> m_vampire_t "vampires"
+		with quip "~So what do you think about vampires?~ you ask." "~I used to stay up late at night and watch vampire shows with my father when I was a little girl.  At least I did when he wasn't working.~^^You grimace. ~Not exactly Sesame Street.~^^She shrugs.  ~It's true.  I was too young to be watching those kinds of shows.  Vampires scare me even today.~"
+		,   menuDisplay "What do think about vampires?"
+		,	relatedTopics d_mummies_t m_father_t
+		,	name	'vampires' 'dracula'
+	;
+	orTopic -> m_starwars_t "Star Wars"
+		with quip "~So you're a Star Wars fan?~^^She smiles. ~I love Star Wars And Star Trek.~^^~I'm surprised.  You don't look like a 'Treky,'~ you say.^^~Well, I draw the line at going to conventions, but yes.  I tend to like Science Fiction as a whole.~"
+		,	relatedTopics d_flashgordon_t
+		,	menuDisplay "So you're a Star Wars fan?"						
+		,	name 'starwars' 'star' 'wars' 'yoda'
+	;
+	orTopic -> m_buckrogers_t "Buck Rogers"
+		with quip "~My favorite was Buck Rogers in the 24th and a half century,~ she says with a sly look on her face.^^You're beginning to catch on to her joking personality now, but decide to take the bait anyway: ~I think that was 'Duck Dodgers' from a Bugs Bunny cartoon.~^^~Oh,~ she responds dismissively.  ~I hadn't realized.~^^~Yeah, I bet,~ you say, smiling."
+		,	name 'buck' 'rogers'
+	;
+	orTopic -> m_garden_t "garden location"
+		with quip "~So where exactly is this garden you need a stone scarecrow for?~^^~I keep my garden in the back of our sorority house.~"
+		,	relatedTopics m_gardentype_t m_sorority_t
+		,	menuDisplay "So where is this garden?"
+		,	name 'garden' 'location'
+	;
+	orTopic -> m_gardentype_t "garden type"
+		with quip "~Do you grow a flower garden, or a vegetable garden?~^^~Vegetable, definitely.  I love flowers, but there's something about growing vegetables I find more satisfying.  Also, I'm a vegetarian so it comes in handy.~"
+		,	relatedTopics d_vegetarian_t d_cousingarden_t
+		,	menuDisplay "Is it a flower or vegetable garden?"
+		,	name 'garden' 'type'
+	;
+	orTopic -> m_sorority_t "sorority"
+		with quip "~What sorority are you in?~" "~I'm in the Chi Lambda sorority,~ she says.^^~Oh yes,~ you say, recalling an event last summer. ~You held that protest against the death-penalty last year.~^^She smiles at the recognition and nods.  ~Yes, it was fairly successful I think.  It definitely heightened public awareness.~^^You suddenly feel a little warm. ~I suppose,~ you say and suddenly gain an intense interest in the floor indicator."
+		,	relatedTopics d_capitalpunishment_t
+		,	menuDisplay "What sorority are you in?"
+		,	name 'sorority'
+	;
+	!-------------------------------------------------------------------------------
+	! Orphan Medusa topics (won't come up in the convesation unless the player 
+	! specifically ASKs about them and don't lead to additional conversation 
+	! topics, although they easily could if this game were expanded upon.)
+	!-------------------------------------------------------------------------------
+	orTopic -> m_snakes_t "snakes" 
+		with name 'snakes' 'snake'
+		,	quip "~So,~ you begin with a smile. ~You seem to have quite the affinity for snakes.~" "~Just the rubber kind,~ she responds, and twirls one around her fingers. ~They don't bite.~"
+	;
+	orTopic -> m_mythology_t "mythology" 
+		with name 'mythology' 'greek' 'myths'
+		,	quip "~Your interest in Greek mythology led you to a Medusa costume,~ you comment." "She nods. ~Poor Medusa, an innocent woman just trying to make do in a man's world.~ Her voice almost drips in sarcasm.  ~And what does all of her work get her? Decapitation by 'the man'.~ She shakes her head in mock sorrow."
+	;
+	orTopic -> m_mother_t "mother" 
+		with name 'mother' 'mom'
+		,	quip "~What does your mother do?~ you ask, looking to find more about this enchanting young woman's roots." "~She's a homemaker,~ is her matter-of-fact response."
+	;
+	orTopic -> m_roommate_t "Lisa" 
+		with name 'lisa' 'roommate'
+		,	quip "~Your roommate sounds like she's seriously into theater.~" "~I like to think of her as a 'drama queen.'~ she nods, grinning."
+	;
+!---------------------------------------------------------------------------------------------------
+! Code 
+[Initialise;
+	ChangePlayer(dracula);
+
+	medusa.takeNoticeOfTopic(m_costume_t); 	!orLib: playerTakeNoticeOfTopic places a topic in the player's topic pool.  So Dracula might start off by asking about her costume 
+
+	!orLib: the only print patter we haven't seen so far in the below text is $numbText:1, which prints out the name of the number passed in via the first paramter
+	orPrint("^^^^It took you a little time to get your vampire costume together, so you're running late for Gary's party. But now you've arrived, on the ground floor of his high-rise apartment building. $i;Better late than never.$n^^The elevator chimes softly as it opens and you step into the mirrored interior.  For a moment, you struggle to remember Gary's floor number.  $i;Oh, yeah... $numbText:1.$n You reach out and push the button.  The doors begin to close but stop suddenly as a slender hand appears.  With another chime, the doors open again revealing a beautiful, red-headed young woman dressed in a toga.^^You recognize her from campus although you do not actually know her.  For a moment you almost do not see the red rubber snakes entwined with her long red curls.  She steps into the elevator and reaches for a button, but stops, apparently seeing it already lit.^^$i;It seems$n, you think as the doors close and the elevator begins to move, $i;this ~Medusa~ is going to same costume party I am.$n;^^^",FLOOR_COUNT);
+	
+	orTransition(); !orLib: a simple routine, which prints a message (if supplied), waits for a keypress, then clears the screen
+	print "^^^";
+	
+];
+[HandleEnding;
+	!--Were this game to be expanded and multiple endings added.  This would be the place to do it.
+	orPrint("^^~Well,~ says the woman.  ~It was nice to meet you.~  And with that, she turns and steps off of the elevator. ^^You watch her blend into the party, mildly disappointed to see her walk away, then shrug it off. $i;After all$n, you think to yourself. $i;If you could just keep a girl confined in a one-room conversation all the time, there wouldn't be much use for a party$n.^");
+];
+
+!---------------------------------------------------------------------------------------------------
+! Grammer 
+#Include "#grammar"; 
+!---------------------------------------------------------------------------------------------------
+verb meta 'help' 'menu' 'about' 'info' * -> showHelp;
+[showHelpSub; HelpSys.show(orMenuFullScreen); ];  		!orLib: show the help menu in full screen mode
+
+extend 'talk' replace
+	* -> sayRandomTopic
+	* 'to' animate -> sayRandomTopic !accept "Talk to girl" even though it isn't all that meaningful in this example.  There's only one other person to talk to.
+;
+
+[sayRandomTopicSub
+		num topic; 
+	num=orDialogueMenu.initForDisplay();
+	if(num==0) "You can think of nothing to talk about.";
+	num=random(num)-1;
+	topic=util.orArray.get(orDialogueMenu,childMenuItems,num); 
+	queuePlayerTopic(topic);
+];
+!---------------------------------------------------------------------------------------------------
+end;
+---------------------------------------------------------------------------------------------------
+	N O T E S 	
+---------------------------------------------------------------------------------------------------
+Conversation Map:
+Because of the complexity, the conversation map has been moved to a better medium.  
+It can be found at the following URL:
+	http://www.github.com/onyxring/orLibraryI6/src/_extras/examples/medusaConversationMap.png
+	

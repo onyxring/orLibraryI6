@@ -20,6 +20,7 @@ default        orTopicPool_STAGE  0;
 #include "orDialogue";
 #include "orUtilArray";
 #include "_orInfExt";
+#include "_orTopic";
 !--------------------------------------------------------------------------------------
 #endif;
 #ifnot;
@@ -35,7 +36,7 @@ default        orTopicPool_STAGE  0;
 	Constant allTopics 1;
 	default  orMaxTopicPoolSize 20;
 	Array 	 playerDialoguePool table orMaxTopicPoolSize;
-
+ 
 	property individual dialoguePool;
 	property individual relatedTopics;
 	property individual excludedTopics;
@@ -45,7 +46,7 @@ default        orTopicPool_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 
 	[playerTakeNoticeOfTopic topic;
-         if(util.orArray.find(playerDialoguePool, topic)==-1) util.orArray.insert(playerDialoguePool,0,topic);		 
+         if(util.orArray.find(playerDialoguePool, topic)==-1 && topic.isTellable()) util.orArray.insert(playerDialoguePool,0,topic);		 
     ];
 
 	[imprintRelatedTopics top c1 c2
@@ -53,7 +54,6 @@ default        orTopicPool_STAGE  0;
 		if(top provides relatedTopics){
 			for(t=0:t<util.orArray.getLength(top,relatedTopics):t++){
 				relTop=util.orArray.get(top,relatedTopics,t);
-
 				if(relTop.isAppropriateFor(c1,c2)){
 					if(c1==player){
 						if(util.orArray.find(playerDialoguePool,relTop)==-1) util.orArray.prepend(playerDialoguePool,relTop);
@@ -83,9 +83,9 @@ default        orTopicPool_STAGE  0;
 
 		]
 	,	ext_topicAsked[top act talkingTo;
-			removeExcludedTopics(top, act, talkingTo);
-			imprintRelatedTopics(top, act, talkingTo);
-			rfalse;
+			! removeExcludedTopics(top, act, talkingTo);
+			! imprintRelatedTopics(top, act, talkingTo);
+			! rfalse;
 		]
    ,	ext_topicTell[top act talkingTo;
 
