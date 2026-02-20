@@ -49,7 +49,7 @@ default        orCenter_STAGE  0;
 ! INCLUDE DEPENDENCIES
 	#include "orUtilUi";
 	#include "orUtilBuf";
-	!TODO: use the orUI tools and perhaps orBuf for this code.
+	!TODO: use orBuf for this code.
 !--------------------------------------------------------------------------------------
 #endif;
 #ifnot;
@@ -82,17 +82,31 @@ default        orCenter_STAGE  0;
 		return orCenter(text, maxwidth, NO_HIGHLIGHT, true, subIndent);
 	];
 
-	[orCenter text maxwidth highlight leftAlign subIndent
-			width markerstart markerend o i offset sv len svt includeBreakingChar;
+	!	text 		- the text to be centered
+	!	maxwidth	- the maximum width of a line; if not defined, then the screen width is used
+	!	highlight	- how to print the text in reverse:
+	!					NO_HIGHLIGHT (default) don't print any of the text in reverse 
+	!					HIGHLIGHT_TEXT_ONLY print the text in reverse, but not the line of spaces leading up to the text
+	!					HIGHLIGHT_ALL print the text text, and also the spaces preceding it
+	!	leftAlign	- true to center a block of left-aligned text of maxwidth length
+	!	prefixPostFixCallback - a callback routine called three times with a single paramter:
+	!						0 - return the length in characters of the prefix and postfix combined (for centering calculations)
+	!						1 - print the prefix
+	!						2 - print the postfix
+	!	subIndent	- indents the text by adding additional spaces to the left; primariliy used by the orInset routine
+	[orCenter text maxwidth highlight leftAlign prefixPostFixCallback subIndent 
+			padding width markerstart markerend o i offset len includeBreakingChar;
 
 		orTempBuffer=util.orBuf.convertToSizedBuffer(orTempBuffer,8000);
-		svt=0; sv=0; !--suppress compiler warnings...
+		
+		if(prefixPostFixCallback~=0) padding = prefixPostFixCallback(0)/2;
+		padding =10;
 		font off; !fixed width
 		width=util.orUI.getScreenWidth();
 		width=width-2;							!subtract a little from the width (keep the left-most and right-most column blank)
 		if(maxwidth==0 || maxwidth>width) maxwidth=width;		!default maxwidth of line to the width of the display if it is not defined or too large to display
 
-		util.orBuf.capture(orTempBuffer);
+			util.orBuf.capture(orTempBuffer);
 
 			switch(metaclass(text)){
 				string:
@@ -135,14 +149,17 @@ default        orCenter_STAGE  0;
 				font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued
 
 				if(markerstart==WORDSIZE)
-					spaces offset;
+					spaces offset-padding;
 				else
-					spaces offset+subIndent;
+					spaces offset+subIndent-padding;
 
 				if(highlight> NO_HIGHLIGHT) style reverse;
 				font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued
 
+				
+				if(prefixPostFixCallback~=0) prefixPostFixCallback(1);
 				for(i=markerstart:i<markerend:i++) print (char) orTempBuffer->i;	!print every character from startmark to just prior to endmark (so as not to print ending space or carriage return)
+				if(prefixPostFixCallback~=0) prefixPostFixCallback(2);
 
 				if(highlight~=HIGHLIGHT_ALL) style roman;
 				font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued

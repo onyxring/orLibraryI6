@@ -48,7 +48,7 @@ default        orUtilUI_STAGE  0;
          ]
    ,   getScreenWidth[w; 
    #ifdef orUtilUiGlulx_STAGE;
-         return util.orUi.glulx.getScreenTextWidth();
+         !return util.orUi.glulx.getScreenTextWidth(); !--the creation of a zero height text buffer doesn't seem to work in Lectrote
    #endif;
          if(w==0) w=winStatus;
 

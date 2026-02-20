@@ -93,7 +93,7 @@ default        orMenu_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 	#include "orUtilUi"; !make sure this previously declared dependency is included *before* this code
 
-	[printOr val tStr fStr; if(val==true) print(string) tStr; else print (string) fStr;];
+	[__decorate val; if(val==1) print "> "; if(val==2) print " <"; return 2;];
 	object orMenuController
 		private _startingStatusHeight 0 !remember the status height used by the game
 		,	_rootMenu 0 !--The menu that show() was actually called against
@@ -152,8 +152,8 @@ default        orMenu_STAGE  0;
 
 				style reverse;
 				!--left-----
-				printOr(children(currentMenu), " X : ", "Any: ");
-				printOr(currentMenu==self._rootMenu, "Exit ", "Prev");
+				if(children(currentMenu)) print " X : "; else print "Any: ";
+				if(currentMenu==self._rootMenu) print "Exit "; else print "Prev";
 				!--right-----
 				if(children(currentMenu)){
 					util.orUI.position(util.orUI.getScreenWidth()-14, 1);
@@ -232,7 +232,7 @@ default        orMenu_STAGE  0;
 				util.orUI.position(0,pos);
 
 				str.capture();
-				printOr(isSelected>0, self.prefixHighlight,self.prefixNormal);
+				!if(isSelected>0) printorrun(self,prefixHighlight,true); else printorRun(self,prefixNormal,true);
 
 				if(util.orRef.isString(obj))
 					print (string)obj;
@@ -243,11 +243,13 @@ default        orMenu_STAGE  0;
 					else
 						print (name)obj;
 				}
-
-				printOr(isSelected>0, self.postfixHighlight, self.postfixNorm);
+				!if(isSelected>0) printorRun(self,postfixHighlight,true); else printorrun(self,postfixNorm,true);
 
 				str.release();
-				orCenter(str);
+				if(isSelected>0)  
+					orCenter(str,0,0,0,0,__decorate(0),__decorate);
+				else
+					orCenter(str);
 				str.free();
 			]
 			!---handle user input
@@ -285,10 +287,10 @@ default        orMenu_STAGE  0;
 				}
 			]
 		with displayStyle orMenuFullScreen
-		,	prefixHighlight "> "
-		,	postfixHighlight " <"
-		,	prefixNormal "  "
-		,	postfixNorm "  "
+		! ,	prefixHighlight ""
+		! ,	postfixHighlight ""
+		! ,	prefixNormal ""
+		! ,	postfixNorm ""
 		,	result  0 !--The final selected result
 		,	getNumberOfVisibleChildren[currentMenu
 					count o;
