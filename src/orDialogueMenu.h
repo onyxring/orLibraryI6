@@ -64,15 +64,16 @@ default        orDialogueMenu_STAGE  0;
    object orDialogueMenu
       class orMenu
       with childMenuItems 0 0 0 0 0 0 0 0 0 0 0 0
+      ,  itemWindowId 0
       ,  initForDisplay[
                t talkingTo top;
             self.clear();
             talkingTo=vagueError(ResolveActorTalkingTo());
-
             for(t=0:t<util.orArray.getLength(playerDialoguePool):t++){
                top=util.orArray.get(playerDialoguePool,t);
                if(top.isAppropriateFor(player, talkingTo)) self.add(top);
             }
+            
             return util.orArray.getLength(self,childMenuItems);
          ]
       , clear[; util.orArray.clear(self,childMenuItems);]
@@ -130,7 +131,12 @@ verb meta 'ms' 'menuspeak' * -> menuSpeak;				!orLib: note that we launch the di
 														!	immediately executed, but are queued up to happen at the next prompt.  This way, if the player exits from the menu without
 														!	making a selection, no game time passes.
 
-[menuSpeakSub; orDialogueMenu.show(orMenuTopOnly); ];	!orLib: show the dialog menu if it contains anything to show
+[MenuSpeakSub; 	
+   if(orDialogueMenu.initForDisplay()==0) 
+      "You had nothing to say.";
+   else
+      orDialogueMenu.show(orMenuTopOnly); 
+];
 
 verb meta 'ams' 'autoMenuSpeak' 
 	* -> toggleAutoMenuSpeak

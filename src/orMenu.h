@@ -93,7 +93,7 @@ default        orMenu_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 	#include "orUtilUi"; !make sure this previously declared dependency is included *before* this code
 
-	[__decorate val; if(val==1) print "> "; if(val==2) print " <"; return 2;];
+	[__menuFrameSelection val; if(val==1) print "> "; if(val==2) print " <"; return 2;];
 	object orMenuController
 		private _startingStatusHeight 0 !remember the status height used by the game
 		,	_rootMenu 0 !--The menu that show() was actually called against
@@ -148,7 +148,7 @@ default        orMenu_STAGE  0;
 				util.orUI.eraseStatus();
 
 				orCenter(currentMenu,0,HIGHLIGHT_ALL);
-				util.orUI.position(0, 1);
+				util.orUI.position(0, 1, self._rootMenu.itemWindowId);
 
 				style reverse;
 				!--left-----
@@ -156,7 +156,7 @@ default        orMenu_STAGE  0;
 				if(currentMenu==self._rootMenu) print "Exit "; else print "Prev";
 				!--right-----
 				if(children(currentMenu)){
-					util.orUI.position(util.orUI.getScreenWidth()-14, 1);
+					util.orUI.position(util.orUI.getScreenWidth()-14, 1, self._rootMenu.itemWindowId);
 					print "Enter : Select";
 				}
 				style roman;
@@ -170,18 +170,25 @@ default        orMenu_STAGE  0;
 				util.orUI.setStatusHeight(s + self.getNumberOfVisibleChildren(currentMenu));
 			]
 		,	_renderItems[currentMenu o t;
-				util.orUI.activateStatus();
-				self._resizeHeader(currentMenu);
+				if(self._rootMenu.itemWindowId==0){
+					util.orUI.activateStatus();
+					self._resizeHeader(currentMenu);
+				}
+				else{
+					self._resizeHeader(currentMenu);
+					util.orUI.activateWindow(self._rootMenu.itemWindowId);
+					util.orUI.eraseWindow(self._rootMenu.itemWindowId);
+				}
 				!--Actually draw all the items...
 				if(self._isListMenu(currentMenu)) {
-					for(t=0:t<util.orArray.getSize(currentMenu,childMenuItems):t++){
+					for(t=0:t<util.orArray.getLength(currentMenu,childMenuItems):t++){
 						o=util.orArray.get(currentMenu,childMenuItems,t);
 						if(util.orRef.isObject(o)==false || o hasnt concealed) self._drawItem(o,false, t);
 					}
 				}
 				else{
 					objectloop(o in currentMenu && o ofclass orMenu && valueOrRun(o, canDisplay)==true)
-					self._drawItem(o, false, o.number);
+						self._drawItem(o, false, o.number);
 				}
 
 				!--now show what is currently selected...
@@ -193,6 +200,7 @@ default        orMenu_STAGE  0;
 			]
 		,	_dismiss[;
 				util.orUI.setStatusHeight(self._startingStatusHeight);
+				if(self._rootMenu.itemWindowId~=0) util.orUI.eraseWindow(self._rootMenu.itemWindowId);
 				util.orUI.eraseStatus();
 				util.orUI.activateMain();
 		]
@@ -227,9 +235,9 @@ default        orMenu_STAGE  0;
 				else
 					pos=pos + self._startingStatusHeight;
 
-				util.orUI.position(0,pos);
+				util.orUI.position(0,pos, self._rootMenu.itemWindowId);
 				spaces util.orUI.getScreenWidth();
-				util.orUI.position(0,pos);
+				util.orUI.position(0,pos, self._rootMenu.itemWindowId);
 
 				str.capture();
 				!if(isSelected>0) printorrun(self,prefixHighlight,true); else printorRun(self,prefixNormal,true);
@@ -246,8 +254,9 @@ default        orMenu_STAGE  0;
 				!if(isSelected>0) printorRun(self,postfixHighlight,true); else printorrun(self,postfixNorm,true);
 
 				str.release();
+				
 				if(isSelected>0)  
-					orCenter(str,0,0,0,0,__decorate(0),__decorate);
+					orCenter(str,0,0,0,0,__menuFrameSelection(0),__menuFrameSelection);
 				else
 					orCenter(str);
 				str.free();
@@ -287,10 +296,6 @@ default        orMenu_STAGE  0;
 				}
 			]
 		with displayStyle orMenuFullScreen
-		! ,	prefixHighlight ""
-		! ,	postfixHighlight ""
-		! ,	prefixNormal ""
-		! ,	postfixNorm ""
 		,	result  0 !--The final selected result
 		,	getNumberOfVisibleChildren[currentMenu
 					count o;
@@ -340,26 +345,8 @@ default        orMenu_STAGE  0;
 				if(self has concealed) rfalse; !hidden
 				if(orMenuController.getNumberOfVisibleChildren(self)>0) rtrue; !there are visible children
 				if(children(self)==0) rtrue; !no children at all, hidden or otherwise, so this must be a selectable option
-
 				rfalse; !here we've established that there ARE children, but none of them are visible, so hide this parent object as well
-
-				!objectloop(o in self && valueorrun(o,canDisplay)==true) rtrue; !at least one child is visible
-				!rfalse; !has children, but none ar visible
-
-				!rtrue;
-
-				!if(orMenuController.getNumberOfVisibleChildren(self)>0) rtrue;
-
-				! if(_isListMenu._isListMenu(self)) {
-				! 	for(t=0:t<util.orArray.getSize(self,childMenuItems):t++){
-				! 		obj=util.orArray.get(self,childMenuItems);
-				! 		if(util.orRef.isObject(obj)==false) rtrue; !non-objects can't be hidden
-				! 		if(obj hasnt concealed) rtrue; !at least one item is visible
-				! 	}
-				! }
-				! if(children(self)==0) rtrue; !no children, so this must be an action
-				! objectloop(o in self && valueorrun(o,canDisplay)==true) rtrue; !at least one child is visible
-				!rfalse; !has children, but none ar visible
+			
 			]
 	;
 

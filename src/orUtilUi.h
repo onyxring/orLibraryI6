@@ -47,9 +47,9 @@ default        orUtilUI_STAGE  0;
       #endif;         
          ]
    ,   getScreenWidth[w; 
-   #ifdef orUtilUiGlulx_STAGE;
-         !return util.orUi.glulx.getScreenTextWidth(); !--the creation of a zero height text buffer doesn't seem to work in Lectrote
-   #endif;
+   !#ifdef orUtilUiGlulx_STAGE;
+    !     return util.orUi.glulx.getScreenTextWidth(); !--the creation of a zero height text buffer doesn't seem to work in Lectrote
+   !#endif;
          if(w==0) w=winStatus;
 
          #ifdef TARGET_ZCODE;
@@ -110,13 +110,14 @@ default        orUtilUI_STAGE  0;
                #endif;
                !self.position(0,0);
          ]
-         ,  position[x y;
+         ,  position[x y win; win=win; !--for gluls
                !util.orUI.activateStatus();
                #ifdef TARGET_ZCODE;
                   y=y+1; x=x+1;
                   @set_cursor y x;
                #ifnot;
-                  glk_window_move_cursor(gg_statuswin,x,y);
+                  if(win==0) win=gg_statuswin;
+                  glk_window_move_cursor(win,x,y);
                #endif;
             ]
          ,  hideCursor[;

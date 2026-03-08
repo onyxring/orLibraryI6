@@ -148,8 +148,14 @@ default        orDialogue_STAGE  0;
 				self=topic;
 				s(actor, talkingTo);
 				self=saveSelf;
-			}else
+			}else{
+#ifdef orPrint_STAGE;
+				orPrint(s);
+#ifnot;
 				print (string)s;
+#endif;
+
+			}
 			print "^^";
 		}
 		if(LibraryExtensions.RunUntil(ext_topicAsked, true, topic, actor, talkingTo)==true) return;
@@ -214,8 +220,15 @@ default        orDialogue_STAGE  0;
 			self=topic;
 			s(actor, talkingTo);
 			self=saveSelf;
-		}else
-			print (string)s,"^";
+		}
+		else{
+#ifdef orPrint_STAGE;
+				orPrint(s);
+#ifnot;
+				print (string)s;
+#endif;
+			new_line;
+		}			
 		topic.recordTell(actor, talkingTo);
 		if(topic has learnable && talkingTo provides learnTopic)
 			talkingTo.learnTopic(topic);

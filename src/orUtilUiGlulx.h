@@ -189,7 +189,14 @@ default        orUtilUiGlulx_STAGE  0;
             self._numStyles=self._numStyles+1;
             return retval;
          ]
-
+      ,  getQueuedStyle[styl
+               retval t;
+            for(t=0:t<self._numStyles:t++){
+               retval=util.orArray.get(self,queuedStyleDefinitions, t);
+               if(retval._styleType==styl) return retval;
+            }
+            return 0;
+         ]
       ,  _applyQueuedStyles[type
                t;
             for(t=0:t<self._numStyles:t++){
