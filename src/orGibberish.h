@@ -16,7 +16,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orGibberish_STAGE;
-default        orGibberish_STAGE  0;
+Constant        orGibberish_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 

@@ -12,7 +12,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orGotoLocation_STAGE;
-default        orGotoLocation_STAGE  0;
+Constant        orGotoLocation_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orTrackSeen";

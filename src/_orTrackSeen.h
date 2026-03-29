@@ -18,7 +18,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orTrackSeen_STAGE;
-default        orTrackSeen_STAGE  0;
+Constant        orTrackSeen_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orInfExt";

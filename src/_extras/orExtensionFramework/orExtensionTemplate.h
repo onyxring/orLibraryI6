@@ -31,7 +31,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        <REPLACEWITHNAME>_STAGE;
-default        <REPLACEWITHNAME>_STAGE  0;
+Constant        <REPLACEWITHNAME>_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 

@@ -17,7 +17,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef		   orString_STAGE;
-default        orString_STAGE  	0;
+Constant        orString_STAGE  	0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orInfExt";

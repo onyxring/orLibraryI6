@@ -18,7 +18,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orDialogue_STAGE;
-default        orDialogue_STAGE  0;
+Constant        orDialogue_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orStylePrintRules";

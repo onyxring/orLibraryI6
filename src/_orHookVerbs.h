@@ -16,7 +16,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orHookVerbs_STAGE;
-default        orHookVerbs_STAGE  0;
+Constant        orHookVerbs_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orInfExt";

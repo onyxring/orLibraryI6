@@ -34,7 +34,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orPlayerCommandQueue_STAGE;
-default        orPlayerCommandQueue_STAGE  0;
+Constant        orPlayerCommandQueue_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orActionQueue";

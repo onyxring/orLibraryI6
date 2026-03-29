@@ -17,7 +17,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orVagueQuantity_STAGE;
-default        orVagueQuantity_STAGE  0;
+Constant        orVagueQuantity_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orInfExt";

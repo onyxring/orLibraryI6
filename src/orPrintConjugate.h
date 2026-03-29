@@ -17,7 +17,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orPrintConjugate_STAGE;
-default        orPrintConjugate_STAGE  0;
+Constant        orPrintConjugate_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orPrint";

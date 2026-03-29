@@ -33,7 +33,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orReview_STAGE;
-default        orReview_STAGE  0;
+Constant        orReview_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orTrackSeen";

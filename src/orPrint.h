@@ -12,7 +12,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orPrint_STAGE;
-default        orPrint_STAGE  0 ;
+Constant        orPrint_STAGE  0 ;
 system_file;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES

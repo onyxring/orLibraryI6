@@ -16,7 +16,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orHookWriteList_STAGE;
-default        orHookWriteList_STAGE  0;
+Constant        orHookWriteList_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDED DEPENDENCIES
 

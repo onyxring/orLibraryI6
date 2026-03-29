@@ -25,7 +25,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orHookParseToken_STAGE;
-default        orHookParseToken_STAGE  0;
+Constant        orHookParseToken_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 

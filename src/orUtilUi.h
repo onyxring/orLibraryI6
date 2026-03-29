@@ -19,7 +19,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orUtilUI_STAGE ;
-default        orUtilUI_STAGE  0;
+Constant        orUtilUI_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";

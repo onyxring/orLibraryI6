@@ -30,7 +30,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orPrefixSuffix_STAGE;
-default        orPrefixSuffix_STAGE 0;
+Constant        orPrefixSuffix_STAGE 0;
 system_file;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES

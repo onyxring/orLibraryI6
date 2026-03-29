@@ -21,20 +21,20 @@ system_file;
 !======================================================================================
 #include "_#version"; 
 !======================================================================================
-default orXFErrorInclude "ERROR: orExtensionFramework extensions must only be #Included once, before including '#orParser'.";
 !--Do some checking to make sure things are included in the right order; notify of detected sequencing issues.
 #ifndef orExtensionFramework_STAGE; !-- this is the first time we've ever included this file
+    Constant orXFErrorInclude "ERROR: orExtensionFramework extensions must only be #Included once, before including '#orParser'.";
 !-- Define default extensions here ----------------------------------------------------
     #include "_orHookBanner";
 !--------------------------------------------------------------------------------------
     #ifndef VN_1633; message "WARNING: orExtensionFramework was developed against the Inform 6 compiler version 6.43. Although it might work with some previous versions, this has not been tested."; #endif;
     #ifndef LIBRARY_STAGE;          !--if parser has not yet been included
-        Default BEFORE_PARSER 10;   !--temporarily define the stage constants, since modules reference them before they are actually defined
-        Default AFTER_PARSER  20;
-        Default AFTER_VERBLIB 30;
-        Default AFTER_GRAMMAR 40;
-        Default orExtensionFramework_STAGE BEFORE_PARSER; !--set the orLibrary stage to "BEFORE_PARSER", even though it hasn't been defined yet
-        Default LIBRARY_STAGE BEFORE_PARSER; !--we set this so extensions will know the stage, even though parser hasn't been included yet to define these
+        Constant BEFORE_PARSER 10;   !--temporarily define the stage constants, since modules reference them before they are actually defined
+        Constant AFTER_PARSER  20;
+        Constant AFTER_VERBLIB 30;
+        Constant AFTER_GRAMMAR 40;
+        Constant orExtensionFramework_STAGE BEFORE_PARSER; !--set the orLibrary stage to "BEFORE_PARSER", even though it hasn't been defined yet
+        Constant LIBRARY_STAGE BEFORE_PARSER; !--we set this so extensions will know the stage, even though parser hasn't been included yet to define these
        	#ifndef orExtensionFrameworkBrief; message "orExtensionFramework: pre-PARSER section."; #endif;
         #include "#orExtensionRegistry"; !--include all registered modules
         #ifndef orExtensionFrameworkBrief; message "----"; #endif;

@@ -40,7 +40,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orRecogName_STAGE;
-default        orRecogName_STAGE  0;
+Constant        orRecogName_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilBuf";

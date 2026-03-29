@@ -19,7 +19,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orParentChildRelationship_STAGE;
-default        orParentChildRelationship_STAGE  0;
+Constant        orParentChildRelationship_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orHookWriteAfterEntry";

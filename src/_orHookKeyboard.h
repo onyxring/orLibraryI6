@@ -29,7 +29,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orHookKeyboard_STAGE;
-default        orHookKeyboard_STAGE  0; 
+Constant        orHookKeyboard_STAGE  0; 
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 

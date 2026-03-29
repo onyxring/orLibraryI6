@@ -58,7 +58,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orMenu_STAGE;
-default        orMenu_STAGE  0;
+Constant        orMenu_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orCenter";
@@ -340,6 +340,7 @@ default        orMenu_STAGE  0;
 
 	class orMenu
 		with number 0
+		,	itemWindowId 0
 		,	show[showStyle; return orMenuController.show(self, showStyle);]
 		,	canDisplay[; !o hasChildren t obj;
 				if(self has concealed) rfalse; !hidden

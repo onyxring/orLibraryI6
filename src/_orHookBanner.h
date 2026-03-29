@@ -21,7 +21,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orHookBanner_STAGE;
-default        orHookBanner_STAGE  0;
+Constant        orHookBanner_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 

@@ -22,7 +22,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orHookInformLibrary_STAGE;
-default        orHookInformLibrary_STAGE  0;
+Constant        orHookInformLibrary_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 

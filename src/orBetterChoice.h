@@ -20,7 +20,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orBetterChoice_STAGE;
-default        orBetterChoice_STAGE  0;
+Constant        orBetterChoice_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orHookStandardLibrary";

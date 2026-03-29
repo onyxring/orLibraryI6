@@ -62,7 +62,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orRemoteLook_STAGE;
-default        orRemoteLook_STAGE  0;
+Constant        orRemoteLook_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilMap";

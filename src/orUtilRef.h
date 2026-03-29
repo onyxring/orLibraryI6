@@ -18,7 +18,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orUtilRef_STAGE;
-default        orUtilRef_STAGE  0;
+Constant        orUtilRef_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";

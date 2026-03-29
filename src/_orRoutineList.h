@@ -26,7 +26,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orRoutineList_STAGE;
-default        orRoutineList_STAGE  0;
+Constant        orRoutineList_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilArray";

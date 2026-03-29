@@ -21,7 +21,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orStylePrintRules_STAGE;
-default        orStylePrintRules_STAGE  0; 	
+Constant        orStylePrintRules_STAGE  0; 	
 system_file;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES

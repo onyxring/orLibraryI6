@@ -27,7 +27,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orBackdrop_STAGE;
-default        orBackdrop_STAGE  0;
+Constant        orBackdrop_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orInfExt";

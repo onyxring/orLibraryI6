@@ -20,7 +20,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef		   orUtilArray_STAGE;
-default        orUtilArray_STAGE  0;
+Constant        orUtilArray_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orUtil";

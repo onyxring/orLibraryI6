@@ -13,7 +13,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orUnitTest_STAGE;
-default        orUnitTest_STAGE   0;
+Constant        orUnitTest_STAGE   0;
 !--------------------------------------------------------------------------------------
 ! INCLUDED DEPENDENCIES
   #include "orString";

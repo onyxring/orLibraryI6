@@ -26,7 +26,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orTransition_STAGE;
-default        orTransition_STAGE  0;
+Constant        orTransition_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orCenter";

@@ -13,7 +13,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orUtilUiGlulx_STAGE;
-default        orUtilUiGlulx_STAGE  0;
+Constant        orUtilUiGlulx_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orUtilUi";

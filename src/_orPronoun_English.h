@@ -38,7 +38,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orPronoun_English_STAGE;
-default        orPronoun_English_STAGE  0;
+Constant        orPronoun_English_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 

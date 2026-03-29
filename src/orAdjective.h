@@ -67,7 +67,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orAdjective_STAGE;
-default        orAdjective_STAGE  0;
+Constant        orAdjective_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orHookStandardLibrary";

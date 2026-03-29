@@ -24,7 +24,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orFirstImpressions_STAGE;
-default        orFirstImpressions_STAGE  0;
+Constant        orFirstImpressions_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orHookVerbs";

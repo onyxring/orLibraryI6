@@ -26,7 +26,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orDistinctRead_STAGE;
-default        orDistinctRead_STAGE  0;
+Constant        orDistinctRead_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 

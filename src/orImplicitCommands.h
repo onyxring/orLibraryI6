@@ -38,7 +38,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orImplicitCommands_STAGE;
-default        orImplicitCommands_STAGE  0;
+Constant        orImplicitCommands_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orInfExt";

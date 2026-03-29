@@ -36,7 +36,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orCantGoOdd_STAGE;
-default        orCantGoOdd_STAGE  0;
+Constant        orCantGoOdd_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "_orHookVerbs";

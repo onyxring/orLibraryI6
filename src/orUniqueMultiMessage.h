@@ -35,7 +35,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orUniqueMultiMessage_STAGE;
-default        orUniqueMultiMessage_STAGE  0;
+Constant        orUniqueMultiMessage_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orString";

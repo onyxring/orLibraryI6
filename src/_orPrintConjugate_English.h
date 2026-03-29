@@ -16,7 +16,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orPrintConjugate_English_STAGE;
-default        orPrintConjugate_English_STAGE  0;
+Constant        orPrintConjugate_English_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 

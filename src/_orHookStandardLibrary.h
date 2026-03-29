@@ -16,7 +16,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orHookStandardLibrary_STAGE;
-default        orHookStandardLibrary_STAGE 0;
+Constant        orHookStandardLibrary_STAGE 0;
 !--------------------------------------------------------------------------------------
 ! INCLUDED DEPENDENCIES
 

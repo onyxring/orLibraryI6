@@ -14,7 +14,7 @@
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
 #ifndef        orNpcSkillMove_STAGE;
-default        orNpcSkillMove_STAGE  0;
+Constant        orNpcSkillMove_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orNpc";
