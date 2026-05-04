@@ -41,9 +41,10 @@ system_file;
 	!special includes, not typical for the Extension Managment Framework, to load language-specific print rules
 	#ifdef LIBRARY_ENGLISH; #ifndef orPrintPatterns_English_STAGE;
 		#ifndef orExtensionFrameworkBrief; message "      (English detected. Including English print patterns.)"; #endif;
-		Default orPronoun_English_STAGE BEFORE_PARSER;
+		#undef orPronoun_English_STAGE;
+		constant orPronoun_English_STAGE BEFORE_PARSER;
 		#include "_orPronoun_English"; !pronoun is a requirement of the english print patterns.  Give it a chance to catchup with the current compiler stage.
-		Default orPrintPatterns_English_STAGE BEFORE_PARSER;
+		constant orPrintPatterns_English_STAGE BEFORE_PARSER;
 		#include "_orPrintPatterns_English"; !also include let the English print patterns extension catch up, since it wasn't included manually
 	#endif; #endif;
 

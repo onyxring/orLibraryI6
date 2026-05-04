@@ -31,7 +31,7 @@ system_file;
 ! AFTER PARSER
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 	#ifndef orPronoun_English_STAGE;
-		Default orPronoun_English_STAGE BEFORE_PARSER;
+		Constant orPronoun_English_STAGE BEFORE_PARSER;
 		#include "_orPronoun_English";
 	#endif;
 #endif;

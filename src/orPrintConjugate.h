@@ -39,7 +39,7 @@ Constant        orPrintConjugate_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 	!detect current language and load language-specific conjugation functionality...
 	#ifdef LIBRARY_ENGLISH; #ifndef orPrintConjugate_English_STAGE; 
-            Default orPrintConjugate_English_STAGE BEFORE_PARSER; #include "_orPrintConjugate_English"; 
+            constant orPrintConjugate_English_STAGE BEFORE_PARSER; #include "_orPrintConjugate_English"; 
 	#endif; #endif;
       
 #endif; !--After Parser
