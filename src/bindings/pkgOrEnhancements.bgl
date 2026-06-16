@@ -6,6 +6,8 @@
 // to be authored incrementally as the orLibrary port moves forward — none yet.
 //===================================================================================================
 #once
+// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
+#include "pkgOrHooks"
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

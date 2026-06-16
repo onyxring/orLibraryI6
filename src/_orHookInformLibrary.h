@@ -38,7 +38,9 @@ Constant        orHookInformLibrary_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
-   replace main;
+   #ifndef beguiler;        ! under Beguile the BLR owns `replace main` (see __orBeguileMainInit below)
+      replace main;
+   #endif;
    property individual ext_playLoopRewriteParsedCommands;
    property individual ext_playLoopAssignObjectVariables;
    property individual ext_playLoopPerformSingleObjectAction;
@@ -48,6 +50,7 @@ Constant        orHookInformLibrary_STAGE  0;
 !======================================================================================
 ! AFTER PARSER
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
+   #ifndef beguiler;
 	[ Main o; o=o; !suppress warning
 		InformLibrary.play=__orPlayHooks;
       #ifdef allocateInformExtensions;
@@ -55,6 +58,18 @@ Constant        orHookInformLibrary_STAGE  0;
       #endif;
 		InformLibrary.play();
 	];
+   #ifnot;
+      ! Beguile compile: don't define Main — the stdlib Main ([Main; InformLibrary.play();])
+      ! survives and becomes the BLR's `_oldmain`. Expose just the play-loop setup so bglInit can
+      ! run it first (wired via the `#startup` block in the pkgOrHooks Beguile binding). bglInit
+      ! runs before _oldmain, so InformLibrary.play is set before _oldmain calls it.
+      [ __orBeguileMainInit;
+         InformLibrary.play=__orPlayHooks;
+         #ifdef allocateInformExtensions;
+            allocateInformExtensions();
+         #endif;
+      ];
+   #endif;
 
    [__orPlayHooks i j k l;
          #Ifdef TARGET_ZCODE;

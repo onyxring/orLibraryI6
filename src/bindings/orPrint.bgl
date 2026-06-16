@@ -5,6 +5,8 @@
 // substitutions, etc.). extern — orPrint (I6) provides the real routine; this is type-info only.
 //===================================================================================================
 #once
+// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
+#include "pkgOrHooks"
 
 extern void orPrint(string s) {}
 

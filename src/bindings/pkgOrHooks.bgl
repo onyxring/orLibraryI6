@@ -11,3 +11,15 @@
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "pkgOrHooks";
+
+// Beguile-managed startup. Under a Beguile compile, _orHookInformLibrary.h detects `beguiler`
+// (the I6 constant the compiler now emits) and does NOT `replace main` or define its own [Main] —
+// the BLR's main wrapper owns that, and the stdlib Main survives as `_oldmain`. orLibrary instead
+// exposes `__orBeguileMainInit` (its play-loop setup, minus the InformLibrary.play() call). We run
+// it from bglInit so the hooks are wired before the BLR's `[main; bglInit(); _oldmain()]` calls
+// _oldmain (= stdlib Main → InformLibrary.play() → __orPlayHooks). Forward routine ref is fine —
+// I6 resolves __orBeguileMainInit even though it's defined later in the file. Requires
+// autoInitialize = true (the default).
+#startup {
+    __orBeguileMainInit();
+}

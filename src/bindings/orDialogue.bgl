@@ -13,6 +13,8 @@
 // All `extern` — orDialogue (I6) provides the real definitions; this is type-info only.
 //===================================================================================================
 #once
+// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
+#include "pkgOrHooks"
 
 extern class orTopic : object {
     string short_name;              // the topic's printed name
