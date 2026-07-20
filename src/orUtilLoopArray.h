@@ -10,6 +10,7 @@
 !--------------------------------------------------------------------------------------
 ! Revision History
 ! 2024.11.17	Initial Creation
+! 2026.07.16   Fixed error stopping getNext from working on stand alone arrays.
 !======================================================================================
 ! Extension Framework management
 #ifndef        orExtensionFramework_STAGE;
@@ -79,9 +80,11 @@ object _orLoopArray
          return self._getUnusedIndex(obj, prop, r);
       ]
    with getNext[obj prop onceOnly;
+         if(metaclass(obj) ~= object) prop = orArrayNoProp;
          return self._get(obj, prop, onceOnly, _getUnusedIndex);
       ]
    ,  getAny[obj prop onceOnly;
+         if(metaclass(obj) ~= object) prop = orArrayNoProp;
          return self._get(obj, prop, onceOnly, _getRandomUnusedIndex);
       ]
    ,  isComplete[obj prop; return self._countUnusedIndexes(obj,prop)==0; ]
