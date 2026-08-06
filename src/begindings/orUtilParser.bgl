@@ -1,0 +1,40 @@
+//===================================================================================================
+// bindings/orUtilParser.bgl — Beguile binding for orLibrary's orUtilParser extension.
+//---------------------------------------------------------------------------------------------------
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Provides the ChooseObject/disambiguation constants and the `util.orParser`
+// helper object used by object `chooseobject` hooks.
+//===================================================================================================
+#once
+// dependency bindings — mirror orUtilParser.h's orLibrary #includes so nested extern
+// declarations (types, members, properties, globals) are available transitively.
+#include "orUtilNum"
+#include "orUtilLoopArray"   // defines _orUtil (the `util` object); orParser is hung off it below
+// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
+#include "pkgOrHooks"
+
+// ChooseObject entry-point `code` values (orUtilParser.h) — what the parser is asking for.
+extern const int PLANNING_EXCLUDE;   // 0
+extern const int PLANNING_INCLUDE;   // 1
+extern const int ASKING_FOR_HINT;    // 2
+// chooseobject / ext_chooseObjects return values.
+extern const int DEFER_CHOICE;       // 0 — defer to other hooks, then the parser
+extern const int FORCE_INCLUDE;      // 1
+extern const int FORCE_EXCLUDE;      // 2
+
+// util.orParser — parser/disambiguation helpers (orUtilParser.h `object _orParser`).
+extern class _orParser : object {
+    // Drop obj from the disambiguation match list (without resizing it) — used inside `chooseobject`.
+    emitter int excludeObjFromDisambiguation(object obj) { ($self.excludeObjFromDisambiguation($obj)) }
+    // Remove the match-list entry at pos (resizing the list).
+    emitter void removeMatchPos(int pos) { ($self.removeMatchPos($pos)) }
+}
+// Hang orParser off the shared `util` object (_orUtil is declared in orUtilLoopArray.bgl).
+extend class _orUtil {
+    _orParser orParser;
+}
+
+// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
+// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
+// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+#includeI6 "orUtilParser";

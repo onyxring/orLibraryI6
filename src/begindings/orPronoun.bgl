@@ -1,0 +1,61 @@
+//===================================================================================================
+// bindings/orPronoun.bgl — Beguile binding for orLibrary's orPronoun (_orPronoun_English) print rules.
+//---------------------------------------------------------------------------------------------------
+// A collection of pronoun / possessive / copula print-rule emitters. Each prints the appropriate
+// English form for an object and is meant to splice into a `print(...)` or an interpolated string:
+//
+//     print($"You try to balance {the(noun)} on the statue, but {i(noun)} fall{sIfNotPlural(noun)}…");
+//     print($"{cThe(actor)} {am(actor)} watching {me(noun)}.");
+//
+// Forms: subject (i), object (me), possessive-adjective (my), possessive-pronoun (mine), reflexive
+// (myself); each with a Capitalized start-of-sentence variant (c…) and a "the <name> OR pronoun"
+// variant (the…) and its capitalized form (cThe…). Plus the tense-aware copula (am / was / is / …)
+// and a few subject+copula compounds. The article emitters the()/a()/cThe()/cA() live in the core
+// (`__beguileCore`), since they use the I6 standard-library print rules; these pronoun forms are
+// orLibrary-specific, so they live here.
+//===================================================================================================
+#once
+// Beguile main-handoff: pull pkgOrHooks so a game depending on this binding alone still wires the
+// orLibrary play-loop into bglInit. #once-guarded; harmless if pulled more than once.
+#include "pkgOrHooks"
+
+// ── Subject / object / possessive / reflexive ────────────────────────────────
+emitter void i(object o)      { print (I)$o; }        // I / we / you / they / it / she / he
+emitter void me(object o)     { print (Me)$o; }       // me / us / you / them / it / her / him
+emitter void my(object o)     { print (My)$o; }       // my / our / your / their / its / her / his
+emitter void mine(object o)   { print (Mine)$o; }     // mine / ours / yours / theirs / its / hers / his
+emitter void myself(object o) { print (Myself)$o; }   // myself / ourselves / … / itself / herself / himself
+
+// Capitalized (start-of-sentence) forms
+emitter void cI(object o)      { print (CI)$o; }
+emitter void cMe(object o)     { print (CMe)$o; }
+emitter void cMy(object o)     { print (CMy)$o; }
+emitter void cMine(object o)   { print (CMine)$o; }
+emitter void cMyself(object o) { print (CMyself)$o; }
+
+// "the <name>" for a specific object, or the matching pronoun for the player/narrator
+emitter void theI(object o)      { print (TheI)$o; }
+emitter void theMe(object o)     { print (TheMe)$o; }
+emitter void theMy(object o)     { print (TheMy)$o; }     // appends "'s" for named objects
+emitter void theMine(object o)   { print (TheMine)$o; }   // appends "'s" for named objects
+emitter void theMyself(object o) { print (TheMyself)$o; }
+
+// Capitalized the-or-pronoun forms
+emitter void cTheI(object o)      { print (CTheI)$o; }
+emitter void cTheMe(object o)     { print (CTheMe)$o; }
+emitter void cTheMy(object o)     { print (CTheMy)$o; }
+emitter void cTheMine(object o)   { print (CTheMine)$o; }
+emitter void cTheMyself(object o) { print (CTheMyself)$o; }
+
+// ── Copula: was / am / will / were / are / is (tense- and person-aware) ───────
+emitter void am(object o)  { print (Am)$o; }
+emitter void cAm(object o) { print (CAm)$o; }
+
+// Subject + copula compounds ("I am" / "the guard is" / …)
+emitter void iAm(object o)     { print (IAm)$o; }
+emitter void cIAm(object o)    { print (CIAm)$o; }
+emitter void theIAm(object o)  { print (TheIAm)$o; }
+emitter void cTheIAm(object o) { print (CTheIAm)$o; }
+
+// Pull in the actual orLibrary I6 extension (the print-rule routines). Resolved via includePaths.
+#includeI6 "_orPronoun_English";

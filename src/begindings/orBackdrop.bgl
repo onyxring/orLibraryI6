@@ -1,0 +1,40 @@
+//===================================================================================================
+// bindings/orBackdrop.bgl — Beguile binding for orLibrary's orBackdrop extension.
+//---------------------------------------------------------------------------------------------------
+// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
+// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
+// to be authored incrementally as the orLibrary port moves forward — none yet.
+//===================================================================================================
+#once
+// dependency bindings — mirror orBackdrop.h's orLibrary #includes so nested extern
+// declarations (types, members, properties, globals) are available transitively.
+#include "_orInfExt"
+#include "orUtilArray"
+#include "orUtilRef"
+#include "orBetterChoice"
+// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
+#include "pkgOrHooks"
+
+// Backdrop-DSL sentinels used in a room's `backdrops` property array (a heterogeneous
+// `array<var>` of dict-words + description strings + these sentinels/handlers, one entry per
+// backdrop, terminated by bdEnd): bdEnd (0) ends an entry; bdDefault (-1) marks the catch-all.
+extern const int bdEnd;
+extern const int bdDefault;
+
+// The backdrop object type (I6 `class orBackdrop has scenery`). A game declares a standalone
+// backdrop as `orBackdrop name { array<var> backdrops = {…}; }`; `found_in` may be an object
+// list, or a `bool found_in()` method deciding scope dynamically, and `react_before()` can
+// intercept actions. Entries whose text is a routine reference or an inline handler stay `#i6`.
+extern class orBackdrop : object { }
+
+// The engine object behind orBackdrop. `getKeyword(loc)` returns the dictionary word the player
+// referenced for the backdrop currently being resolved (0 if `loc` is given and isn't the matched
+// object) — used inside a backdrop's react_before to branch on which keyword was typed.
+extern object orBackdropEngine {
+    dictionaryWord getKeyword();
+}
+
+// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
+// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
+// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+#includeI6 "orBackdrop";
