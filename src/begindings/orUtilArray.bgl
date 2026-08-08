@@ -1,16 +1,52 @@
 //===================================================================================================
 // bindings/orUtilArray.bgl — Beguile binding for orLibrary's orUtilArray extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Provides `util.orArray` — index-based access to a multi-value I6 property
+// (an object property that holds several words, e.g. an orTopic's `name` dictionary-word list).
 //===================================================================================================
 #once
 // dependency bindings — mirror orUtilArray.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilNum"
+#include "orUtilLoopArray"   // defines _orUtil (the `util` object); orArray is hung off it below
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// util.orArray — read/write/measure a multi-value property (obj.prop holding N words). `prop` is a
+// property name (pass a bare member name via the (property) cast); values are `var` (a dictionary
+// word, object, or int).
+//
+// The I6 routines are polymorphic on their first argument (metaclass check): passed an object they
+// index a multi-value PROPERTY (the overloads below with `object obj, property prop`); passed a bare
+// I6 array they index the ARRAY directly (word 0 = count, data at 1..N). The bare-array overloads
+// take an `array<var>` — matching an untracked `rawArray<T>` literal, whose count-prefixed layout is
+// exactly what the I6 array branch reads. (Passing a TRACKED array<T> — one carrying a <len>+<magic>
+// trailer, i.e. a plain `array<T>` under `#include <array>` — would over-read the count by two; use
+// a `rawArray<T>` for arrays consumed this way.) The I6 side shifts the arguments internally, so the
+// bare overloads simply drop the `prop` slot.
+extern class _orArray : object {
+    emitter var  get(object obj, property prop, int n)            { ($self.get($obj, $prop, $n)) }
+    emitter void set(object obj, property prop, int n, var val)   { $self.set($obj, $prop, $n, $val) }
+    emitter int  getSize(object obj, property prop)               { ($self.getSize($obj, $prop)) }
+    emitter int  getLength(object obj, property prop, var endVal) { ($self.getLength($obj, $prop, $endVal)) }
+    emitter int  find(object obj, property prop, var val)         { ($self.find($obj, $prop, $val)) }
+    emitter void remove(object obj, property prop, int pos)       { $self.remove($obj, $prop, $pos) }
+
+    // Bare-array (single-array) form — for a count-prefixed I6 table (e.g. an untracked
+    // `rawArray<var>` walkthrough command list consumed by a debug verb). Mirrors the I6 routines'
+    // array branch, which shifts args so the `prop` slot is simply dropped.
+    emitter var  get(array<var> arr, int n)            { ($self.get($arr, $n)) }
+    emitter void set(array<var> arr, int n, var val)   { $self.set($arr, $n, $val) }
+    emitter int  getSize(array<var> arr)               { ($self.getSize($arr)) }
+    emitter int  getLength(array<var> arr, var endVal) { ($self.getLength($arr, $endVal)) }
+    emitter int  find(array<var> arr, var val)         { ($self.find($arr, $val)) }
+    emitter void remove(array<var> arr, int pos)       { $self.remove($arr, $pos) }
+}
+// Hang orArray off the shared `util` object (_orUtil is declared in orUtilLoopArray.bgl).
+extend class _orUtil {
+    _orArray orArray;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
