@@ -1,11 +1,13 @@
 //===================================================================================================
 // bindings/orDistinctMeSelf.bgl — Beguile binding for orLibrary's orDistinctMeSelf extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// NO AUTHOR-FACING API. Including this binding pulls in the I6 extension (#includeI6 below), whose
+// effect is entirely automatic: when an NPC is commanded ("bob, examine yourself"), "me"/"myself"
+// resolve to the player while "self"/"yourself" resolve to the actor (the commanded NPC). There are
+// no types, routines, or properties to expose — including the binding is all a game needs.
 //===================================================================================================
 #once
+// dependency bindings — orDistinctMeSelf.h has no orLibrary #includes of its own.
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

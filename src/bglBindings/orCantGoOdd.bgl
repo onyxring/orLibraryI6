@@ -1,9 +1,9 @@
 //===================================================================================================
 // bindings/orCantGoOdd.bgl — Beguile binding for orLibrary's orCantGoOdd extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orCantGoOdd lets a room give a distinct "can't go that way" message for the
+// "odd" directions (up, down, in, out) via a `cant_go_odd` property, separate from `cant_go`.
 //===================================================================================================
 #once
 // dependency bindings — mirror orCantGoOdd.h's orLibrary #includes so nested extern
@@ -11,6 +11,10 @@
 #include "_orInfExt"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// Per-room message for a blocked up/down/in/out move (a string, or a routine that prints it). When
+// set and non-zero, it is used instead of the default "It is not possible to go that way."
+extern property cant_go_odd;
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

@@ -1,16 +1,37 @@
 //===================================================================================================
 // bindings/orUtilMap.bgl — Beguile binding for orLibrary's orUtilMap extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Provides `util.orMap` — direction reversal and simple map queries. Hung off
+// the shared `util` object (I6 `util.orMap` → object `_orMap`). The pathfinder facade (`.pathFinder`)
+// is added by the orUtilMapPathFinder binding.
 //===================================================================================================
 #once
 // dependency bindings — mirror orUtilMap.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+// declarations (types, members, properties, globals) are available transitively. (orUtilRef reaches
+// the shared `_orUtil`/`util` type transitively, off which orMap is hung below.)
 #include "orUtilRef"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// util.orMap — map/direction helpers (orUtilMap.h `object _orMap`).
+extern class _orMap : object {
+    // Given a direction PROPERTY (e.g. n_to), return its opposite (s_to). Pass the property via the
+    // (property) cast; the result is a property number for use as `room.(…)`.
+    emitter property reverseDirProp(property d)                       { ($self.reverseDirProp($d)) }
+    // Given a compass direction OBJECT (e.g. n_obj), return its opposite (s_obj).
+    emitter object   reverseDirObj(object d)                          { ($self.reverseDirObj($d)) }
+    // The compass direction object needed to travel from `start` to the adjacent room, or 0 if the
+    // rooms are not adjacent. Both args are resolved to their root location first.
+    emitter object   getDirectionToAdjacentObject(object start, object adjacentRoom) { ($self.getDirectionToAdjacentObject($start, $adjacentRoom)) }
+    // The root location (topmost parent) of an object or character.
+    emitter object   locationOf(object a)                            { ($self.locationOf($a)) }
+}
+// Hang orMap off the shared `util` object (_orUtil declared in orUtilLoopArray.bgl, reached
+// transitively via orUtilRef → orUtilNum → _orInfExt → orUtilArray → orUtilLoopArray).
+extend class _orUtil {
+    _orMap orMap;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

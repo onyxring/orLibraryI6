@@ -1,9 +1,13 @@
 //===================================================================================================
 // bindings/orUtilUiGlulx.bgl — Beguile binding for orLibrary's orUtilUiGlulx extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// DEFERRED (type bindings pending). Including this binding pulls in the I6 extension (#includeI6
+// below), so a game can already depend on the binding alone and reach the Glulx UI surface via #i6.
+// The full Beguile surface — the styleDefinition builder, the _glulxWindow split/draw/resize tree,
+// the capability-query singletons, and the imageAlign/winType/styleType/justification/weight enum
+// objects — is large and Glulx-only, so it is intentionally left unbound for now; it will be authored
+// when a concrete Glulx-graphics game needs it. `util.orUi` (the portable UI surface) IS bound in
+// orUtilUi.bgl. Author types here incrementally (extend `_orUI` with the `glulx` sub-facade).
 //===================================================================================================
 #once
 // dependency bindings — mirror orUtilUiGlulx.h's orLibrary #includes so nested extern

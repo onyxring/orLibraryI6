@@ -1,9 +1,10 @@
 //===================================================================================================
 // bindings/orAdjective.bgl — Beguile binding for orLibrary's orAdjective extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orAdjective lets an object list words that should be treated as ADJECTIVES
+// (matched only alongside a noun) via its `adjective` property, and controls globally whether a bare
+// adjective can stand in for the noun (the `orAdjective.mode` setting).
 //===================================================================================================
 #once
 // dependency bindings — mirror orAdjective.h's orLibrary #includes so nested extern
@@ -11,6 +12,21 @@
 #include "orUtilParser"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// Parser mode (set orAdjective.mode in your init):
+extern const int REQUIRE_NOUN;   // 0 — an adjective alone never matches; a noun word is required
+extern const int PREFER_NOUN;    // 1 — (default) a noun is preferred, but a bare adjective can match
+
+// Per-object parser vocabulary. `adjective` lists dictionary words to treat as adjectives for the
+// object; `requireNoun` (a bool, or a routine returning one) overrides the global mode for this object.
+extern property adjective;
+extern property requireNoun;
+
+// The extension's controller object. Set `orAdjective.mode = REQUIRE_NOUN` (usually in your init) to
+// change the global adjective-matching policy.
+extern object orAdjective {
+    int mode;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

@@ -1,9 +1,9 @@
 //===================================================================================================
 // bindings/orPlayerCommandQueue.bgl — Beguile binding for orLibrary's orPlayerCommandQueue extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orPlayerCommandQueue lets code enqueue commands to run on the player's behalf
+// (walkthroughs, "go to" routing, direction/look redirects) via the `playerCommands` action queue.
 //===================================================================================================
 #once
 // dependency bindings — mirror orPlayerCommandQueue.h's orLibrary #includes so nested extern
@@ -16,10 +16,18 @@
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "orPlayerCommandQueue";
+// The player's command queue (an orActionQueue). Enqueue commands with pushCommand (appends to the
+// back) or preempt the current turn with preemptCommand (runs next). Query/clear the queue as needed.
 extern object playerCommands{
-    void pushCommand(string, bool isMeta = false, bool isSilent = false);
+    void pushCommand(string cmd, bool isMeta = false, bool isSilent = false);      // append to the queue
+    void preemptCommand(string cmd, bool isMeta = false, bool isSilent = false);   // run before anything queued
+    int  getLength();                                                              // number of queued commands
+    void clear();                                                                  // empty the queue
 }
 
 // Queue `cmd` as a preempting command and mark the current turn meta; returns true (handled).
 // Used by room direction/look routines: `bool s_look() { return redirectCommand("x jeep"); }`.
 extern bool redirectCommand(string cmd);
+
+// Turn-inference message suppression flag (orPlayerCommandQueue.h `Constant noInferMessage 1`).
+extern const int noInferMessage;

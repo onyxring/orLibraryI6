@@ -1,9 +1,10 @@
 //===================================================================================================
 // bindings/orNameable.bgl — Beguile binding for orLibrary's orNameable extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orNameable lets the player give an object a custom name ("NAME rock AS
+// pebble" / "CALL …"); the object then answers to that name too, shown in parentheses after its own.
+// Subclass `orNameable` to make an object renameable.
 //===================================================================================================
 #once
 // dependency bindings — mirror orNameable.h's orLibrary #includes so nested extern
@@ -11,6 +12,18 @@
 #include "_orInfExt"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// The NAME / UNNAME actions (also reached via "call"/"dub"/"refer to … as …") — register the names so
+// before()/react_before() can intercept them.
+extern verb Name;
+extern verb Unname;
+
+// Base class for a renameable object. The player-supplied name is stored/managed by the engine (in
+// the object's custom_name buffer); `customArticle` is the article printed with it — 'a', 'an', 'the',
+// or 0 for none. Add name/short_name/description as usual.
+extern class orNameable : object {
+    int customArticle;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

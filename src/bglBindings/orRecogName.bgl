@@ -1,9 +1,9 @@
 //===================================================================================================
 // bindings/orRecogName.bgl — Beguile binding for orLibrary's orRecogName extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orRecogName lets the parser match an object by the words in its printed
+// short_name (not just its `name` dictionary words). Give an object `noRecogName` to opt it out.
 //===================================================================================================
 #once
 // dependency bindings — mirror orRecogName.h's orLibrary #includes so nested extern
@@ -12,6 +12,13 @@
 #include "_orInfExt"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// Put on an object to exclude it from short_name matching.
+extern attribute noRecogName;
+
+// Test whether the input word at `wordnumber` (a word-stream index) appears in `obj`'s printed
+// short_name. Returns 1 (match) or -1 (no match) — callable from a custom parse_name.
+extern int MatchAgainstShortName(object obj, int wordnumber);
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

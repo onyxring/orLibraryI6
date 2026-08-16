@@ -1,13 +1,14 @@
 //===================================================================================================
 // bindings/orDialogueMenu.bgl — Beguile binding for orLibrary's orDialogueMenu extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orDialogueMenu presents the topics the player can currently raise with an
+// NPC as a selectable orMenu, optionally auto-showing it before each prompt.
 //===================================================================================================
 #once
 // dependency bindings — mirror orDialogueMenu.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+// declarations (types, members, properties, globals) are available transitively. (orMenu declares the
+// base menu type this extends.)
 #include "_orInfExt"
 #include "orUtilArray"
 #include "orMenu"
@@ -15,6 +16,23 @@
 #include "orUtilBuf"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// When true (the default), the dialogue menu is shown automatically before each command prompt while
+// there are topics to raise.
+extern bool autoMenuSpeak;
+
+// Per-topic override of the text shown for it in the menu (a string, or a routine that prints).
+extern property commandText;
+
+// The dialogue-menu singleton (an orMenu). Rebuild it from the topics available to the player, then
+// show() it (from orMenu). Normally driven automatically, but exposed for manual control.
+extern class _orDialogueMenu : orMenu {
+    // Repopulate the menu with the topics the player can raise with the current NPC; returns the count.
+    emitter int  initForDisplay()   { ($self.initForDisplay()) }
+    emitter void clear()            { $self.clear() }
+    emitter void add(object topic)  { $self.add($topic) }
+}
+extern _orDialogueMenu orDialogueMenu;
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

@@ -1,16 +1,44 @@
 //===================================================================================================
 // bindings/orUtilMapPathFinder.bgl — Beguile binding for orLibrary's orUtilMapPathFinder extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Adds the pathfinder facade to the shared map object: `util.orMap.pathFinder`
+// — a breadth-first shortest-path finder over the compass map. Compute a path, then read/convert it:
+//     var r = orLibUtil.orMap.pathFinder.determinePath(npc, targetRoom);
+//     orLibUtil.orMap.pathFinder.convertPathToDirections(bgl.world.locationOf(npc));
 //===================================================================================================
 #once
 // dependency bindings — mirror orUtilMapPathFinder.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+// declarations (types, members, properties, globals) are available transitively. (orUtilMap declares
+// the `_orMap` type this binding extends with the pathFinder facade.)
 #include "orUtilMap"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// util.orMap.pathFinder — the singleton orPathFinder (an orDeque; installs itself as _orMap.pathFinder
+// at startup). `path` is its computed route, a multi-value property read via util.orArray.
+extern class _orPathFinder : object {
+    // Find the shortest route from `npcOrRoom` (a character — resolved to its location — or a room)
+    // to `endRoom` (a room, or an object resolved to its location). Fills `path`. Returns 0 if already
+    // there, a negative error (-1 unreachable, -2 out of workspace), else the first room to move to.
+    emitter var  determinePath(object npcOrRoom, object endRoom) { ($self.determinePath($npcOrRoom, $endRoom)) }
+    // Rewrite `path` in place, replacing each room with the compass direction object to step there;
+    // `startingLoc` is the room the traveller starts from.
+    emitter void convertPathToDirections(object startingLoc)     { $self.convertPathToDirections($startingLoc) }
+    // Number of entries in the currently computed `path`.
+    emitter int  getPathLength()                                 { ($self.getPathLength()) }
+    // The computed route (rooms, or direction objects after convertPathToDirections). Read with
+    // util.orArray: `util.orArray.get(pf, (property)path, i)` / `getLength(pf, (property)path)`.
+    array<object> path;
+}
+// Hang pathFinder off the shared map object (_orMap declared in orUtilMap.bgl).
+extend class _orMap {
+    _orPathFinder pathFinder;
+}
+
+// Search workspace depth (max path length considered); `default PATHDEPTH 32` in I6 — override in an
+// #i6 island before this extension is staged if a game needs longer paths.
+extern const int PATHDEPTH;
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

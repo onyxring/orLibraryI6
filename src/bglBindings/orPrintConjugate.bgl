@@ -1,9 +1,10 @@
 //===================================================================================================
 // bindings/orPrintConjugate.bgl — Beguile binding for orLibrary's orPrintConjugate extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// NO DIRECT AUTHOR-FACING API. Including this binding pulls in the I6 extension (#includeI6 below),
+// which is a language dispatcher: it wires up orPrint's verb-conjugation markup (present/past tense
+// agreement for the current actor) by pulling the English conjugation tables. Authors use it through
+// orPrint's `$…;` markup, not by calling anything here — so there is nothing to `extern`-declare.
 //===================================================================================================
 #once
 // dependency bindings — mirror orPrintConjugate.h's orLibrary #includes so nested extern

@@ -1,16 +1,60 @@
 //===================================================================================================
 // bindings/orUtilNum.bgl — Beguile binding for orLibrary's orUtilNum extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Provides `util.orNum` — unsigned comparisons, ranges, bit ops, and signed/
+// unsigned min/max. Hung off the shared `util` object (I6 `util.orNum` → object `_orNum`).
+//
+// NOTE the min/max/umin/umax I6 routines take five slots and use sentinel fillers (orMinEnd/orMaxEnd/
+// orUMinEnd) for the unused ones; the 2- and 3-argument overloads below supply those sentinels for
+// you, so a bare `util.orNum.min(a, b)` is correct even for negative operands.
 //===================================================================================================
 #once
 // dependency bindings — mirror orUtilNum.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+// declarations (types, members, properties, globals) are available transitively. _orInfExt brings
+// the shared `_orUtil` (`util`) type in transitively, off which orNum is hung below.
 #include "_orInfExt"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// util.orNum — numeric helpers (orUtilNum.h `object _orNum`). All values are `int`; the `u…`
+// variants treat their operands as UNSIGNED (0..uMaxNumber) rather than signed.
+extern class _orNum : object {
+    emitter bool uIsGreaterThan(int v1, int v2)          { ($self.uIsGreaterThan($v1, $v2)) }
+    emitter bool uIsGreaterThanOrEqualTo(int v1, int v2) { ($self.uIsGreaterThanOrEqualTo($v1, $v2)) }
+    emitter bool uIsLessThan(int v1, int v2)             { ($self.uIsLessThan($v1, $v2)) }
+    emitter bool uIsLessThanOrEqualTo(int v1, int v2)    { ($self.uIsLessThanOrEqualTo($v1, $v2)) }
+    // signed / unsigned range test (v within [v1,v2]; the bounds are swapped internally if reversed).
+    emitter bool isBetween(int v, int v1, int v2)        { ($self.isBetween($v, $v1, $v2)) }
+    emitter bool uIsBetween(int v, int v1, int v2)       { ($self.uIsBetween($v, $v1, $v2)) }
+    // a raised to the b power.
+    emitter int  pow(int a, int b)                       { ($self.pow($a, $b)) }
+    // bit N (0 = least-significant): test, set on, set off. isBitSet is an alias for getBit.
+    emitter bool getBit(int val, int bit)                { ($self.getBit($val, $bit)) }
+    emitter bool isBitSet(int val, int bit)              { ($self.isBitSet($val, $bit)) }
+    emitter int  setBitOn(int val, int bit)              { ($self.setBitOn($val, $bit)) }
+    emitter int  setBitOff(int val, int bit)             { ($self.setBitOff($val, $bit)) }
+    emitter int  xor(int val1, int val2)                 { ($self.xor($val1, $val2)) }
+    // signed min/max (unused slots filled with the orMaxEnd/orMinEnd sentinels so 2- and 3-operand
+    // calls are correct for any operand, including negatives).
+    emitter int  max(int a, int b)                       { ($self.max($a, $b, orMaxEnd, orMaxEnd, orMaxEnd)) }
+    emitter int  max(int a, int b, int c)                { ($self.max($a, $b, $c, orMaxEnd, orMaxEnd)) }
+    emitter int  min(int a, int b)                       { ($self.min($a, $b, orMinEnd, orMinEnd, orMinEnd)) }
+    emitter int  min(int a, int b, int c)                { ($self.min($a, $b, $c, orMinEnd, orMinEnd)) }
+    // unsigned min/max.
+    emitter int  umax(int a, int b)                      { ($self.umax($a, $b, 0, 0, 0)) }
+    emitter int  umax(int a, int b, int c)               { ($self.umax($a, $b, $c, 0, 0)) }
+    emitter int  umin(int a, int b)                      { ($self.umin($a, $b, orUMinEnd, orUMinEnd, orUMinEnd)) }
+    emitter int  umin(int a, int b, int c)               { ($self.umin($a, $b, $c, orUMinEnd, orUMinEnd)) }
+    // largest representable signed / unsigned value on the current target (Z-machine or Glulx).
+    int maxNumber;
+    int uMaxNumber;
+}
+// Hang orNum off the shared `util` object (_orUtil is declared in orUtilLoopArray.bgl, reached here
+// transitively via _orInfExt → orUtilArray → orUtilLoopArray).
+extend class _orUtil {
+    _orNum orNum;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

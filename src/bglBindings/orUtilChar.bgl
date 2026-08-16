@@ -1,11 +1,36 @@
 //===================================================================================================
 // bindings/orUtilChar.bgl — Beguile binding for orLibrary's orUtilChar extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Provides `util.orChar` — character classification and case conversion
+// (accent-aware, code-page 437). Hung off the shared `util` object (I6 `util.orChar` → object
+// `_orChar`).
 //===================================================================================================
 #once
+// dependency bindings — orUtilChar.h itself has no orLibrary #includes; _orInfExt is pulled only to
+// bring the shared `_orUtil` (`util`) type in transitively, off which orChar is hung below.
+#include "_orInfExt"
+// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
+#include "pkgOrHooks"
+
+// util.orChar — single-character helpers (orUtilChar.h `object _orChar`). `c` is a character.
+extern class _orChar : object {
+    emitter bool isAlpha(char c)        { ($self.isAlpha($c)) }
+    emitter bool isNumeric(char c)      { ($self.isNumeric($c)) }
+    emitter bool isAlphaNumeric(char c) { ($self.isAlphaNumeric($c)) }
+    emitter bool isVowel(char c)        { ($self.isVowel($c)) }
+    emitter bool isConsonant(char c)    { ($self.isConsonant($c)) }
+    emitter bool isLower(char c)        { ($self.isLower($c)) }
+    emitter bool isUpper(char c)        { ($self.isUpper($c)) }
+    // case conversion — returns the converted character (unchanged if not a letter).
+    emitter char toUpper(char c)        { ($self.toUpper($c)) }
+    emitter char toLower(char c)        { ($self.toLower($c)) }
+}
+// Hang orChar off the shared `util` object (_orUtil declared in orUtilLoopArray.bgl, reached
+// transitively via _orInfExt → orUtilArray → orUtilLoopArray).
+extend class _orUtil {
+    _orChar orChar;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

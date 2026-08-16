@@ -1,13 +1,21 @@
 //===================================================================================================
 // bindings/orReview.bgl — Beguile binding for orLibrary's orReview extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orReview adds a meta "REVIEW" verb that reprints the current room ("review")
+// or re-examines an object ("review <noun>") WITHOUT consuming a turn — handy after a state change.
 //===================================================================================================
 #once
+// dependency bindings — orReview.h has no orLibrary #includes of its own.
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// The REVIEW actions — register the names so before()/react_before() can intercept them. Review is the
+// no-noun form (reprint the room); ReviewObj re-examines a noun. (ReviewObj is also referenced from
+// the orDialogue binding, which re-prints an object's description on a state change; a duplicate
+// `extern verb` is harmless.)
+extern verb Review;
+extern verb ReviewObj;
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

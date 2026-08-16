@@ -1,9 +1,15 @@
 //===================================================================================================
 // bindings/orUtilBuf.bgl — Beguile binding for orLibrary's orUtilBuf extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Provides `util.orBuf` — string manipulation over orLibrary character buffers
+// (the hybrid length-prefixed buffers used by orString / orCenter / orMenu). Hung off the shared
+// `util` object (I6 `util.orBuf` → object `_orBuf`).
+//
+// CORE SUBSET. The most-used measure / compare / search / transform routines are bound here; buffer
+// arguments are typed `var` so a literal string, a raw character buffer, or an orString all pass. The
+// lower-level stream/pool plumbing (capture/release, lock/free, convertToSizedBuffer, …) stays in #i6
+// — and for new Beguile code the native <string>/<buf> extensions are usually the better choice.
 //===================================================================================================
 #once
 // dependency bindings — mirror orUtilBuf.h's orLibrary #includes so nested extern
@@ -12,6 +18,61 @@
 #include "orUtilChar"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// util.orBuf — buffer/string helpers (orUtilBuf.h `object _orBuf`). `buf` is a mutable target buffer;
+// the "source" arguments accept a literal string, a buffer, or an orString.
+extern class _orBuf : object {
+    // fill/measure/resize
+    emitter void setFromLiteral(var buf, var stringVal)          { $self.setFromLiteral($buf, $stringVal) }
+    emitter void setFromBuffer(var buf, var source)              { $self.setFromBuffer($buf, $source) }
+    emitter int  getLength(var buf)                              { ($self.getLength($buf)) }
+    emitter void setLength(var buf, int newLength)               { $self.setLength($buf, $newLength) }
+    emitter int  getSize(var buf)                                { ($self.getSize($buf)) }       // allocated capacity, or -1
+    emitter bool isSized(var buf)                                { ($self.isSized($buf)) }
+    emitter void print(var buf)                                  { $self.print($buf) }
+    emitter void print(var buf, int len)                         { $self.print($buf, $len) }
+
+    // per-character access
+    emitter char getChar(var buf, int pos)                       { ($self.getChar($buf, $pos)) }
+    emitter void setChar(var buf, int pos, char val)             { $self.setChar($buf, $pos, $val) }
+
+    // compare / search (caseInsensitive defaults to false; startingIndex to 0)
+    emitter bool equals(var buf1, var buf2)                      { ($self.equals($buf1, $buf2)) }
+    emitter bool equals(var buf1, var buf2, bool caseInsensitive){ ($self.equals($buf1, $buf2, $caseInsensitive)) }
+    emitter bool startsWith(var buf1, var buf2)                  { ($self.startsWith($buf1, $buf2)) }
+    emitter bool startsWith(var buf1, var buf2, bool caseInsensitive) { ($self.startsWith($buf1, $buf2, $caseInsensitive)) }
+    emitter bool endsWith(var buf1, var buf2)                    { ($self.endsWith($buf1, $buf2)) }
+    emitter bool endsWith(var buf1, var buf2, bool caseInsensitive)   { ($self.endsWith($buf1, $buf2, $caseInsensitive)) }
+    emitter int  indexOf(var buf, var searchText)               { ($self.indexOf($buf, $searchText)) }
+    emitter int  indexOf(var buf, var searchText, int startingIndex) { ($self.indexOf($buf, $searchText, $startingIndex)) }
+
+    // copy / substring into a destination buffer
+    emitter void copy(var toBuf, var fromBuf, int numCharsToCopy) { $self.copy($toBuf, $fromBuf, $numCharsToCopy) }
+    emitter void mid(var toBuf, var fromBuf, int fromPos, int numCharsToCopy) { $self.mid($toBuf, $fromBuf, $fromPos, $numCharsToCopy) }
+    emitter void left(var toBuf, var fromBuf, int numCharsToCopy)  { $self.left($toBuf, $fromBuf, $numCharsToCopy) }
+    emitter void right(var toBuf, var fromBuf, int numCharsToCopy) { $self.right($toBuf, $fromBuf, $numCharsToCopy) }
+
+    // in-place edit
+    emitter void insert(var toBuf, var fromBuf, int toPos)       { $self.insert($toBuf, $fromBuf, $toPos) }
+    emitter void prepend(var toBuf, var fromBuf)                 { $self.prepend($toBuf, $fromBuf) }
+    emitter void append(var toBuf, var fromBuf)                  { $self.append($toBuf, $fromBuf) }
+    emitter void delete(var buf, int pos, int count)            { $self.delete($buf, $pos, $count) }
+    emitter void replace(var buf, var searchText, var replaceText)    { $self.replace($buf, $searchText, $replaceText) }
+    emitter void replaceAll(var buf, var searchText, var replaceText) { $self.replaceAll($buf, $searchText, $replaceText) }
+
+    // whole-buffer transforms (in place)
+    emitter void toUpper(var buf)   { $self.toUpper($buf) }
+    emitter void toLower(var buf)   { $self.toLower($buf) }
+    emitter void reverse(var buf)   { $self.reverse($buf) }
+    emitter void trimLeft(var buf)  { $self.trimLeft($buf) }
+    emitter void trimRight(var buf) { $self.trimRight($buf) }
+    emitter void trim(var buf)      { $self.trim($buf) }
+}
+// Hang orBuf off the shared `util` object (_orUtil reached transitively via orUtilNum → _orInfExt →
+// orUtilArray → orUtilLoopArray).
+extend class _orUtil {
+    _orBuf orBuf;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

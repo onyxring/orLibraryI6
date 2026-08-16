@@ -1,11 +1,27 @@
 //===================================================================================================
 // bindings/orExits.bgl — Beguile binding for orLibrary's orExits extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orExits adds an EXITS verb that lists the obvious exits from the current
+// room, plus a standalone DescribeExits() routine that does the same. A room can override the wording
+// with its `exitsText` property (a string or routine).
 //===================================================================================================
 #once
+// dependency bindings — orExits.h has no orLibrary #includes of its own.
+// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
+#include "pkgOrHooks"
+
+// The EXITS action — register the name so before()/react_before() can intercept it (##Exits).
+extern verb Exits;
+
+// Per-room override of the exit description (string, or a routine that prints it). When set and
+// non-zero on the current room, it is printed instead of the generated exit list.
+extern property exitsText;
+
+// Print the obvious exits from the current room. `qualifier` (a string) is inserted into the phrasing
+// ("The only exit <qualifier> lies …"); `ignoreExitsText` bypasses a room's exitsText override.
+// Both are optional (default to the bare "list the exits" behaviour).
+extern void DescribeExits(string qualifier = 0, bool ignoreExitsText = false);
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

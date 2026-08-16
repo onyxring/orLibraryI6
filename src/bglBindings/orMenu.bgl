@@ -1,9 +1,8 @@
 //===================================================================================================
 // bindings/orMenu.bgl — Beguile binding for orLibrary's orMenu extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orMenu is a scrolling menu system for help/about screens.
 //===================================================================================================
 #once
 // dependency bindings — mirror orMenu.h's orLibrary #includes so nested extern
@@ -16,13 +15,20 @@
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
 
+// Display styles passed to show():
+extern const int orMenuFullScreen;   // 0 — take over the whole screen (leaves can render description text)
+extern const int orMenuTopOnly;      // 1 — draw the menu in the status region only
+
 // The menu-node type. A game builds its help/menu tree by declaring `orMenu` objects and linking
 // them with `object parent = <parentNode>;` (the I6 object tree the arrow syntax `orMenu -> child`
 // builds). Each node's title is its `short_name` (printed via `(name)`); a leaf carries either a
 // `string description` (shown directly) or a `void rawDescription()` method (a routine property the
 // engine runs to render richer text via orInset/orCenter). The root node is `show()`n to open it.
 extern class orMenu : object {
-    emitter void show()  { $self.show() }   // open this menu (root node)
+    int displayStyle;   // set/read the active display style (orMenuFullScreen / orMenuTopOnly)
+    emitter void show()  { $self.show() }   // open this menu as the root, full-screen
+    // Open `rootMenu` (usually the same node) with an explicit display style.
+    emitter void show(object rootMenu, int showStyle)  { $self.show($rootMenu, $showStyle) }
 }
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an

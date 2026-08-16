@@ -1,9 +1,15 @@
 //===================================================================================================
 // bindings/orUtilStr.bgl — Beguile binding for orLibrary's orUtilStr extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Provides `util.orStr` — polymorphic string helpers that accept a literal, a
+// character buffer, or an orString interchangeably. Hung off the shared `util` object (I6
+// `util.orStr` → object `_orStr`).
+//
+// CORE SUBSET. The methods that construct or compare strings are bound; the ones that MAKE a new
+// orString (new/format/trim) return an orString object typed `var` here (the full orString class is
+// not bound — native <string> is preferred for new Beguile code), so treat the result as an opaque
+// handle to print or pass along. The internal ambiguous-buffer lock/free plumbing stays in #i6.
 //===================================================================================================
 #once
 // dependency bindings — mirror orUtilStr.h's orLibrary #includes so nested extern
@@ -12,6 +18,31 @@
 #include "orString"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// util.orStr — polymorphic string helpers (orUtilStr.h `object _orStr`). `var` arguments accept a
+// literal string, a character buffer, or an orString.
+extern class _orStr : object {
+    // Make a new (locked) orString from any string value. Returned as an opaque `var` handle.
+    emitter var  new(var unkStr)                                 { ($self.new($unkStr)) }
+    // Build an orString from a `pattern` with up to three substituted params (orLibrary format markup).
+    emitter var  format(var pattern)                            { ($self.format($pattern)) }
+    emitter var  format(var pattern, var p1)                    { ($self.format($pattern, $p1)) }
+    emitter var  format(var pattern, var p1, var p2)            { ($self.format($pattern, $p1, $p2)) }
+    emitter var  format(var pattern, var p1, var p2, var p3)    { ($self.format($pattern, $p1, $p2, $p3)) }
+    // A new orString with leading/trailing whitespace removed.
+    emitter var  trim(var buf)                                  { ($self.trim($buf)) }
+    // Compare any two string values (caseInsensitive defaults to false).
+    emitter bool areEqual(var buf1, var buf2)                   { ($self.areEqual($buf1, $buf2)) }
+    emitter bool areEqual(var buf1, var buf2, bool caseInsensitive) { ($self.areEqual($buf1, $buf2, $caseInsensitive)) }
+    // Print any string value (literal / buffer / orString). The 2-arg form dereferences buf.prop first.
+    emitter void print(var buf)                                 { $self.print($buf) }
+    emitter void print(var buf, property prop)                 { $self.print($buf, $prop) }
+}
+// Hang orStr off the shared `util` object (_orUtil reached transitively via orUtilRef → orUtilNum →
+// _orInfExt → orUtilArray → orUtilLoopArray).
+extend class _orUtil {
+    _orStr orStr;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

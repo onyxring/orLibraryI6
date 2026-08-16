@@ -1,9 +1,13 @@
 //===================================================================================================
 // bindings/orString.bgl — Beguile binding for orLibrary's orString extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// DEFERRED (type bindings pending). Including this binding pulls in the I6 extension (#includeI6
+// below), so the orString pool/type is staged and a game can reach it via #i6. The full orString
+// class (~60 methods: get/set, search, and the many transform helpers that return new orStrings) is
+// intentionally left unbound: Beguile's native <string> extension covers the same ground and is the
+// preferred choice for new code, and orLibrary strings are usually consumed via `util.orStr`
+// (bound in orUtilStr.bgl — new/format/trim/areEqual/print). Author the class here incrementally if a
+// game needs to hold and mutate orString objects directly.
 //===================================================================================================
 #once
 // dependency bindings — mirror orString.h's orLibrary #includes so nested extern

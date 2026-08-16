@@ -1,9 +1,14 @@
 //===================================================================================================
 // bindings/orStatusLine.bgl — Beguile binding for orLibrary's orStatusLine extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orStatusLine draws a three-region status bar (left / middle / right).
+//
+// Its author surface is OVERRIDE HOOKS, not callable externs: a game customises the bar by DEFINING
+// its own `orStatusLeft` / `orStatusMiddle` / `orStatusRight` routines (each `#ifndef`-guarded in I6,
+// so your definition replaces the default). Provide them from an `#i6` island (or via `#i6replace`),
+// e.g.  #i6 [ orStatusLeft; print (name) location; ];  — there is nothing to `extern`-declare here,
+// which is why this binding carries only the #includeI6.
 //===================================================================================================
 #once
 // dependency bindings — mirror orStatusLine.h's orLibrary #includes so nested extern

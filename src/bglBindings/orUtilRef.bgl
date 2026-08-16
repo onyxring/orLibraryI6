@@ -1,16 +1,45 @@
 //===================================================================================================
 // bindings/orUtilRef.bgl — Beguile binding for orLibrary's orUtilRef extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Provides `util.orRef` — runtime metaclass tests and the "resolve a property
+// that might be a value OR a routine" helpers (an enhanced valueOrRun). Hung off the shared `util`
+// object (I6 `util.orRef` → object `_orRef`).
 //===================================================================================================
 #once
 // dependency bindings — mirror orUtilRef.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+// declarations (types, members, properties, globals) are available transitively. (orUtilNum reaches
+// the shared `_orUtil`/`util` type transitively, off which orRef is hung below.)
 #include "orUtilNum"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// util.orRef — reference/metaclass helpers (orUtilRef.h `object _orRef`).
+extern class _orRef : object {
+    // metaclass tests. (isDictionaryWord is only reliable on Glulx — see orUtilRef.h for the Z-code
+    // caveat, where high-memory strings can overlap the dictionary address space.)
+    emitter bool isRoutine(var r)        { ($self.isRoutine($r)) }
+    emitter bool isString(var r)         { ($self.isString($r)) }
+    emitter bool isObject(var r)         { ($self.isObject($r)) }
+    emitter bool isDictionaryWord(var j) { ($self.isDictionaryWord($j)) }
+
+    // resolveValue: if `obj` is itself a routine, call it with (prop, params…); else if obj provides
+    // `prop`, return obj.prop (calling it with params… when it is a routine); otherwise return obj.
+    // Pass a bare member name via the (property) cast for `prop`.
+    emitter var resolveValue(var obj, property prop)                     { ($self.resolveValue($obj, $prop)) }
+    emitter var resolveValue(var obj, property prop, var p1)             { ($self.resolveValue($obj, $prop, $p1)) }
+    emitter var resolveValue(var obj, property prop, var p1, var p2)     { ($self.resolveValue($obj, $prop, $p1, $p2)) }
+
+    // resolvePrint: like resolveValue, but a resolved string/value is PRINTED. Returns true once it
+    // has printed (false only for a 0/-1 obj).
+    emitter bool resolvePrint(var obj, property prop)                    { ($self.resolvePrint($obj, $prop)) }
+    emitter bool resolvePrint(var obj, property prop, var p1)            { ($self.resolvePrint($obj, $prop, $p1)) }
+}
+// Hang orRef off the shared `util` object (_orUtil declared in orUtilLoopArray.bgl, reached
+// transitively via orUtilNum → _orInfExt → orUtilArray → orUtilLoopArray).
+extend class _orUtil {
+    _orRef orRef;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

@@ -1,9 +1,10 @@
 //===================================================================================================
 // bindings/orUniqueMultiMessage.bgl — Beguile binding for orLibrary's orUniqueMultiMessage extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// NO AUTHOR-FACING API. Including this binding pulls in the I6 extension (#includeI6 below), whose
+// effect is entirely automatic: when one command acts on many objects, identical per-object library
+// messages are consolidated (e.g. "marbles: Removed." once rather than repeated). Nothing to expose —
+// including the binding is all a game needs.
 //===================================================================================================
 #once
 // dependency bindings — mirror orUniqueMultiMessage.h's orLibrary #includes so nested extern

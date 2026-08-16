@@ -1,9 +1,10 @@
 //===================================================================================================
 // bindings/orDynamicMap.bgl — Beguile binding for orLibrary's orDynamicMap extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orDynamicMap wires a chain of rooms together on the fly as the player
+// explores: declare an `orDynamicMap` with a `found_in` list of rooms, and each new direction taken
+// links the next room in the list, so the map "unfolds" during play.
 //===================================================================================================
 #once
 // dependency bindings — mirror orDynamicMap.h's orLibrary #includes so nested extern
@@ -11,6 +12,27 @@
 #include "orUtilMap"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// What to do when the room a new link points back from already has that return direction occupied.
+extern const int ALLOW_UNIDIRECTIONAL_PATH;   // 0 — create a one-way link, leave the return alone
+extern const int OVERWRITE_RETURN_PATH;        // 1 — overwrite the existing return link
+extern const int DISALLOW;                     // 2 — refuse the move (no link created)
+
+// Convenience base class for the rooms an orDynamicMap chains: `has light` and every direction plus
+// cant_go pre-declared to 0, so the map is free to fill them in. Add name/description as usual.
+extern class orDynamicMapRoom : object {
+    // `cant_go` message (string or routine) propagated from the orDynamicMap if this room leaves it 0.
+    string cant_go;
+}
+
+// The dynamic-map controller. Set `found_in` to the ordered list of rooms to unfold (the first must
+// be reachable at the start); the object itself is placed in that starting room.
+extern class orDynamicMap : object {
+    array<object> found_in;      // the rooms to chain, in unfold order
+    string        cant_go;       // default blocked-direction message propagated to chained rooms
+    bool          complete;      // set true once every found_in room has been linked (read-only)
+    int           handleAllocatedReturn;   // one of ALLOW_UNIDIRECTIONAL_PATH / OVERWRITE_RETURN_PATH / DISALLOW
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

@@ -1,9 +1,10 @@
 //===================================================================================================
 // bindings/orReferByContents.bgl — Beguile binding for orLibrary's orReferByContents extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orReferByContents lets a container be referred to by the words of the things
+// inside it (e.g. "TAKE WATER" when a glass of water is what's actually held). Subclass it and tune
+// which actions this applies to.
 //===================================================================================================
 #once
 // dependency bindings — mirror orReferByContents.h's orLibrary #includes so nested extern
@@ -11,6 +12,14 @@
 #include "orUtilParser"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// Base class for a container whose contents lend it their names. `referActions` lists the actions the
+// content-referencing applies to (defaults to take/drop/insert); `ignoreActions` lists actions to
+// exclude. Each is a list of action references (e.g. {take, drop, insert}).
+extern class orReferByContents : object {
+    array<var> referActions;
+    array<var> ignoreActions;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

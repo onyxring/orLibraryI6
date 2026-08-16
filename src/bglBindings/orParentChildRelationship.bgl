@@ -1,9 +1,11 @@
 //===================================================================================================
-// bindings/orParentChildRelationship.bgl — Beguile binding for orLibrary's orParentChildRelationship extension.
+// bindings/orParentChildRelationship.bgl — Beguile binding for orLibrary's orParentChildRelationship.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orParentChildRelationship (PCR) generalises "in"/"on": each relationship
+// pairs a parent attribute with a child attribute and a set of prepositions, so a game can add novel
+// containment kinds (under, behind, …) that the parser, scope, and room descriptions all understand.
+// The library ships two ready-made relationships, orPcrContainer (in) and orPcrSupporter (on).
 //===================================================================================================
 #once
 // dependency bindings — mirror orParentChildRelationship.h's orLibrary #includes so nested extern
@@ -12,6 +14,49 @@
 #include "orString"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// Child-side markers the library applies (parallels the standard `in`/`on` state):
+extern attribute contained;   // child is inside a container-style parent
+extern attribute supported;   // child is on a supporter-style parent
+
+// A parent/child relationship. Subclass (or use the two below) to define a containment kind.
+extern class orParentChildRelationship : object {
+    var    parentAttribute;          // the attribute a parent must have to provide this relationship
+    var    childAttribute;           // the attribute stamped on a child in this relationship
+    string preposition;              // e.g. "in" / "on" — the base preposition
+    string toPreposition;            // e.g. "into" / "onto" (defaults to preposition)
+    string fromPreposition;          // e.g. "out of" / "off" (defaults to "from " + preposition)
+    bool   includeContentsInExamine; // list a parent's contents when it's examined (default true)
+
+    emitter void sayPrep()       { $self.sayPrep() }        // print the base preposition
+    emitter void sayToPrep()     { $self.sayToPrep() }      // print the "to" preposition
+    emitter void sayFromPrep()   { $self.sayFromPrep() }    // print the "from" preposition
+    emitter bool isAppliedTo(object c)          { ($self.isAppliedTo($c)) }   // does child c have this relationship?
+    emitter void applyTo(object c)              { $self.applyTo($c) }         // give child c this relationship
+    emitter void removeFrom(object c)           { $self.removeFrom($c) }      // clear it from child c
+    emitter bool isProvidedBy(object o)         { ($self.isProvidedBy($o)) }  // does object o offer this relationship?
+    emitter int  numVisibleChildrenWith(object p) { ($self.numVisibleChildrenWith($p)) }
+}
+
+// The two library-provided relationships.
+extern orParentChildRelationship orPcrContainer;   // "in" / "into" / "out of"
+extern orParentChildRelationship orPcrSupporter;    // "on" / "onto" / "off"
+
+// Convenience queries over an object's relationships:
+extern bool   isContained(object c);               // c is inside a container-style parent
+extern bool   isSupported(object c);               // c is on a supporter-style parent
+extern object getPcrFromChild(object c);           // the relationship applied to child c, or 0
+extern bool   isMissingPcr(object c);              // c currently has no relationship applied
+extern void   clearAllPcrsFromChild(object c);     // strip every relationship from c
+extern int    numPcrsProvidedBy(object p);         // how many relationships object p can host
+extern object getFirstPcrProvidedBy(object p);     // the first relationship p provides, or 0
+extern object inferPcr(object c, object p);        // best relationship for putting c into/onto p
+
+// Print the contents of p grouped by relationship. `hideDesignatedPcrs` (a relationship, or 0) omits
+// one group; `addInitialLF` prepends a line break. Both optional.
+extern void describeContents(object p, var hideDesignatedPcrs = 0, bool addInitialLF = false);
+// Print a short parenthetical annotation of p's contents.
+extern void annotateContents(object p);
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

@@ -1,9 +1,11 @@
 //===================================================================================================
 // bindings/pkgOrUtils.bgl — Beguile binding for orLibrary's pkgOrUtils extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// BUNDLE. This is an aggregator: including it pulls in the whole orLibrary "util" set (orUtilArray /
+// Buf / Char / LoopArray / Map / MapPathFinder / Num / Parser / Ref / Str / Ui) plus the matching I6
+// (#includeI6 at the bottom). It declares no types of its own — each `#include`d binding supplies its
+// own extern surface (the `util.*` facades), so one `#include "bglBindings/pkgOrUtils"` gives a game
+// the whole util toolkit.
 //===================================================================================================
 #once
 // dependency bindings — mirror pkgOrUtils.h's orLibrary #includes so nested extern

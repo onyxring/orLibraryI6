@@ -1,9 +1,9 @@
 //===================================================================================================
 // bindings/orGotoLocation.bgl — Beguile binding for orLibrary's orGotoLocation extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orGotoLocation adds a "GO TO <room>" verb that path-finds from the player's
+// location to a named room and queues the movement commands to walk there.
 //===================================================================================================
 #once
 // dependency bindings — mirror orGotoLocation.h's orLibrary #includes so nested extern
@@ -12,6 +12,13 @@
 #include "orPlayerCommandQueue"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// The GO-TO action — register the name so before()/react_before() can intercept it (##gotoLocation).
+extern verb gotoLocation;
+
+// When true (the default), only rooms the player has already visited (beenSeen) are in scope for
+// "go to"; set false to allow travelling to any room on the map.
+extern bool orPathFinderAvoidUnvisitedLocations;
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

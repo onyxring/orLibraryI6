@@ -1,9 +1,9 @@
 //===================================================================================================
 // bindings/orNpcSkillDialogue.bgl — Beguile binding for orLibrary's orNpcSkillDialogue extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orNpcSkillDialogue is an orNpc skill that lets a character raise conversation
+// topics: it keeps a pool of orTopics the NPC knows, and can volunteer or answer them.
 //===================================================================================================
 #once
 // dependency bindings — mirror orNpcSkillDialogue.h's orLibrary #includes so nested extern
@@ -12,6 +12,20 @@
 #include "orDialogue"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// When false (the default), topics an NPC raises are queued as a pending question (shown via the
+// dialogue menu) rather than answered immediately.
+extern bool orDialogueAutoAnswer;
+
+// The dialogue skill. Give the NPC a dialoguePool of orTopics; learnTopic/takeNoticeOfTopic manage it.
+extern class orNPCSkillDialogue : object {
+    array<object> dialoguePool;    // the orTopics this NPC can bring up
+    object        pendingQuestion; // a topic awaiting the player's answer (when auto-answer is off)
+    // Register the NPC as knowing `topic` (adds the NPC to the topic's knownBy).
+    emitter void learnTopic(object topic)        { $self.learnTopic($topic) }
+    // Push `topic` to the front of the NPC's dialogue pool so it's raised next.
+    emitter void takeNoticeOfTopic(object topic) { $self.takeNoticeOfTopic($topic) }
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

@@ -1,11 +1,53 @@
 //===================================================================================================
 // bindings/orUtilUi.bgl — Beguile binding for orLibrary's orUtilUi extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Provides `util.orUi` — screen/window geometry, window activation, cursor,
+// and simple input, portable across Z-machine and Glulx. Hung off the shared `util` object
+// (I6 `util.orUi` → object `_orUI`). The Glulx-only sub-facade `.glulx` is added by orUtilUiGlulx.
 //===================================================================================================
 #once
+// dependency bindings — orUtilUi.h has no orLibrary #includes; _orInfExt is pulled only to bring the
+// shared `_orUtil` (`util`) type in transitively, off which orUi is hung below.
+#include "_orInfExt"
+// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
+#include "pkgOrHooks"
+
+// Window handles. On Z-machine these are the window ids 0 (main) and 1 (status); orUtilUiGlulx turns
+// them into window objects, so bind as `var`.
+extern var winMain;
+extern var winStatus;
+
+// util.orUi — display helpers (orUtilUi.h `object _orUI`). Dimensions are in characters/rows.
+extern class _orUI : object {
+    emitter int  getStatusWidth()              { ($self.getStatusWidth()) }
+    emitter int  getScreenWidth(var win = 0)   { ($self.getScreenWidth($win)) }   // win 0 → status window
+    emitter int  getScreenHeight()             { ($self.getScreenHeight()) }
+    emitter int  getStatusHeight()             { ($self.getStatusHeight()) }
+    emitter void setStatusHeight(int h)        { $self.setStatusHeight($h) }
+    // set the current output window.
+    emitter void activateMain()                { $self.activateMain() }
+    emitter void activateStatus()              { $self.activateStatus() }
+    emitter void activateWindow(var win)       { $self.activateWindow($win) }
+    // read a single keystroke (character code).
+    emitter int  getChar()                     { ($self.getChar()) }
+    // clear windows.
+    emitter void eraseWindow(var win)          { $self.eraseWindow($win) }
+    emitter void eraseMain()                   { $self.eraseMain() }
+    emitter void eraseStatus()                 { $self.eraseStatus() }
+    emitter void eraseScreen()                 { $self.eraseScreen() }
+    // move the cursor to (x, y) — 0-based; `win` defaults to the status window.
+    emitter void position(int x, int y)            { $self.position($x, $y) }
+    emitter void position(int x, int y, var win)   { $self.position($x, $y, $win) }
+    emitter void hideCursor()                  { $self.hideCursor() }
+    // "[MORE]"-style pause: hide the cursor and wait for a keystroke.
+    emitter void pauseForInput()               { $self.pauseForInput() }
+}
+// Hang orUi off the shared `util` object (_orUtil declared in orUtilLoopArray.bgl, reached
+// transitively via _orInfExt → orUtilArray → orUtilLoopArray).
+extend class _orUtil {
+    _orUI orUi;
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

@@ -1,9 +1,9 @@
 //===================================================================================================
 // bindings/orVagueQuantity.bgl — Beguile binding for orLibrary's orVagueQuantity extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orVagueQuantity names a pile of like objects vaguely ("a few coins", "a
+// couple of rocks") based on how many there are, via each object's `vagueQuantity` property.
 //===================================================================================================
 #once
 // dependency bindings — mirror orVagueQuantity.h's orLibrary #includes so nested extern

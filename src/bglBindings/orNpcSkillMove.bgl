@@ -1,9 +1,9 @@
 //===================================================================================================
 // bindings/orNpcSkillMove.bgl — Beguile binding for orLibrary's orNpcSkillMove extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. orNpcSkillMove is an orNpc skill that walks a character along a path, follows
+// a target, or wanders — driving movement each turn according to a movePattern.
 //===================================================================================================
 #once
 // dependency bindings — mirror orNpcSkillMove.h's orLibrary #includes so nested extern
@@ -13,6 +13,27 @@
 #include "orUtilMapPathFinder"
 // Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
 #include "pkgOrHooks"
+
+// movePattern values — what happens at the end of movePath:
+extern const int MOVE_PATTERN_REVERSE;   // 0 — walk back along the path
+extern const int MOVE_PATTERN_REPEAT;    // 1 — loop back to the start
+extern const int MOVE_PATTERN_SINGLE;    // 2 — walk it once, then stop
+extern const int MOVE_PATTERN_HALT;      // 3 — don't move
+
+// Movement configuration (set on the moving NPC / its move skill):
+extern property movePath;          // ordered list of rooms to visit
+extern property moveArrived;       // routine called when a waypoint is reached
+extern property followTarget;      // an object to move toward when it's in an adjacent room
+extern property moveTargetFound;   // routine called when a followed target is caught up with
+
+// The move skill itself.
+extern class orNpcSkillMove : object {
+    int    movePattern;      // one of MOVE_PATTERN_* (default MOVE_PATTERN_REVERSE)
+    object lastLocation;     // the room the NPC was in before its last move (read-only)
+    bool   moveDoesWander;   // wander randomly when there's no path/target (default true)
+    // Move the NPC one step in `dir` (a compass direction object), running a Go action.
+    emitter void moveInDirection(object dir) { $self.moveInDirection($dir) }
+}
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

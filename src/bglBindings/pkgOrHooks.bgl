@@ -1,9 +1,11 @@
 //===================================================================================================
 // bindings/pkgOrHooks.bgl — Beguile binding for orLibrary's pkgOrHooks extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// MAIN-HANDOFF WIRING (no author-facing types). This binding is the load-bearing bridge that lets the
+// orLibrary play-loop coexist with Beguile's own `main`: it pulls the pkgOrHooks I6 and adds the
+// `#startup` block below that runs `__orBeguileMainInit()` from bglInit. Nearly every other orLibrary
+// binding `#include`s this so a game can depend on any single binding and still boot correctly. See
+// the note above the #startup block for the full mechanism.
 //===================================================================================================
 #once
 
