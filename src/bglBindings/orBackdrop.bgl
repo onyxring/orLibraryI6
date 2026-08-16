@@ -24,8 +24,10 @@ extern const int bdDefault;
 // The backdrop object type (I6 `class orBackdrop has scenery`). A game declares a standalone
 // backdrop as `orBackdrop name { array<var> backdrops = {…}; }`; `found_in` may be an object
 // list, or a `bool found_in()` method deciding scope dynamically, and `react_before()` can
-// intercept actions. Entries whose text is a routine reference or an inline handler stay `#i6`.
-extern class orBackdrop : object { }
+// intercept actions. Entries whose text is a routine reference or an inline handler use lambdas.
+extern class orBackdrop : object {
+    array<object> found_in;   // rooms this backdrop floats in (multi-room scope); omit for a single `parent =` room
+}
 
 // The engine object behind orBackdrop. `getKeyword(loc)` returns the dictionary word the player
 // referenced for the backdrop currently being resolved (0 if `loc` is given and isn't the matched

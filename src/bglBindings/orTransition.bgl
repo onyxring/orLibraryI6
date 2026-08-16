@@ -1,9 +1,9 @@
 //===================================================================================================
 // bindings/orTransition.bgl — Beguile binding for orLibrary's orTransition extension.
 //---------------------------------------------------------------------------------------------------
-// SCAFFOLD ONLY. Including this binding pulls in the I6 extension (#includeI6 below), so a game can
-// depend on the Beguile binding alone. Type bindings (extern classes / functions / properties) are
-// to be authored incrementally as the orLibrary port moves forward — none yet.
+// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
+// Beguile binding alone. Type bindings are authored incrementally as the orLibrary port moves
+// forward; the orTransition() routine itself is bound below.
 //===================================================================================================
 #once
 // dependency bindings — mirror orTransition.h's orLibrary #includes so nested extern
@@ -17,3 +17,9 @@
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "orTransition";
+
+// orTransition() is a special effect that divides story parts: it prints a blank separation, an
+// optional centered `text`, then an optional centered `prompt` (default "Press any key to continue")
+// and waits for a keypress, erasing the main window afterward unless `skipErase` is true. All three
+// arguments are optional; the common call is the bare orTransition().
+extern void orTransition(string text = 0, string prompt = 0, bool skipErase = false);

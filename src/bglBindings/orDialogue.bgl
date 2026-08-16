@@ -46,7 +46,7 @@ extern verb reviewObj;  // orReview.h ReviewObj — re-print an object's descrip
 
 // True if `act` is one of the conversation actions (ask/tell/say/talk/…). (orDialogue.h)
 extern bool isDialogueAction(var act);
-// (Pronoun print-rule emitters — i()/me()/… — live in begindings/orPronoun.bgl.)
+// (Pronoun print-rule emitters — i()/me()/… — live in bglBindings/orPronoun.bgl.)
 
 // Pull in the actual orLibrary I6 extension, so including this binding is all a game needs — no
 // separate `#include "orDialogue";` in an #i6 island. The beguiler resolves it (via includePaths)
