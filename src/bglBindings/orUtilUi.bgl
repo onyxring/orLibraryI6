@@ -15,8 +15,8 @@
 
 // Window handles. On Z-machine these are the window ids 0 (main) and 1 (status); orUtilUiGlulx turns
 // them into window objects, so bind as `var`.
-extern var winMain;
-extern var winStatus;
+// extern var winMain;
+// extern var winStatus;
 
 // util.orUi — display helpers (orUtilUi.h `object _orUI`). Dimensions are in characters/rows.
 extern class _orUI : object {
