@@ -213,7 +213,7 @@ Constant        orString_STAGE  	0;
 			]
 		,	trimRight[retval;
 				retval=self.clone();
-				util.orBuf.trimLeft(retval.getBuf());
+				util.orBuf.trimRight(retval.getBuf());
 				return retval.free();
 			]
 		,	trim[retval;
