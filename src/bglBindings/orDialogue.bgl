@@ -26,8 +26,13 @@ extern class orTopic : object {
     object knownBy;                 // NPC(s) who know this topic (for ASK); inherited up parent(self)
     object context;                 // NPC(s) this topic is in-context for (for SAY/TELL); inherited
     string quip;                    // the response — a string, or a `bool quip() { … }` routine override
-    array<dictionaryWord> name;     // parser vocabulary (the words the player types)
-    array<dictionaryWord> adjective;
+    // `name`/`adjective` are I6 ADDITIVE parser-vocabulary properties: contributions accumulate into
+    // one run of dictionary words, so they must be rawArray (a tracked array's trailing length slot
+    // would land inside the accumulated data). `name` is declared type-less `additive property name;`
+    // in core (_property.bgl); these member declarations are what FIX its element type (dictionaryWord)
+    // for the orTopic hierarchy — the compiler enforces raw + a consistent element type across it.
+    rawArray<dictionaryWord> name;     // parser vocabulary (the words the player types)
+    rawArray<dictionaryWord> adjective;
     bool   requireNoun;             // orLibrary parser flag
     emitter bool hasBeenTold() { ($self.hasBeenTold()) }
 }
