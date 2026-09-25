@@ -2,7 +2,7 @@
 !% -d 								!--convert double spaces after periods to single space
 !% $ZCODE_FILE_END_PADDING=0 		!--eliminate extra padding; so the output size is more precise
 !% $OMIT_UNUSED_ROUTINES=1
-!% +include_path=./inform6/lib,./orLibraryI6/src !--ORLib: the path to your orLibrary install must be included here
+!% +include_path=./inform6/stdlib,./orLibraryI6/src !--ORLib: the path to your orLibrary install must be included here
 !---------------------------------------------------------------------------------------------------
 ! Medusa
 ! A one-room example of NPC conversations using select orLibrary modules.
