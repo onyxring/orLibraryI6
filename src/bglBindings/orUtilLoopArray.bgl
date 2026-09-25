@@ -36,7 +36,7 @@ extern class _orUtil : object {
 }
 // Beguile-facing name is `orLibUtil` so it doesn't shadow `bgl.util`; emitted/referenced as the
 // I6-side `util` object (i.e. `orLibUtil.orLoopArray.getNext(...)` → `util.orLoopArray.getNext(...)`).
-extern _orUtil orLibUtil as util;
+extern _orUtil util asBgl orLibUtil;
 
 // onceOnly flag for getNext (orUtilLoopArray.h `constant repeatLast 2`).
 extern const int repeatLast;
