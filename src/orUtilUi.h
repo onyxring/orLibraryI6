@@ -39,7 +39,7 @@ Constant        orUtilUI_STAGE  0;
 	global winStatus	1;
 
    object   _orUI
-     with getStatusWidth[w;    
+     with getStatusWidth[;    
       #ifdef orUtilUiGlulx_STAGE;
             return util.orUi.glulx.getStatusTextWidth();
       #ifnot;
@@ -60,6 +60,20 @@ Constant        orUtilUI_STAGE  0;
             else glk_window_get_size(w, gg_arguments, 0);
             
             return gg_arguments-->0;
+         #endif;
+      ]
+   ,   getCurrentWidth[w s; !--the width of the window the current output stream prints to
+         #ifdef TARGET_ZCODE;
+            w=0; s=0; !--suppress compiler warnings
+            return self.getScreenWidth();
+         #ifnot;
+            s=glk_stream_get_current();
+            for(w=glk_window_iterate(0,0):w~=0:w=glk_window_iterate(w,0))
+               if(glk_window_get_stream(w)==s){
+                  glk_window_get_size(w, gg_arguments, 0);
+                  return gg_arguments-->0;
+               }
+            return self.getScreenWidth(); !--the output isn't going to a window
          #endif;
       ]
 	   ,  getScreenHeight[; 

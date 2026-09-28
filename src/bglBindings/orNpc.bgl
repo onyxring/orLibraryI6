@@ -6,11 +6,10 @@
 // it `orNpcSkill`s, and a per-turn daemon picks and performs the highest-priority applicable skill.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orNpc.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilArray"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
 
 // Optional per-NPC startup hook — define `void npcInit()` on your orNpc subclass to initialise it
 // (the framework calls each NPC's npcInit at game start). Declared `additive` in I6.

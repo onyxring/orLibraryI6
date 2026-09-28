@@ -7,11 +7,10 @@
 // adjective can stand in for the noun (the `orAdjective.mode` setting).
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orAdjective.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilParser"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
 
 // Parser mode (set orAdjective.mode in your init):
 extern const int REQUIRE_NOUN;   // 0 — an adjective alone never matches; a noun word is required

@@ -10,12 +10,12 @@
 // you, so a bare `util.orNum.min(a, b)` is correct even for negative operands.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orUtilNum.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively. _orInfExt brings
 // the shared `_orUtil` (`util`) type in transitively, off which orNum is hung below.
 #include "_orInfExt"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "orUtilLoopArray"   // declares _orUtil, which this binding extends
 
 // util.orNum — numeric helpers (orUtilNum.h `object _orNum`). All values are `int`; the `u…`
 // variants treat their operands as UNSIGNED (0..uMaxNumber) rather than signed.

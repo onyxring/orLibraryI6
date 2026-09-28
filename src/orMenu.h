@@ -93,7 +93,7 @@ Constant        orMenu_STAGE  0;
 #iftrue (LIBRARY_STAGE == AFTER_PARSER);
 	#include "orUtilUi"; !make sure this previously declared dependency is included *before* this code
 
-	[__menuFrameSelection val; if(val==1) print "> "; if(val==2) print " <"; return 2;];
+	[__menuFrameSelection val; if(val==1) print "> "; if(val==2) print " <"; return 4;]; !--0: the combined width of "> " and " <"
 	object orMenuController
 		private _startingStatusHeight 0 !remember the status height used by the game
 		,	_rootMenu 0 !--The menu that show() was actually called against
@@ -162,6 +162,7 @@ Constant        orMenu_STAGE  0;
 				style roman;
 			]
 		,	_resizeHeader[currentMenu s;
+				if(self._rootMenu.itemWindowId~=0) return; !--the items have their own window, so the status line keeps its size
 				if(self.displayStyle==orMenuFullScreen)
 					s = _orMenuFullScreenStatusHeight;
 				else
@@ -230,13 +231,17 @@ Constant        orMenu_STAGE  0;
 				if(obj==0) return;
 				str=util.orStr.new();
 
-				if(self.displayStyle==orMenuFullScreen)
+				if(self._rootMenu.itemWindowId~=0){
+					util.orUI.activateWindow(self._rootMenu.itemWindowId); !--hideCursor() leaves output on the status line
+					pos=pos; !--the items have their own window: rows count from its top
+				}
+				else if(self.displayStyle==orMenuFullScreen)
 					pos=pos+_orMenuFullScreenStatusHeight;
 				else
 					pos=pos + self._startingStatusHeight;
 
 				util.orUI.position(0,pos, self._rootMenu.itemWindowId);
-				spaces util.orUI.getScreenWidth();
+				spaces util.orUI.getScreenWidth(self._rootMenu.itemWindowId); !--0 (no item window) measures the status line, as before
 				util.orUI.position(0,pos, self._rootMenu.itemWindowId);
 
 				str.capture();
@@ -256,7 +261,7 @@ Constant        orMenu_STAGE  0;
 				str.release();
 				
 				if(isSelected>0)  
-					orCenter(str,0,0,0,0,__menuFrameSelection(0),__menuFrameSelection);
+					orCenter(str,0,0,0,__menuFrameSelection); !--the frame routine is orCenter's prefixPostFixCallback
 				else
 					orCenter(str);
 				str.free();

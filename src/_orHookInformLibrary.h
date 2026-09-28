@@ -61,7 +61,7 @@ Constant        orHookInformLibrary_STAGE  0;
    #ifnot;
       ! Beguile compile: don't define Main — the stdlib Main ([Main; InformLibrary.play();])
       ! survives and becomes the BLR's `_oldmain`. Expose just the play-loop setup so bglInit can
-      ! run it first (wired via the `#startup` block in the pkgOrHooks Beguile binding). bglInit
+      ! run it first (wired via the `#startup` block in the _orHookInformLibrary Beguile binding). bglInit
       ! runs before _oldmain, so InformLibrary.play is set before _oldmain calls it.
       [ __orBeguileMainInit;
          InformLibrary.play=__orPlayHooks;

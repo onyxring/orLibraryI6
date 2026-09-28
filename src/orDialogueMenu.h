@@ -68,7 +68,8 @@ Constant        orDialogueMenu_STAGE  0;
       ,  initForDisplay[
                t talkingTo top;
             self.clear();
-            talkingTo=vagueError(ResolveActorTalkingTo());
+            talkingTo=ResolveActorTalkingTo();
+            if(talkingTo<=0) return 0; !--no one to talk to, so nothing to offer (and no error: this runs before every prompt)
             for(t=0:t<util.orArray.getLength(playerDialoguePool):t++){
                top=util.orArray.get(playerDialoguePool,t);
                if(top.isAppropriateFor(player, talkingTo)) self.add(top);

@@ -5,12 +5,12 @@
 // substitutions, etc.). extern — orPrint (I6) provides the real routine; this is type-info only.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orPrint.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orString"
 #include "orUtilNum"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 extern void orPrint(string s);
 

@@ -1,0 +1,22 @@
+//===================================================================================================
+// bindings/_orHookBanner.bgl — Beguile binding for orLibrary's _orHookBanner framework extension.
+//---------------------------------------------------------------------------------------------------
+// _orHookBanner.h is the extension the framework includes in every orLibrary build; it replaces the
+// standard library's Banner to add orLibrary's version line. Under Beguile the banner is Beguile's:
+// this binding keeps the I6 extension out and adds the orLibrary line on top of the standard-
+// library binding's banner. Every orLibrary binding includes this file, so any one of them brings it.
+//
+// No `#includeI6`: the standard-library binding keeps the I6 extension out, and this binding stands in for it.
+//===================================================================================================
+#once
+// The banner this extends must be declared first; otherwise it would replace this one instead.
+#include <bindings/i6StandardLibrary>
+
+// orLibrary's version stamps (_#version.h).
+extern string orLibVersion;
+extern string orLibDateStamp;
+
+replace void Banner(){
+    replaced();
+    print($"{bgl.printRules.italics}Using{bgl.printRules.roman} orLibrary v{orLibVersion} ({orLibDateStamp})^");
+}

@@ -10,6 +10,7 @@
 // orUtilUi.bgl. Author types here incrementally (extend `_orUI` with the `glulx` sub-facade).
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orUtilUiGlulx.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilUi"

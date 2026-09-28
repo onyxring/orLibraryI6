@@ -6,11 +6,11 @@
 // "odd" directions (up, down, in, out) via a `cant_go_odd` property, separate from `cant_go`.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orCantGoOdd.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "_orInfExt"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // Per-room message for a blocked up/down/in/out move (a string, or a routine that prints it). When
 // set and non-zero, it is used instead of the default "It is not possible to go that way."

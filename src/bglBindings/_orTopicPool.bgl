@@ -1,0 +1,29 @@
+//===================================================================================================
+// bindings/_orTopicPool.bgl — Beguile binding for orLibrary's _orTopicPool framework helper.
+//---------------------------------------------------------------------------------------------------
+// _orTopicPool.h keeps each character's pool of topics they might raise next. The player's pool is
+// what orDialogueMenu lists. When a topic is told, it leaves the pool along with its `excludedTopics`,
+// and its `relatedTopics` join the pools of the characters they suit — so a conversation can be laid
+// out as topics that lead to one another.
+//
+// TYPE-INFO ONLY — no `#includeI6`, like _orInfExt: the extensions that depend on it (orDialogueMenu,
+// orNpcSkillDialogue) already bring the I6.
+//===================================================================================================
+#once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+// dependency bindings — mirror _orTopicPool.h's orLibrary #includes so nested extern
+// declarations (types, members, properties, globals) are available transitively.
+#include "orDialogue"
+#include "orUtilArray"
+#include "_orInfExt"
+
+// An `excludedTopics` entry that withdraws every topic in the teller's pool.
+extern const int allTopics;
+
+extend extern class orTopic {
+    rawArray<object> relatedTopics;   // topics added to the pools once this one is told
+    rawArray<var>    excludedTopics;  // topics (or allTopics) withdrawn once this one is told
+}
+
+// Put a tellable topic in the player's pool (at the front), unless it is already there.
+extern void playerTakeNoticeOfTopic(object topic);

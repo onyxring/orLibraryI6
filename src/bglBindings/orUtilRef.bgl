@@ -7,12 +7,12 @@
 // object (I6 `util.orRef` → object `_orRef`).
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orUtilRef.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively. (orUtilNum reaches
 // the shared `_orUtil`/`util` type transitively, off which orRef is hung below.)
 #include "orUtilNum"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "orUtilLoopArray"   // declares _orUtil, which this binding extends
 
 // util.orRef — reference/metaclass helpers (orUtilRef.h `object _orRef`).
 extern class _orRef : object {

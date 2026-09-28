@@ -6,12 +6,11 @@
 // helper object used by object `chooseobject` hooks.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orUtilParser.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilNum"
 #include "orUtilLoopArray"   // defines _orUtil (the `util` object); orParser is hung off it below
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
 
 // ChooseObject entry-point `code` values (orUtilParser.h) — what the parser is asking for.
 extern const int PLANNING_EXCLUDE;   // 0

@@ -79,7 +79,7 @@ Constant        orCenter_STAGE  0;
 			maxwidth;
 		if(inset==0) inset=8;
 		maxWidth=util.orUI.getScreenWidth()-(inset*2);
-		return orCenter(text, maxwidth, NO_HIGHLIGHT, true, subIndent);
+		return orCenter(text, maxwidth, NO_HIGHLIGHT, true, 0, subIndent);
 	];
 
 	!	text 		- the text to be centered
@@ -100,9 +100,8 @@ Constant        orCenter_STAGE  0;
 		orTempBuffer=util.orBuf.convertToSizedBuffer(orTempBuffer,8000);
 		
 		if(prefixPostFixCallback~=0) padding = prefixPostFixCallback(0)/2;
-		padding =10;
 		font off; !fixed width
-		width=util.orUI.getScreenWidth();
+		width=util.orUI.getCurrentWidth(); !--the window this prints to, which isn't always the status line
 		width=width-2;							!subtract a little from the width (keep the left-most and right-most column blank)
 		if(maxwidth==0 || maxwidth>width) maxwidth=width;		!default maxwidth of line to the width of the display if it is not defined or too large to display
 
@@ -143,7 +142,7 @@ Constant        orCenter_STAGE  0;
 				if(leftAlign==false)
 					offset=(width/2)-((markerend-markerstart)/2);	!--GLULX note: These /2 are correct.  They do NOT represent WORDSIZE, but calculate the half way point
 				else
-					offset=(util.orUI.getScreenWidth()-maxwidth)/4; !TODO not sure about this formula, but if the /4 is set to /2 like above, it creates wordwrap issues
+					offset=(width+2-maxwidth)/4; !TODO not sure about this formula, but if the /4 is set to /2 like above, it creates wordwrap issues
 
 				if(highlight==HIGHLIGHT_ALL) style reverse;
 				font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued

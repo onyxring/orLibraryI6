@@ -6,14 +6,14 @@
 // `backdrops` property array, and the engine resolves the keyword the player referenced.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orBackdrop.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "_orInfExt"
 #include "orUtilArray"
 #include "orUtilRef"
 #include "orBetterChoice"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // Backdrop-DSL sentinels used in a room's `backdrops` property array (a heterogeneous
 // `array<var>` of dict-words + description strings + these sentinels/handlers, one entry per

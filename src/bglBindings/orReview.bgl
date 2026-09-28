@@ -6,9 +6,9 @@
 // or re-examines an object ("review <noun>") WITHOUT consuming a turn — handy after a state change.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — orReview.h has no orLibrary #includes of its own.
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // The REVIEW actions — register the names so before()/react_before() can intercept them. Review is the
 // no-noun form (reprint the room); ReviewObj re-examines a noun. (ReviewObj is also referenced from

@@ -6,13 +6,12 @@
 // a target, or wanders — driving movement each turn according to a movePattern.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orNpcSkillMove.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orNpc"
 #include "orUtilRef"
 #include "orUtilMapPathFinder"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
 
 // movePattern values — what happens at the end of movePath:
 extern const int MOVE_PATTERN_REVERSE;   // 0 — walk back along the path

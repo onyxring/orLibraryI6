@@ -6,23 +6,30 @@
 // NPC as a selectable orMenu, optionally auto-showing it before each prompt.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orDialogueMenu.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively. (orMenu declares the
 // base menu type this extends.)
 #include "_orInfExt"
 #include "orUtilArray"
+#include "_orTopicPool"
 #include "orMenu"
 #include "orPlayerCommandQueue"
 #include "orUtilBuf"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // When true (the default), the dialogue menu is shown automatically before each command prompt while
 // there are topics to raise.
 extern bool autoMenuSpeak;
 
-// Per-topic override of the text shown for it in the menu (a string, or a routine that prints).
+// Choosing a topic from the menu queues a command: it is printed at the next prompt and parsed as if
+// typed. `commandText` overrides that command (default: "tell/ask <npc> about <topic>"), so it must be
+// one the parser understands. A string, or a routine that prints it.
 extern property commandText;
+extend extern class orTopic {
+    string commandText;
+    string menuDisplay;   // the topic's text in the menu (default: its short_name)
+}
 
 // The dialogue-menu singleton (an orMenu). Rebuild it from the topics available to the player, then
 // show() it (from orMenu). Normally driven automatically, but exposed for manual control.

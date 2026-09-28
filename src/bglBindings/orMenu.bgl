@@ -5,6 +5,7 @@
 // Beguile binding alone. orMenu is a scrolling menu system for help/about screens.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orMenu.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orCenter"
@@ -12,8 +13,7 @@
 #include "orUtilUi"
 #include "orUtilRef"
 #include "_orInfExt"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // Display styles passed to show():
 extern const int orMenuFullScreen;   // 0 — take over the whole screen (leaves can render description text)
@@ -26,7 +26,12 @@ extern const int orMenuTopOnly;      // 1 — draw the menu in the status region
 // engine runs to render richer text via orInset/orCenter). The root node is `show()`n to open it.
 extern class orMenu : object {
     int displayStyle;   // set/read the active display style (orMenuFullScreen / orMenuTopOnly)
-    emitter void show()  { $self.show() }   // open this menu as the root, full-screen
+    int itemWindowId;   // [Glulx] a window to draw the items in, in place of the status bar (0: status bar)
+    string menuDisplay; // the node's text in its parent's menu (default: its short_name)
+    // Open this menu as the root (full-screen, or in the given style). Returns the node chosen, or
+    // nothing if the player left the menu.
+    emitter object show()  { ($self.show()) }
+    emitter object show(int showStyle)  { ($self.show($showStyle)) }
     // Open `rootMenu` (usually the same node) with an explicit display style.
     emitter void show(object rootMenu, int showStyle)  { $self.show($rootMenu, $showStyle) }
 }

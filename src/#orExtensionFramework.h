@@ -25,7 +25,9 @@ system_file;
 #ifndef orExtensionFramework_STAGE; !-- this is the first time we've ever included this file
     Constant orXFErrorInclude "ERROR: orExtensionFramework extensions must only be #Included once, before including '#orParser'.";
 !-- Define default extensions here ----------------------------------------------------
+    #ifndef orLib_suppress_forced_banner_hook;  !--define it (before #orParser) to leave the banner hook out; include _orHookBanner yourself to use it
     #include "_orHookBanner";
+    #endif;
 !--------------------------------------------------------------------------------------
     #ifndef VN_1633; message "WARNING: orExtensionFramework was developed against the Inform 6 compiler version 6.43. Although it might work with some previous versions, this has not been tested."; #endif;
     #ifndef LIBRARY_STAGE;          !--if parser has not yet been included

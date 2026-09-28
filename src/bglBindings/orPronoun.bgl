@@ -15,9 +15,7 @@
 // orLibrary-specific, so they live here.
 //===================================================================================================
 #once
-// Beguile main-handoff: pull pkgOrHooks so a game depending on this binding alone still wires the
-// orLibrary play-loop into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 
 // ── Subject / object / possessive / reflexive ────────────────────────────────
 emitter void i(object o)      { print (I)$o; }        // I / we / you / they / it / she / he

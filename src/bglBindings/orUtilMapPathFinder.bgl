@@ -8,12 +8,11 @@
 //     orLibUtil.orMap.pathFinder.convertPathToDirections(bgl.world.locationOf(npc));
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orUtilMapPathFinder.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively. (orUtilMap declares
 // the `_orMap` type this binding extends with the pathFinder facade.)
 #include "orUtilMap"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
 
 // util.orMap.pathFinder — the singleton orPathFinder (an orDeque; installs itself as _orMap.pathFinder
 // at startup). `path` is its computed route, a multi-value property read via util.orArray.

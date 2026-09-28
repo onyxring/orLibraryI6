@@ -7,12 +7,12 @@
 // is added by the orUtilMapPathFinder binding.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orUtilMap.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively. (orUtilRef reaches
 // the shared `_orUtil`/`util` type transitively, off which orMap is hung below.)
 #include "orUtilRef"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "orUtilLoopArray"   // declares _orUtil, which this binding extends
 
 // util.orMap — map/direction helpers (orUtilMap.h `object _orMap`).
 extern class _orMap : object {

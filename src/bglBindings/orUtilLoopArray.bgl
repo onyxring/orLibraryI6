@@ -15,11 +15,7 @@
 // I6-declared `util` object.)
 //===================================================================================================
 #once
-// dependency bindings — mirror orUtilLoopArray.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
-#include "orUtilArray"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 
 extern class _orLoopArray : object {
     emitter string getNext(var loopArray)                           { ($self.getNext($loopArray)) }
@@ -37,6 +33,11 @@ extern class _orUtil : object {
 // Beguile-facing name is `orLibUtil` so it doesn't shadow `bgl.util`; emitted/referenced as the
 // I6-side `util` object (i.e. `orLibUtil.orLoopArray.getNext(...)` → `util.orLoopArray.getNext(...)`).
 extern _orUtil util asBgl orLibUtil;
+
+// dependency bindings — mirror orUtilLoopArray.h's orLibrary #includes so nested extern
+// declarations (types, members, properties, globals) are available transitively. Included after
+// _orUtil is declared: they extend it, and reach this file again partway through the cycle.
+#include "orUtilArray"
 
 // onceOnly flag for getNext (orUtilLoopArray.h `constant repeatLast 2`).
 extern const int repeatLast;

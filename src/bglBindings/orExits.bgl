@@ -7,9 +7,8 @@
 // with its `exitsText` property (a string or routine).
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — orExits.h has no orLibrary #includes of its own.
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
 
 // The EXITS action — register the name so before()/react_before() can intercept it (##Exits).
 extern verb Exits;

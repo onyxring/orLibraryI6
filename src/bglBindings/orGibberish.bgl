@@ -6,6 +6,7 @@
 // speech, spell names, and the like.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — orGibberish.h has no orLibrary #includes of its own.
 
 // The generator object. printWord prints one random pronounceable word built from `numVowels` vowel

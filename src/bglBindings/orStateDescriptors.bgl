@@ -16,11 +16,11 @@
 // All `extern` — orStateDescriptors (I6) provides the real definitions; this is type-info only.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orStateDescriptors.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "_orInfExt"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // The engine object's type. orStateDescriptors is the sole `orRoutineList` instance, so its
 // game-facing registration surface lives here. A handler is `bool handler(object obj, bool suppress)`.

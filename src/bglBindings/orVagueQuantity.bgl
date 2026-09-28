@@ -6,12 +6,12 @@
 // couple of rocks") based on how many there are, via each object's `vagueQuantity` property.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orVagueQuantity.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "_orInfExt"
 #include "orUtilArray"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // orVagueQuantity.h `property individual vagueQuantity;` — a multi-value list describing how a pile of
 // like objects is named at each count threshold: {N1, "phrase1", N2, "phrase2", …, useLastFlag}.

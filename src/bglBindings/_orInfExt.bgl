@@ -12,6 +12,7 @@
 // binding only supplies the Beguile type so `orInfExt`-based declarations type-check.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror _orInfExt.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilArray"

@@ -6,12 +6,11 @@
 // (an object property that holds several words, e.g. an orTopic's `name` dictionary-word list).
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orUtilArray.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilNum"
 #include "orUtilLoopArray"   // defines _orUtil (the `util` object); orArray is hung off it below
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
 
 // util.orArray — read/write/measure a multi-value property (obj.prop holding N words). `prop` is a
 // property name (pass a bare member name via the (property) cast); values are `var` (a dictionary

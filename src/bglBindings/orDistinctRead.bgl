@@ -6,6 +6,7 @@
 // `READ <obj>` runs obj.readDescription (a string or routine) instead of its description.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 
 extern verb Read;                  // the distinct READ action (orDistinctRead `Extend "read" replace … -> Read`)
 extern property readDescription;   // per-object READ text (string or routine); falls back to description if == description

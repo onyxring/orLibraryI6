@@ -1,0 +1,22 @@
+//===================================================================================================
+// bindings/_orHookInformLibrary.bgl — Beguile binding for orLibrary's _orHookInformLibrary hook.
+//---------------------------------------------------------------------------------------------------
+// Under a Beguile compile, _orHookInformLibrary.h detects `beguiler` (the I6 constant the compiler
+// emits) and does NOT `replace main` or define its own [Main] — the BLR's main wrapper owns that, and
+// the stdlib Main survives as `_oldmain`. orLibrary instead exposes `__orBeguileMainInit` (its
+// play-loop setup, minus the InformLibrary.play() call), which must run from bglInit so the hooks are
+// wired before the BLR's `[main; bglInit(); _oldmain()]` calls _oldmain (= stdlib Main →
+// InformLibrary.play() → __orPlayHooks). Requires autoInitialize = true (the default).
+//
+// Every binding whose I6 brings in _orHookInformLibrary includes this file, so the setup runs exactly
+// when the hook is in the build.
+//===================================================================================================
+#once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+
+#includeI6 "_orHookInformLibrary";
+
+// Forward routine ref is fine: I6 resolves __orBeguileMainInit though it is defined later in the file.
+#startup {
+    __orBeguileMainInit();
+}

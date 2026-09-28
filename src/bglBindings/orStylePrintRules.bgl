@@ -6,9 +6,8 @@
 // styled text and then restore the roman/normal style.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — orStylePrintRules.h has no orLibrary #includes of its own.
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
 
 // Print `o` (a string or an object printed by its short_name) in the given style, then restore roman.
 extern void italics(var o);     // underline / italic

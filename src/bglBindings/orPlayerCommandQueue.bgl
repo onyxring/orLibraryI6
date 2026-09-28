@@ -6,12 +6,12 @@
 // (walkthroughs, "go to" routing, direction/look redirects) via the `playerCommands` action queue.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orPlayerCommandQueue.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "_orInfExt"
 #include "orUtilBuf"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)

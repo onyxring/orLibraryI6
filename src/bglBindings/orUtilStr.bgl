@@ -12,12 +12,12 @@
 // handle to print or pass along. The internal ambiguous-buffer lock/free plumbing stays in #i6.
 //===================================================================================================
 #once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orUtilStr.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilRef"
 #include "orString"
-// Beguile main-handoff: this binding reaches _orHookInformLibrary (orLibrary then drops its own `replace main`/[Main] under a Beguile compile), so pull pkgOrHooks for the #startup that wires __orBeguileMainInit into bglInit. #once-guarded; harmless if pulled more than once.
-#include "pkgOrHooks"
+#include "orUtilLoopArray"   // declares _orUtil, which this binding extends
 
 // util.orStr — polymorphic string helpers (orUtilStr.h `object _orStr`). `var` arguments accept a
 // literal string, a character buffer, or an orString.
