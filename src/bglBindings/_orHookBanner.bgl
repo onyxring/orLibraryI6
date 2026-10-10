@@ -6,9 +6,13 @@
 // this binding keeps the I6 extension out and adds the orLibrary line on top of the standard-
 // library binding's banner. Every orLibrary binding includes this file, so any one of them brings it.
 //
-// No `#includeI6`: the standard-library binding keeps the I6 extension out, and this binding stands in for it.
+// No `#includeI6`: this binding stands in for the I6 extension.
 //===================================================================================================
 #once
+// Keep the framework from including the I6 extension (#orExtensionFramework); hoisted ahead of #orParser.
+#emitfirst {
+    Constant orLib_suppress_forced_banner_hook;
+}
 // The banner this extends must be declared first; otherwise it would replace this one instead.
 #include <bindings/i6StandardLibrary>
 
