@@ -15,7 +15,7 @@
 // declarations (types, members, properties, globals) are available transitively. _orInfExt brings
 // the shared `_orUtil` (`util`) type in transitively, off which orNum is hung below.
 #include "_orInfExt"
-#include "orUtilLoopArray"   // declares _orUtil, which this binding extends
+#include "_orUtil"   // declares _orUtil (the `util` object), which this binding extends
 
 // util.orNum — numeric helpers (orUtilNum.h `object _orNum`). All values are `int`; the `u…`
 // variants treat their operands as UNSIGNED (0..uMaxNumber) rather than signed.
@@ -50,10 +50,9 @@ extern class _orNum : object {
     int maxNumber;
     int uMaxNumber;
 }
-// Hang orNum off the shared `util` object (_orUtil is declared in orUtilLoopArray.bgl, reached here
-// transitively via _orInfExt → orUtilArray → orUtilLoopArray).
+// Hang orNum off the shared `util` object (declared in _orUtil.bgl).
 extend class _orUtil {
-    _orNum orNum;
+    ref _orNum orNum; 
 }
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an

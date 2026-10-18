@@ -15,8 +15,8 @@
 
 // The NAME / UNNAME actions (also reached via "call"/"dub"/"refer to … as …") — register the names so
 // before()/react_before() can intercept them.
-extern verb Name;
-extern verb Unname;
+extern verb Name { }
+extern verb Unname { }
 
 // Base class for a renameable object. The player-supplied name is stored/managed by the engine (in
 // the object's custom_name buffer); `customArticle` is the article printed with it — 'a', 'an', 'the',

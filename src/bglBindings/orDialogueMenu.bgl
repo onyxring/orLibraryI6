@@ -26,7 +26,7 @@ extern bool autoMenuSpeak;
 // typed. `commandText` overrides that command (default: "tell/ask <npc> about <topic>"), so it must be
 // one the parser understands. A string, or a routine that prints it.
 extern property commandText;
-extend extern class orTopic {
+extend class orTopic {
     string commandText;
     string menuDisplay;   // the topic's text in the menu (default: its short_name)
 }

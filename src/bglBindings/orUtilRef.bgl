@@ -12,7 +12,7 @@
 // declarations (types, members, properties, globals) are available transitively. (orUtilNum reaches
 // the shared `_orUtil`/`util` type transitively, off which orRef is hung below.)
 #include "orUtilNum"
-#include "orUtilLoopArray"   // declares _orUtil, which this binding extends
+#include "_orUtil"   // declares _orUtil (the `util` object), which this binding extends
 
 // util.orRef — reference/metaclass helpers (orUtilRef.h `object _orRef`).
 extern class _orRef : object {
@@ -35,10 +35,9 @@ extern class _orRef : object {
     emitter bool resolvePrint(var obj, property prop)                    { ($self.resolvePrint($obj, $prop)) }
     emitter bool resolvePrint(var obj, property prop, var p1)            { ($self.resolvePrint($obj, $prop, $p1)) }
 }
-// Hang orRef off the shared `util` object (_orUtil declared in orUtilLoopArray.bgl, reached
-// transitively via orUtilNum → _orInfExt → orUtilArray → orUtilLoopArray).
+// Hang orRef off the shared `util` object (declared in _orUtil.bgl).
 extend class _orUtil {
-    _orRef orRef;
+    ref _orRef orRef;
 }
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an

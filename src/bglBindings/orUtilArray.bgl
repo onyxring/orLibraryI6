@@ -10,7 +10,7 @@
 // dependency bindings — mirror orUtilArray.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilNum"
-#include "orUtilLoopArray"   // defines _orUtil (the `util` object); orArray is hung off it below
+#include "_orUtil"   // declares _orUtil (the `util` object), which this binding extends
 
 // util.orArray — read/write/measure a multi-value property (obj.prop holding N words). `prop` is a
 // property name (pass a bare member name via the (property) cast); values are `var` (a dictionary
@@ -42,9 +42,9 @@ extern class _orArray : object {
     emitter int  find(array<var> arr, var val)         { ($self.find($arr, $val)) }
     emitter void remove(array<var> arr, int pos)       { $self.remove($arr, $pos) }
 }
-// Hang orArray off the shared `util` object (_orUtil is declared in orUtilLoopArray.bgl).
+// Hang orArray off the shared `util` object (_orUtil is declared in _orUtil.bgl).
 extend class _orUtil {
-    _orArray orArray;
+    ref _orArray orArray;
 }
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an

@@ -20,7 +20,7 @@
 // An `excludedTopics` entry that withdraws every topic in the teller's pool.
 extern const int allTopics;
 
-extend extern class orTopic {
+extend class orTopic {
     rawArray<object> relatedTopics;   // topics added to the pools once this one is told
     rawArray<var>    excludedTopics;  // topics (or allTopics) withdrawn once this one is told
 }

@@ -23,8 +23,8 @@
 
 extern class orTopic : object {
     string short_name;              // the topic's printed name
-    object knownBy;                 // NPC(s) who know this topic (for ASK); inherited up parent(self)
-    object context;                 // NPC(s) this topic is in-context for (for SAY/TELL); inherited
+    ref object knownBy;                 // NPC(s) who know this topic (for ASK); inherited up parent(self)
+    ref object context;                 // NPC(s) this topic is in-context for (for SAY/TELL); inherited
     string quip;                    // the response — a string, or a `bool quip() { … }` routine override
     // `name`/`adjective` are I6 ADDITIVE parser-vocabulary properties: contributions accumulate into
     // one run of dictionary words, so they must be rawArray (a tracked array's trailing length slot
@@ -40,14 +40,14 @@ extern class orTopic : object {
 // Conversation actions defined by orDialogue's grammar (Verb 'ask'/'tell'/'say'/… -> askTopic etc.).
 // Grammarless `extern verb` registers the name for `switch(action)` / `action == X` comparisons
 // (emits `##name`) so an object's before()/react_before() can intercept them.
-extern verb talk;
-extern verb askTopic;
-extern verb tellTopic;
-extern verb sayTopic;
-extern verb unrecognizedTopicWords;
-extern verb kissNoun;   // NPC-kiss action (also from the conversation grammar)
-extern verb vagueTalk;  // 'talk'/'mutter' with no recognized topic (orDialogue.h vagueTalkSub)
-extern verb reviewObj;  // orReview.h ReviewObj — re-print an object's description on state change
+extern verb talk { }
+extern verb askTopic { }
+extern verb tellTopic { }
+extern verb sayTopic { }
+extern verb unrecognizedTopicWords { }
+extern verb kissNoun { }   // NPC-kiss action (also from the conversation grammar)
+extern verb vagueTalk { }  // 'talk'/'mutter' with no recognized topic (orDialogue.h vagueTalkSub)
+extern verb reviewObj { }  // orReview.h ReviewObj — re-print an object's description on state change
 
 // True if `act` is one of the conversation actions (ask/tell/say/talk/…). (orDialogue.h)
 extern bool isDialogueAction(var act);

@@ -13,7 +13,7 @@
 #include "orUtilMap"
 
 // The LOOK-<direction> action — register the name so before()/react_before() can intercept it.
-extern verb LookDirection;
+extern verb LookDirection { }
 
 // Per-direction "what you see looking that way" text on the current room (string or routine). When
 // non-zero it is printed; otherwise the adjacent room's `remoteDescription` is consulted.

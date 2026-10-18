@@ -27,7 +27,7 @@ extern const int bdDescr;    // 1 — introduces a description string for the cu
 // list, or a `bool found_in()` method deciding scope dynamically, and `react_before()` can
 // intercept actions. Entries whose text is a routine reference or an inline handler use lambdas.
 extern class orBackdrop : object {
-    array<object> found_in;   // rooms this backdrop floats in (multi-room scope); omit for a single `parent =` room
+    rawArray<object> found_in;   // rooms this backdrop floats in (multi-room scope); omit for a single `parent =` room
 }
 
 // The engine object behind orBackdrop. `getKeyword(loc)` returns the dictionary word the player

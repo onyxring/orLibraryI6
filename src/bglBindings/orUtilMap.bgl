@@ -12,7 +12,7 @@
 // declarations (types, members, properties, globals) are available transitively. (orUtilRef reaches
 // the shared `_orUtil`/`util` type transitively, off which orMap is hung below.)
 #include "orUtilRef"
-#include "orUtilLoopArray"   // declares _orUtil, which this binding extends
+#include "_orUtil"   // declares _orUtil (the `util` object), which this binding extends
 
 // util.orMap — map/direction helpers (orUtilMap.h `object _orMap`).
 extern class _orMap : object {
@@ -27,10 +27,9 @@ extern class _orMap : object {
     // The root location (topmost parent) of an object or character.
     emitter object   locationOf(object a)                            { ($self.locationOf($a)) }
 }
-// Hang orMap off the shared `util` object (_orUtil declared in orUtilLoopArray.bgl, reached
-// transitively via orUtilRef → orUtilNum → _orInfExt → orUtilArray → orUtilLoopArray).
+// Hang orMap off the shared `util` object (declared in _orUtil.bgl).
 extend class _orUtil {
-    _orMap orMap;
+    ref _orMap orMap;
 }
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an

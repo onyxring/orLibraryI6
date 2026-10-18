@@ -1,0 +1,13 @@
+//===================================================================================================
+// bindings/_orUtil.bgl — Beguile binding for orLibrary's shared `util` object (_orUtil.h).
+//---------------------------------------------------------------------------------------------------
+// Each utility binding hangs its helper off `util` with `extend class _orUtil { … }`. Beguile code
+// names the object `orLibUtil` so it doesn't shadow `bgl.util`; it is emitted as the I6 `util`.
+//
+// TYPE-INFO ONLY (no #includeI6): _orUtil.h is staged in by each utility extension's own includes.
+//===================================================================================================
+#once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+
+extern class _orUtil : object { }
+extern _orUtil util asBgl orLibUtil;

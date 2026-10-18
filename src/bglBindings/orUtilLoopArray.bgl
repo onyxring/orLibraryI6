@@ -16,6 +16,7 @@
 //===================================================================================================
 #once
 #include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include "_orUtil"
 
 extern class _orLoopArray : object {
     emitter string getNext(var loopArray)                           { ($self.getNext($loopArray)) }
@@ -27,12 +28,9 @@ extern class _orLoopArray : object {
     emitter bool   isComplete(object obj, property prop)             { ($self.isComplete($obj, $prop)) }
 }
 
-extern class _orUtil : object {
-    _orLoopArray orLoopArray;
+extend class _orUtil {
+     ref _orLoopArray orLoopArray;
 }
-// Beguile-facing name is `orLibUtil` so it doesn't shadow `bgl.util`; emitted/referenced as the
-// I6-side `util` object (i.e. `orLibUtil.orLoopArray.getNext(...)` → `util.orLoopArray.getNext(...)`).
-extern _orUtil util asBgl orLibUtil;
 
 // dependency bindings — mirror orUtilLoopArray.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively. Included after

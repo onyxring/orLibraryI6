@@ -14,7 +14,7 @@
 #include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // The GO-TO action — register the name so before()/react_before() can intercept it (##gotoLocation).
-extern verb gotoLocation;
+extern verb gotoLocation { }
 
 // When true (the default), only rooms the player has already visited (beenSeen) are in scope for
 // "go to"; set false to allow travelling to any room on the map.

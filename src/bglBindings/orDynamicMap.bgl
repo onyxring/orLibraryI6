@@ -27,7 +27,7 @@ extern class orDynamicMapRoom : object {
 // The dynamic-map controller. Set `found_in` to the ordered list of rooms to unfold (the first must
 // be reachable at the start); the object itself is placed in that starting room.
 extern class orDynamicMap : object {
-    array<object> found_in;      // the rooms to chain, in unfold order
+    rawArray<object> found_in;      // the rooms to chain, in unfold order
     string        cant_go;       // default blocked-direction message propagated to chained rooms
     bool          complete;      // set true once every found_in room has been linked (read-only)
     int           handleAllocatedReturn;   // one of ALLOW_UNIDIRECTIONAL_PATH / OVERWRITE_RETURN_PATH / DISALLOW

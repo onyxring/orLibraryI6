@@ -32,7 +32,7 @@ extern class _orPathFinder : object {
 }
 // Hang pathFinder off the shared map object (_orMap declared in orUtilMap.bgl).
 extend class _orMap {
-    _orPathFinder pathFinder;
+    ref _orPathFinder pathFinder;
 }
 
 // Search workspace depth (max path length considered); `default PATHDEPTH 32` in I6 — override in an

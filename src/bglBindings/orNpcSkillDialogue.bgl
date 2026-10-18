@@ -20,7 +20,7 @@ extern bool orDialogueAutoAnswer;
 // The dialogue skill. Give the NPC a dialoguePool of orTopics; learnTopic/takeNoticeOfTopic manage it.
 extern class orNPCSkillDialogue : object {
     array<object> dialoguePool;    // the orTopics this NPC can bring up
-    object        pendingQuestion; // a topic awaiting the player's answer (when auto-answer is off)
+    ref object        pendingQuestion; // a topic awaiting the player's answer (when auto-answer is off)
     // Register the NPC as knowing `topic` (adds the NPC to the topic's knownBy).
     emitter void learnTopic(object topic)        { $self.learnTopic($topic) }
     // Push `topic` to the front of the NPC's dialogue pool so it's raised next.

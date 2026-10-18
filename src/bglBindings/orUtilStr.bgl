@@ -17,7 +17,7 @@
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilRef"
 #include "orString"
-#include "orUtilLoopArray"   // declares _orUtil, which this binding extends
+#include "_orUtil"   // declares _orUtil (the `util` object), which this binding extends
 
 // util.orStr — polymorphic string helpers (orUtilStr.h `object _orStr`). `var` arguments accept a
 // literal string, a character buffer, or an orString.
@@ -38,10 +38,9 @@ extern class _orStr : object {
     emitter void print(var buf)                                 { $self.print($buf) }
     emitter void print(var buf, property prop)                 { $self.print($buf, $prop) }
 }
-// Hang orStr off the shared `util` object (_orUtil reached transitively via orUtilRef → orUtilNum →
-// _orInfExt → orUtilArray → orUtilLoopArray).
+// Hang orStr off the shared `util` object (declared in _orUtil.bgl).
 extend class _orUtil {
-    _orStr orStr;
+    ref _orStr orStr;
 }
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an

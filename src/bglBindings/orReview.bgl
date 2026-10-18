@@ -14,8 +14,8 @@
 // no-noun form (reprint the room); ReviewObj re-examines a noun. (ReviewObj is also referenced from
 // the orDialogue binding, which re-prints an object's description on a state change; a duplicate
 // `extern verb` is harmless.)
-extern verb Review;
-extern verb ReviewObj;
+extern verb Review { }
+extern verb ReviewObj { }
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl

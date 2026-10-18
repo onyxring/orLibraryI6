@@ -17,7 +17,7 @@
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilNum"
 #include "orUtilChar"
-#include "orUtilLoopArray"   // declares _orUtil, which this binding extends
+#include "_orUtil"   // declares _orUtil (the `util` object), which this binding extends
 
 // util.orBuf — buffer/string helpers (orUtilBuf.h `object _orBuf`). `buf` is a mutable target buffer;
 // the "source" arguments accept a literal string, a buffer, or an orString.
@@ -68,10 +68,9 @@ extern class _orBuf : object {
     emitter void trimRight(var buf) { $self.trimRight($buf) }
     emitter void trim(var buf)      { $self.trim($buf) }
 }
-// Hang orBuf off the shared `util` object (_orUtil reached transitively via orUtilNum → _orInfExt →
-// orUtilArray → orUtilLoopArray).
+// Hang orBuf off the shared `util` object (declared in _orUtil.bgl).
 extend class _orUtil {
-    _orBuf orBuf;
+    ref _orBuf orBuf;
 }
 
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
