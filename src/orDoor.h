@@ -49,7 +49,6 @@ Constant        orDoor_STAGE 0;
 system_file;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-#include "orString";
 #include "_orInfExt";
 !--------------------------------------------------------------------------------------
 #endif;
@@ -92,17 +91,14 @@ endif; !--AFTER PARSER
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
-	orInfExt with	ext_initialise[room dir dest str;
-		str=util.orStr.new(); !--create a string object, to suppress output
+	orInfExt with	ext_initialise[room dir dest;
 		objectloop(room provides	n_to or s_to or e_to or w_to
 						or	nw_to or sw_to or ne_to or se_to
 						or	u_to or d_to){
 			objectloop(dir in compass){
 				if(room provides (dir.door_dir)){
 					if(metaclass(room.(dir.door_dir))~=object) continue; !--don't do anything with a string...
-					str.capture(); !--suppress any messages that the direction routines may spit out...
-					dest=valueorrun(room,(dir.door_dir));
-					str.release();
+					dest=room.(dir.door_dir); !--an object (anything else was skipped above), so nothing prints
 
 					if(dest ofclass orDoor && WordInProperty(room,dest,found_in)==false){
 						if((dest.&found_in-->0)==0)
@@ -120,7 +116,6 @@ endif; !--AFTER PARSER
 				}
 			}
 		}
-		str.free(); !when we are done with our string, let's free up its buffer for other purposes
 #ifdef DEBUG;
 		objectloop(dest ofclass orDoor && dest provides found_in && dest.#found_in>1){
 			if(dest.&found_in-->0==0 || dest.&found_in-->1==0) {

@@ -9,9 +9,8 @@
 // dependency bindings — mirror orMenu.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "orCenter"
-#include "orUtilStr"
-#include "orUtilUi"
 #include "orUtilRef"
+#include "orUtilUi"
 #include "_orInfExt"
 #include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 

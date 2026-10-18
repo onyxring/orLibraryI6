@@ -26,7 +26,7 @@ Constant        orParentChildRelationship_STAGE  0;
 #include "_orHookVerbs";
 #include "_orHookParser";
 #include "_orInfExt";
-#include "orString";
+#include "orUtilBuf";
 !--------------------------------------------------------------------------------------
 #endif;
 #ifnot;
@@ -39,6 +39,9 @@ Constant        orParentChildRelationship_STAGE  0;
 !======================================================================================
 ! BEFORE PARSER
 #iftrue (LIBRARY_STAGE == BEFORE_PARSER);
+	default orPcrBufferSize 64;            !--longest preposition, and the "which" text, in characters
+	array _orPcrWord buffer orPcrBufferSize;   !--the word the player typed
+	array _orPcrText buffer orPcrBufferSize;   !--a preposition, or the "which" text, as printed
 	Global matched_pcr 0;
 	attribute contained;
 	attribute supported;
@@ -266,7 +269,11 @@ Constant        orParentChildRelationship_STAGE  0;
 			]
 		,	annotateContentsWith[p;
 				if(self.numVisibleChildrenWith(p)==0) rfalse;
-				print (string)self.preposition," ",(nop)util.orStr.trim(WHICH__TX).print();
+				util.orBuf.capture(_orPcrText, orPcrBufferSize);
+				print (string)WHICH__TX;
+				util.orBuf.release();
+				print (string)self.preposition," ";
+				util.orBuf.print(util.orBuf.trim(_orPcrText));
 
 				self.listChildrenWithPcr(p);
 				rtrue;
@@ -683,26 +690,25 @@ Constant        orParentChildRelationship_STAGE  0;
 	];
 	
 	[pcrPreposition 
-			str pcr;
+			pcr;
 		
 		matched_pcr=0;
-		str=util.orStr.new();
 		
-		!--convert the string of text the user typed into a string, so we can do stuff with it...
-		str.capture();
-		util.orBuf.print(WordAddress(wn)-WORDSIZE,WordAddress(wn+1)-WordAddress(wn)); !--take the word the user typed and remember it
-		str.release();
-		
-		!--...like make sure it doesn't have any additional spaces.
-		str.set(str.trim());
+		!--take the word the player typed, without any extra spaces...
+		util.orBuf.capture(_orPcrWord, orPcrBufferSize);
+		util.orBuf.print(WordAddress(wn)-WORDSIZE,WordAddress(wn+1)-WordAddress(wn));
+		util.orBuf.release();
+		util.orBuf.trim(_orPcrWord);
 		
 		objectloop(pcr ofclass orParentChildRelationship){
-			if(util.orStr.areEqual(pcr.preposition,str, true)) { !--... and match it against literal strings in the pcr;
+			util.orBuf.capture(_orPcrText, orPcrBufferSize);
+			print (string)pcr.preposition;
+			util.orBuf.release();
+			if(util.orBuf.equals(_orPcrWord, _orPcrText, true)) { !--... and match it against the pcr's preposition
 				matched_pcr=pcr;
 				break;
 			}
 		}
-		str.free();
 
 		if(matched_pcr==0) return GPR_FAIL;
 		NextWord(); !--we matched, so advance wn to the next word

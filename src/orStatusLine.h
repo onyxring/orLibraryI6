@@ -27,7 +27,7 @@
 Constant        orStatusLine_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-#include "orString";
+#include "orUtilBuf";
 #include "orCenter";
 #include "orUtilRef";
 #include "orUtilUi";
@@ -89,24 +89,19 @@ Constant        orStatusLine_STAGE  0;
 #ifndef orStatusMiddle;
 	[ orStatusMiddle; ]; !the standard library doesn't do centered text by default, so we mimic this by also doing nothing.
 #endif;
-	[ DrawStatusLine
-			strL  strM  strR ;
+	default orStatusLineBufferSize 160;   !--longest right-aligned status text, in characters
+	array _orStatusRight buffer orStatusLineBufferSize;
+	[ DrawStatusLine;
 	if(gg_statuswin_cursize==0) gg_statuswin_cursize=1;
     #Ifdef TARGET_GLULX;
         if (gg_statuswin == 0) rfalse;
     #Endif;
 		if (location == nothing || parent(player) == nothing) rfalse;
 
-
-		!create our working strings
-		strL=util.orStr.new();
-		strM=util.orStr.new();
-		strR=util.orStr.new();
-
-		!capture our aligned text in each
-		strL.captureOutput(orStatusLeft);
-		strM.captureOutput(orStatusMiddle);
-		strR.captureOutput(orStatusRight);
+		!capture the right-aligned text: its length places it
+		util.orBuf.capture(_orStatusRight, orStatusLineBufferSize);
+		orStatusRight();
+		util.orBuf.release();
 
 		!Now lets draw the status line...
 		util.orUI.activateStatus();
@@ -121,26 +116,22 @@ Constant        orStatusLine_STAGE  0;
 		!util.orUI.eraseStatus();
 
 		!drawing right to left, first we align the Right string, based on the width of the screen, minus the length of our string
-		util.orUI.position(util.orUi.getStatusWidth()-strR.getLength(),0);
-		strR.print();
+		util.orUI.position(util.orUi.getStatusWidth()-util.orBuf.getLength(_orStatusRight),0);
+		util.orBuf.print(_orStatusRight);
 
 		!reposition our cursor to the start and Center the "Middle" aligned text (this does NOT overwrite the right most text)
 		util.orUI.position(0,0);
-		orCenter(strM, 0, HIGHLIGHT_ALL);
+		orCenter(orStatusMiddle, 0, HIGHLIGHT_ALL);
 		style reverse; !the above line turns off reverse, so lets turn it back on
 		font off;
 
-		!reposition our cursor to the start and Center the "Left" aligned text (this does NOT overwrite the middle or right text)
+		!reposition our cursor to the start and print the "Left" aligned text (this does NOT overwrite the middle or right text)
 		util.orUI.position(0,0);
-		strL.print();
+		orStatusLeft();
 
 		!leave the status bar, going back to the main window
 		util.orUI.activateMain();
 
-		!clean up our allocated memory
-		strL.free();
-		strM.free();
-		strR.free();
 		style roman;
 		font on;
 		return;

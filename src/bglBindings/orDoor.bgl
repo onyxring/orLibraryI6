@@ -8,7 +8,6 @@
 #include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — mirror orDoor.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
-#include "orString"
 #include "_orInfExt"
 #include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
@@ -22,8 +21,8 @@
 // direction exit can point straight at the door. Add `name`/`short_name`/`description` and attribute
 // overrides (`{!open, locked}`, etc.) as needed; `before()`/`after()` intercept actions like any object.
 extern class orDoor : object {
-    array<object>         found_in;     // the two rooms the door connects (drives door_to/door_dir)
-    array<dictionaryWord> name;         // parser vocabulary
+    rawArray<object>         found_in;     // the two rooms the door connects (drives door_to/door_dir)
+    rawArray<dictionaryWord> name;
     string                short_name;   // printed name
     string                description;  // examine text (string, or override with a `bool description()` routine)
 }

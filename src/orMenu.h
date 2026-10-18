@@ -62,7 +62,6 @@ Constant        orMenu_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
 #include "orCenter";
-#include "orUtilStr";
 #include "orUtilUi";
 #include "orUtilRef";
 #include "_orInfExt";
@@ -94,6 +93,19 @@ Constant        orMenu_STAGE  0;
 	#include "orUtilUi"; !make sure this previously declared dependency is included *before* this code
 
 	[__menuFrameSelection val; if(val==1) print "> "; if(val==2) print " <"; return 4;]; !--0: the combined width of "> " and " <"
+	Global _orMenuDrawObj; !--the item _drawItem is drawing, for __menuItemText
+	[__menuItemText obj; !--orCenter's text: prints the item being drawn
+		obj=_orMenuDrawObj;
+		if(util.orRef.isString(obj))
+			print (string)obj;
+		else {
+			if(obj provides menuDisplay)
+				printOrRun(obj, menuDisplay, true);
+			else
+				print (name)obj;
+		}
+		rfalse;
+	];
 	object orMenuController
 		private _startingStatusHeight 0 !remember the status height used by the game
 		,	_rootMenu 0 !--The menu that show() was actually called against
@@ -226,10 +238,8 @@ Constant        orMenu_STAGE  0;
 
 			]
 			!---actually write out the name of the given object
-		,	_drawItem[obj isSelected pos
-					str;
+		,	_drawItem[obj isSelected pos;
 				if(obj==0) return;
-				str=util.orStr.new();
 
 				if(self._rootMenu.itemWindowId~=0){
 					util.orUI.activateWindow(self._rootMenu.itemWindowId); !--hideCursor() leaves output on the status line
@@ -244,27 +254,11 @@ Constant        orMenu_STAGE  0;
 				spaces util.orUI.getScreenWidth(self._rootMenu.itemWindowId); !--0 (no item window) measures the status line, as before
 				util.orUI.position(0,pos, self._rootMenu.itemWindowId);
 
-				str.capture();
-				!if(isSelected>0) printorrun(self,prefixHighlight,true); else printorRun(self,prefixNormal,true);
-
-				if(util.orRef.isString(obj))
-					print (string)obj;
-				else {
-
-					if(obj provides menuDisplay)
-						printOrRun(obj, menuDisplay, true);
-					else
-						print (name)obj;
-				}
-				!if(isSelected>0) printorRun(self,postfixHighlight,true); else printorrun(self,postfixNorm,true);
-
-				str.release();
-				
+				_orMenuDrawObj=obj;
 				if(isSelected>0)  
-					orCenter(str,0,0,0,__menuFrameSelection); !--the frame routine is orCenter's prefixPostFixCallback
+					orCenter(__menuItemText,0,0,0,__menuFrameSelection); !--the frame routine is orCenter's prefixPostFixCallback
 				else
-					orCenter(str);
-				str.free();
+					orCenter(__menuItemText);
 			]
 			!---handle user input
 		,	_handleInput[ch currentMenu i count t;

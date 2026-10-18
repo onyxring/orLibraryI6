@@ -16,7 +16,7 @@
 #include "orParentChildRelationship";
 #include "orPlayerCommandQueue";
 #include "orPrefixSuffix";
-#include "orPrint";
+#ifndef noOrPrint; #include "orPrint"; #endif; !--a game that declares noOrPrint leaves orPrint out
 #include "orReview";
 #include "orStateDescriptors";
 #include "orStatusLine";

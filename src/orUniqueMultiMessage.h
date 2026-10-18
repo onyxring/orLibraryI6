@@ -38,7 +38,7 @@
 Constant        orUniqueMultiMessage_STAGE  0;
 !--------------------------------------------------------------------------------------
 ! INCLUDE DEPENDENCIES
-#include "orString";
+#include "orUtilBuf";
 #include "_orHookInformLibrary";
 !--------------------------------------------------------------------------------------
 #endif;
@@ -53,17 +53,20 @@ Constant        orUniqueMultiMessage_STAGE  0;
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
 
+	default orUniqueMultiMessageBufferSize 500;        !--longest response consolidated, in characters
+	array _orUmmCurrent buffer orUniqueMultiMessageBufferSize;   !--what the current object's action printed
+	array _orUmmPrevious buffer orUniqueMultiMessageBufferSize;  !--what the previous object's action printed
 	object orUniqueMultiMessage LibraryExtensions
-		with currentResult
-		,	 previousResult
+		with currentResult _orUmmCurrent
+		,	 previousResult _orUmmPrevious
 		,	ext_playLoopPerformMultiObjectAction[
 			i j k l count retval previous_obj severe_error;
 
 			j = multiple_object-->0;
 			if (j == 0) return 0; !--default
 
-			self.currentResult=util.orStr.new();
-			self.previousResult=util.orStr.new();
+			util.orBuf.setLength(self.currentResult, 0);
+			util.orBuf.setLength(self.previousResult, 0);
 
 			previous_obj=0;
 			multiflag = true;
@@ -87,9 +90,9 @@ Constant        orUniqueMultiMessage_STAGE  0;
 				!print (name) l, (string) COLON__TX, " ";
 				if (inp1 == 0) {
 					inp1 = l;
-					self.currentResult.capture();
+					util.orBuf.capture(self.currentResult, orUniqueMultiMessageBufferSize);
 					retval=InformLibrary.actor_act(actor, action, l, second);
-					self.currentResult.release();
+					util.orBuf.release();
 					switch (retval) {
 						ACTOR_ACT_ABORT_NOTUNDERSTOOD:
 							return self.release(1); ! begin action;
@@ -100,16 +103,16 @@ Constant        orUniqueMultiMessage_STAGE  0;
 				}
 				else {
 					inp2 = l;
-					self.currentResult.capture();
+					util.orBuf.capture(self.currentResult, orUniqueMultiMessageBufferSize);
 					retval=InformLibrary.actor_act(actor, action, noun, l);
-					self.currentResult.release();
+					util.orBuf.release();
 					if(retval==ACTOR_ACT_ABORT_NOTUNDERSTOOD) return self.release(1); ! begin action;
 					inp2 = 0;
 				}
 
-				if(identical(previous_obj,l)==false || self.currentResult.equals(self.previousResult)==false){
+				if(identical(previous_obj,l)==false || util.orBuf.equals(self.currentResult, self.previousResult)==false){
 					if(previous_obj~=0) PrintMultiAction(previous_obj,self.previousResult,count);
-					self.previousResult.set(self.currentResult);
+					util.orBuf.setFromBuffer(self.previousResult, self.currentResult);
 					previous_obj=l;
 					count=1;
 				}else{
@@ -123,8 +126,6 @@ Constant        orUniqueMultiMessage_STAGE  0;
 			return self.release(2); ; !continue...
 		],
 		release[rv;
-			self.currentResult.free();
-			self.previousResult.free();
 			return rv;
 		]
 	;
@@ -135,7 +136,7 @@ Constant        orUniqueMultiMessage_STAGE  0;
 		else
 			print (name)obj;
 		print " : ";
-		str.print();
+		util.orBuf.print(str);
 	];
 #endif; !--After VERBLIB
 !======================================================================================
