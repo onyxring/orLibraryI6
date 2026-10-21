@@ -62,6 +62,7 @@ Constant        orCenter_STAGE  0;
 !======================================================================================
 ! AFTER VERBLIB
 #iftrue (LIBRARY_STAGE == AFTER_VERBLIB);
+#ifndef center_bgl; !--a Beguile game with the center extension (via bglBindings/orCenter) doesn't need it
 	system_file;
 
 	Array cursPos buffer 10;
@@ -174,6 +175,7 @@ Constant        orCenter_STAGE  0;
 		if(highlight>NO_HIGHLIGHT) style roman; !-- if we highlighted the text, turn it off
 		font on; !restore variable-width font
 	];
+#endif; !--center_bgl
 #endif; !--After VERBLIB
 !======================================================================================
 #endif; !--_STAGE  < LIBRARY_STAGE

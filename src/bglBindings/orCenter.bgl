@@ -1,30 +1,31 @@
 //===================================================================================================
 // bindings/orCenter.bgl — Beguile binding for orLibrary's orCenter extension.
 //---------------------------------------------------------------------------------------------------
-// orCenter prints a string centered on the display, honouring the current width. The I6 routine takes
-// several optional trailing args (maxwidth, highlight, leftAlign, prefixPostFixCallback, subIndent);
-// this binds the common single-string form. Missing I6 args default to 0, matching a bare call.
+// Beguile's center extension replaces orCenter.h: orCenter and orInset forward to bgl.ui.center() and
+// bgl.ui.inset(), so orLibrary's I6 callers (orMenu, orStatusLine, orTransition) print through it, and orCenter.h,
+// seeing center_bgl, leaves out its routines and its 8000-byte buffer.
 //
 //     orCenter("*** You have won! ***^(Good job!)");
-//
-// All `extern` — orCenter (I6) provides the real routine; this is type-info only.
 //===================================================================================================
 #once
 #include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orCenter.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
-#include "orUtilUi"
-#include "orUtilBuf"
+#include <extensions/general/center>
 
-// Print `text` centered. `maxwidth` caps the line width (0 → use the screen width). I6 accepts
-// further trailing args (highlight, leftAlign, callback, subIndent); they default to 0.
-extern void orCenter(string text, int maxwidth = 0);
+// center_bgl leaves orCenter.h's routines out; the HIGHLIGHT_* constants are for its I6 callers.
+#i6 {
+    Constant center_bgl;            #ifdef center_bgl; #endif;
+    Constant NO_HIGHLIGHT 0;        #ifdef NO_HIGHLIGHT; #endif;
+    Constant HIGHLIGHT_TEXT_ONLY 1; #ifdef HIGHLIGHT_TEXT_ONLY; #endif;
+    Constant HIGHLIGHT_ALL 2;       #ifdef HIGHLIGHT_ALL; #endif;
+}
 
-// Print `text` as an indented block. `inset` is the left/right margin (0 → I6 default of 8);
-// `subIndent` adds extra left padding. Defined in orCenter.h alongside orCenter.
-extern void orInset(string text, int inset = 0, int subIndent = 0);
+/// Print `text` centered; see bgl.ui.center().
+void orCenter(var text, int maxwidth = 0, int highlightMode = 0, bool leftAlign = false,
+              func<int, int> prefixPostFixCallback = null, int subIndent = 0) {
+    bgl.ui.center(text, maxwidth, (centerHighlight)highlightMode, leftAlign, prefixPostFixCallback, subIndent);
+}
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#includeI6 "orCenter";
+/// Print `text` between margins of `margin` columns; see bgl.ui.inset().
+void orInset(var text, int margin = 0, int subIndent = 0) {
+    bgl.ui.inset(text, margin, subIndent);
+}
