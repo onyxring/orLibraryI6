@@ -1,8 +1,8 @@
 //===================================================================================================
 // bindings/orCenter.bgl — Beguile binding for orLibrary's orCenter extension.
 //---------------------------------------------------------------------------------------------------
-// Beguile's center extension replaces orCenter.h: orCenter and orInset forward to bgl.ui.center() and
-// bgl.ui.inset(), so orLibrary's I6 callers (orMenu, orStatusLine, orTransition) print through it, and orCenter.h,
+// Beguile's center extension replaces orCenter.h: orCenter and orInset forward to bgl.output.center() and
+// bgl.output.inset(), so orLibrary's I6 callers (orMenu, orStatusLine, orTransition) print through it, and orCenter.h,
 // seeing center_bgl, leaves out its routines and its 8000-byte buffer.
 //
 //     orCenter("*** You have won! ***^(Good job!)");
@@ -19,13 +19,13 @@
     Constant HIGHLIGHT_ALL 2;       #ifdef HIGHLIGHT_ALL; #endif;
 }
 
-/// Print `text` centered; see bgl.ui.center().
+/// Print `text` centered; see bgl.output.center().
 void orCenter(var text, int maxwidth = 0, int highlightMode = 0, bool leftAlign = false,
               func<int, int> prefixPostFixCallback = null, int subIndent = 0) {
-    bgl.ui.center(text, maxwidth, (centerHighlight)highlightMode, leftAlign, prefixPostFixCallback, subIndent);
+    bgl.output.center(text, maxwidth, (centerHighlight)highlightMode, leftAlign, prefixPostFixCallback, subIndent);
 }
 
-/// Print `text` between margins of `margin` columns; see bgl.ui.inset().
+/// Print `text` between margins of `margin` columns; see bgl.output.inset().
 void orInset(var text, int margin = 0, int subIndent = 0) {
-    bgl.ui.inset(text, margin, subIndent);
+    bgl.output.inset(text, margin, subIndent);
 }
