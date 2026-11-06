@@ -1,22 +1,33 @@
 //===================================================================================================
 // bindings/_orHookInformLibrary.bgl — Beguile binding for orLibrary's _orHookInformLibrary hook.
 //---------------------------------------------------------------------------------------------------
-// Under a Beguile compile, _orHookInformLibrary.h detects `beguiler` (the I6 constant the compiler
-// emits) and does NOT `replace main` or define its own [Main] — the BLR's main wrapper owns that, and
-// the stdlib Main survives as `_oldmain`. orLibrary instead exposes `__orBeguileMainInit` (its
-// play-loop setup, minus the InformLibrary.play() call), which must run from bglInit so the hooks are
-// wired before the BLR's `[main; bglInit(); _oldmain()]` calls _oldmain (= stdlib Main →
-// InformLibrary.play() → __orPlayHooks). Requires autoInitialize = true (the default).
+// orLibrary's play-loop hooks are Beguile's <extensions/stdlib/hooks/informLibrary>, which merges them
+// into the library rather than replacing InformLibrary; orLibrary's I6 copy is kept out. Every binding
+// whose I6 brings in _orHookInformLibrary includes this file.
 //
-// Every binding whose I6 brings in _orHookInformLibrary includes this file, so the setup runs exactly
-// when the hook is in the build.
+// It also runs orLibrary's play-loop setup from bglInit: under Beguile the BLR owns `main`, and the
+// stdlib Main survives as `_oldmain`, which bglInit runs after the setup.
 //===================================================================================================
 #once
 #include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include <extensions/stdlib/hooks/informLibrary>
 
-#includeI6 "_orHookInformLibrary";
+// Ahead of every orLibrary include: a hook whose _STAGE is above the last library stage skips itself.
+#emitfirst {
+    Constant orHookInformLibrary_STAGE 99; #ifdef orHookInformLibrary_STAGE; #endif;
+}
 
-// Forward routine ref is fine: I6 resolves __orBeguileMainInit though it is defined later in the file.
+#includeI6 "_orInfExt";                  // orInfExt, which the hooks' users are
+
+// After the library, where orInfExt and LibraryExtensions are defined.
+#emitlast {
+    [ __orBeguileMainInit;
+        #ifdef allocateInformExtensions;
+            allocateInformExtensions();
+        #endif;
+    ];
+}
+
 #startup {
     __orBeguileMainInit();
 }

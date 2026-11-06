@@ -13,7 +13,6 @@
 // declares FORCE_INCLUDE / FORCE_EXCLUDE / DEFER_CHOICE.)
 #include "orUtilParser"
 #include "_orInfExt"
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // Per-object disambiguation hook: `int chooseobject(int code)` returning FORCE_INCLUDE / FORCE_EXCLUDE
 // to force the object in/out of the match, DEFER_CHOICE to fall through to the extension's own logic,
@@ -26,4 +25,7 @@ extern const int FORCE_PARSER;   // -1
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+// the hooks this extension's I6 answers
+#include "_orHookInformLibrary"
+#include "_orHookStandardLibrary"
 #includeI6 "orBetterChoice";

@@ -8,7 +8,14 @@
 ! License: Public Domain
 !--------------------------------------------------------------------------------------
 ! Sample use:  TODO Need to comment how this works.  Its nuanced and needs to be commented.
-! TODO: Also need to document the use of the "can't do that" property as an acutal before rule to redirect actions.
+!FOR REVIEW [B-02] document the entry format, including bdDescr's one-text form (an entry with only a reply reads its last word as the description).
+!    ! An entry is: dictionary words, a description, a "can't do that" reply, bdEnd.  Either may be bdDefault.
+!    !	With one text for both, write: words, "text", bdDescr, bdEnd.
+! The "can't do that" entry may be a routine instead of a string.  It then acts as that
+!	word's before rule, run for every action but the description verbs, and can check
+!	action:  return false for the default message; true when it printed a message (the
+!	line feed is added after it); or bdRedirected when it ran another action, which ended
+!	its own line, e.g. [; if(action==##Follow) { <Go w_obj>; return bdRedirected; } print "..."; rtrue;]
 !
 ! Complementary extensions
 ! *	_orString: If included, the "description" text and the "can't do that" text may
@@ -49,6 +56,7 @@ Constant        orBackdrop_STAGE  0;
 Constant bdDefault	-1;
 Constant bdEnd 		0;
 Constant bdDescr	1;
+Constant bdRedirected 2; !--returned by a "can't do that" routine which ran another action
 #endif; !BEFORE_PARSER
 !======================================================================================
 ! AFTER VERBLIB
@@ -117,8 +125,9 @@ Constant bdDescr	1;
 						print (string) e;
 		#endif;
 					Routine:
-						if(e()==false) L__M(##Miscellany, 39);
-						!orSuppressNewlineAfterDescription=true; !action was redirected, so suppress the automatic line feed (NOTE: comes up when not redirected, just using a routine to print. Perhaps detect this in a different way?)
+						i=e();
+						if(i==false) L__M(##Miscellany, 39);
+						return i==bdRedirected; !--a redirected action ended its own line, so skip the line feed
 
 				}
 			]
@@ -164,6 +173,35 @@ Constant bdDescr	1;
 		! 		The last two digits represent the position with the property.
 		!		The hundredths digit represents the property it was found in:
 		!			 1 - backdrops, 2 - backdrops1, 3 - backdrops2, 4 - backdrops3
+		!FOR REVIEW [B-01] a packed string can equal a dictionary word's address, so `x dirt` could match the canopy's reply string (it depends on the build). Reply slots no longer match as words. Replaces the next 28 lines:
+		!    private	_findMatches[obj wrd resultList;
+		!    		util.orArray.clear(self,resultList);
+		!    		if(wrd==0) return 0; !no word to match, so return 0
+		!    
+		!    		self._scanProps(obj, wrd, resultList, 2);
+		!    		if(util.orArray.getLength(self,resultList)==0) self._scanProps(obj, wrd, resultList, 1); !--no better match, so the slot which may be a word in a one-reply entry can have it
+		!    		return util.orArray.getLength(self,resultList);
+		!    	]
+		!    ,	_scanProps[obj wrd resultList minKind;
+		!    		if(obj provides backdrops) self._scanProp(obj, backdrops, wrd, resultList, minKind);
+		!    		if(obj provides backdrops1) self._scanProp(obj, backdrops1, wrd, resultList, minKind);
+		!    		if(obj provides backdrops2) self._scanProp(obj, backdrops2, wrd, resultList, minKind);
+		!    		if(obj provides backdrops3) self._scanProp(obj, backdrops3, wrd, resultList, minKind);
+		!    	]
+		!    ,	_scanProp[obj prop wrd resultList minKind
+		!    				pos size;
+		!    		size=_bdSize(obj, prop);
+		!    		for(pos=0:pos<size:pos++){
+		!    			if(_bdGet(obj,prop,pos)==wrd && self._slotKind(obj, prop, pos, size)>=minKind) util.orArray.append(self, resultList, self._posToEntryId(obj, prop, pos));
+		!    		}
+		!    	]
+		!    !--a packed string can hold the same value as a dictionary word, so the reply slots can't be told apart by value; only by position.
+		!    !	0 - the slot before bdEnd, always a reply;  1 - two before bdEnd, a reply unless the entry has only one;  2 - a word
+		!    ,	_slotKind[obj prop pos size;
+		!    		if(pos+1<size && _bdGet(obj,prop,pos+1)==bdEnd) return 0;
+		!    		if(pos+2<size && _bdGet(obj,prop,pos+2)==bdEnd) return 1;
+		!    		return 2;
+		!    	]
 		private	_findMatches[obj wrd resultList
 						pos;
 

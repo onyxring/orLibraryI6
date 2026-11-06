@@ -1,0 +1,556 @@
+--- a/parser.h
++++ b/parser.h
+@@ -2633,8 +2633,36 @@
+ ];
+ 
+ [ ParseToken__ given_ttype given_tdata token_n
+-             token l o i j k and_parity single_object desc_wn many_flag
+-             token_allows_multiple prev_indef_wanted;
++			 token l and_parity single_object desc_wn
++			 token_allows_multiple;
++	pt_return=false;
++	token=PT_Analyse__(given_ttype, given_tdata, token_n, token);
++		if(pt_return==true) return token;
++	token_allows_multiple=PT_BeginList__(token);
++	pt_many_flag = false; and_parity = true; dont_infer = false;
++.ObjectList;
++	desc_wn=pt_descriptors__();
++		if(pt_return==true) return desc_wn;
++.TryAgain;
++	l=PT_LoopStart__(token_allows_multiple);
++		if(pt_return==true) return l;
++	single_object=PT_ObjectName__(token,and_parity, desc_wn, token_allows_multiple);
++		if(single_object == REPARSE_CODE) return single_object;
++		if(pt_return==-1) jump FailToken;
++	and_parity=PT_Connectives__(and_parity,token_allows_multiple,single_object);
++		if(pt_return==-1) jump FailToken;
++		if(pt_return==-2) jump ObjectList;
++	single_object=PT_PassToken__(single_object,token);
++		if(pt_return==-1) jump FailToken;
++	return single_object;
++.FailToken;
++	l=PT_FailToken__(desc_wn);
++		if(pt_return==-3) jump TryAgain;
++	return GPR_FAIL;
++];
++[PT_Analyse__ given_ttype given_tdata token_n
++             token l o;
++	pt_return=true;
+ 
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     !
+@@ -2644,20 +2672,20 @@
+ 
+     token_filter = 0;
+ 
+-    switch (given_ttype) {
++   switch(given_ttype) {
+       ELEMENTARY_TT:
+-        switch (given_tdata) {
+-          SPECIAL_TOKEN:
+-            l = TryNumber(wn);
+-            special_word = NextWord();
+-            #Ifdef DEBUG;
+-            if (l ~= -1000)
+-                if (parser_trace >= 3) print "  [Read special as the number ", l, "]^";
+-            #Endif; ! DEBUG
+-            if (l == -1000) {
+-                #Ifdef DEBUG;
+-                if (parser_trace >= 3) print "  [Read special word at word number ", wn, "]^";
+-                #Endif; ! DEBUG
++           switch(given_tdata)
++           {   SPECIAL_TOKEN:
++                   l=TryNumber(wn);
++                   special_word=NextWord();
++                   #ifdef DEBUG;
++                   if (l~=-1000)
++                       if (parser_trace>=3) print "  [Read special as the number ", l, "]^";
++                   #endif;
++                   if (l==-1000){
++						#ifdef DEBUG;
++                    	if (parser_trace>=3) print "  [Read special word at word number ", wn, "]^";
++                    	#endif;
+                 l = special_word;
+             }
+             parsed_number = l; return GPR_NUMBER;
+@@ -2664,10 +2692,10 @@
+ 
+           NUMBER_TOKEN:
+             l=TryNumber(wn++);
+-            if (l == -1000) { etype = NUMBER_PE; return GPR_FAIL; }
+-            #Ifdef DEBUG;
++                   if (l == -1000) { etype=NUMBER_PE; return GPR_FAIL; }
++                   #ifdef DEBUG;
+             if (parser_trace>=3) print "  [Read number as ", l, "]^";
+-            #Endif; ! DEBUG
++                   #endif;
+             parsed_number = l; return GPR_NUMBER;
+ 
+           CREATURE_TOKEN:
+@@ -2679,17 +2707,17 @@
+             if ((line_ttype-->(token_n+1) ~= PREPOSITION_TT) &&
+                (line_token-->(token_n+1) ~= ENDIT_TOKEN))
+                 RunTimeError(13);
+-            do o = NextWordStopped();
++                   do o=NextWordStopped();
+             until (o == -1 || PrepositionChain(o, token_n+1) ~= -1);
+             wn--;
+             consult_words = wn-consult_from;
+-            if (consult_words == 0) return GPR_FAIL;
+-            if (action_to_be == ##Ask or ##Answer or ##Tell) {
+-                o = wn; wn = consult_from; parsed_number = NextWord();
+-                #Ifdef EnglishNaturalLanguage;
+-                if (parsed_number == 'the' && consult_words > 1) parsed_number=NextWord();
+-                #Endif; ! EnglishNaturalLanguage
+-                wn = o; return 1;
++                   if (consult_words==0) return GPR_FAIL;
++                   if (action_to_be==##Ask or ##Answer or ##Tell) {
++						o=wn; wn=consult_from; parsed_number=NextWord();
++                    	#IFDEF EnglishNaturalLanguage;
++                       	if (parsed_number=='the' && consult_words>1) parsed_number=NextWord();
++                       	#ENDIF;
++                       	wn=o; return 1;
+             }
+             if (o==-1 && (line_ttype-->(token_n+1) == PREPOSITION_TT))
+                 return GPR_FAIL;    ! don't infer if required preposition is absent
+@@ -2697,7 +2725,7 @@
+         }
+ 
+       PREPOSITION_TT:
+-        #Iffalse (Grammar__Version == 1);
++           #Iffalse Grammar__Version==1;
+         ! Is it an unnecessary alternative preposition, when a previous choice
+         ! has already been matched?
+         if ((token->0) & $10) return GPR_PREPOSITION;
+@@ -2715,7 +2743,7 @@
+ 
+             ! If we are not inferring, then the line is wrong...
+ 
+-            if (inferfrom == 0) return -1;
++            if (inferfrom==0) return -1;
+ 
+             ! If not, then the line is right but we mark in the preposition...
+ 
+@@ -2732,7 +2760,7 @@
+         ! but if it's right, the token is passed (jump to finish this token).
+ 
+         if (o == given_tdata) return GPR_PREPOSITION;
+-        #Iffalse (Grammar__Version == 1);
++           #Iffalse Grammar__Version==1;
+         if (PrepositionChain(o, token_n) ~= -1) return GPR_PREPOSITION;
+         #Endif; ! Grammar__Version
+         return -1;
+@@ -2739,9 +2767,9 @@
+ 
+       GPR_TT:
+         l = given_tdata();
+-        #Ifdef DEBUG;
+-        if (parser_trace >= 3) print "  [Outside parsing routine returned ", l, "]^";
+-        #Endif; ! DEBUG
++           #ifdef DEBUG;
++           if (parser_trace>=3) print "  [Outside parsing routine returned ", l, "]^";
++           #endif;
+         return l;
+ 
+       SCOPE_TT:
+@@ -2748,10 +2776,10 @@
+         scope_token = given_tdata;
+         scope_stage = 1;
+         l = scope_token();
+-        #Ifdef DEBUG;
+-        if (parser_trace >= 3) print "  [Scope routine returned multiple-flag of ", l, "]^";
+-        #Endif; ! DEBUG
+-        if (l == 1) given_tdata = MULTI_TOKEN; else given_tdata = NOUN_TOKEN;
++           #ifdef DEBUG;
++           if (parser_trace>=3) print "  [Scope routine returned multiple-flag of ", l, "]^";
++           #endif;
++           if (l==1) given_tdata = MULTI_TOKEN; else given_tdata = NOUN_TOKEN;
+ 
+       ATTR_FILTER_TT:
+         token_filter = 1 + given_tdata;
+@@ -2763,7 +2791,20 @@
+ 
+     } ! end of switch(given_ttype)
+ 
+-    token = given_tdata;
++	pt_return=false;
++	return given_tdata;
++];
++[PT_BeginList__ token;
++	if(token == MULTI_TOKEN or MULTIHELD_TOKEN or MULTIEXCEPT_TOKEN or MULTIINSIDE_TOKEN)
++		rtrue;
++	rfalse;
++];
++[PT_Descriptors__ o l;
++	pt_return=true;
++	#ifdef DEBUG;
++	if (parser_trace>=3) print "  [Object list from word ", wn, "]^";
++	#endif;
++    o=NextWord(); wn--;
+ 
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     !
+@@ -2781,11 +2822,7 @@
+     ! token_filter is 0 (default), an attribute + 1 for an attribute filter
+     ! or a routine address for a routine filter.
+ 
+-    token_allows_multiple = false;
+-    if (token == MULTI_TOKEN or MULTIHELD_TOKEN or MULTIEXCEPT_TOKEN or MULTIINSIDE_TOKEN)
+-        token_allows_multiple = true;
+ 
+-    many_flag = false; and_parity = true; dont_infer = false;
+ 
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     !
+@@ -2795,11 +2832,7 @@
+ 
+     ! We expect to find a list of objects next in what the player's typed.
+ 
+-  .ObjectList;
+ 
+-    #Ifdef DEBUG;
+-    if (parser_trace >= 3) print "  [Object list from word ", wn, "]^";
+-    #Endif; ! DEBUG
+ 
+     ! Take an advance look at the next word: if it's "it" or "them", and these
+     ! are unset, set the appropriate error number and give up on the line
+@@ -2806,36 +2839,46 @@
+     ! (if not, these are still parsed in the usual way - it is not assumed
+     ! that they still refer to something in scope)
+ 
+-    o = NextWord(); wn--;
+ 
+     pronoun_word = NULL; pronoun_obj = NULL;
+     l = PronounValue(o);
+-    if (l ~= 0) {
++    if (l ~= 0){
+         pronoun_word = o; pronoun_obj = l;
+-        if (l == NULL) {
++        if (l == NULL){
++            for (l=1:l<=LanguageDescriptors-->0:l=l+4)
+             ! Don't assume this is a use of an unset pronoun until the
+             ! descriptors have been checked, because it might be an
+             ! article (or some such) instead
+ 
+-            for (l=1 : l<=LanguageDescriptors-->0 : l=l+4)
+                 if (o == LanguageDescriptors-->l) jump AssumeDescriptor;
+-            pronoun__word = pronoun_word; pronoun__obj = pronoun_obj;
+-            etype = VAGUE_PE; return GPR_FAIL;
++            pronoun__word=pronoun_word; pronoun__obj=pronoun_obj;
++            etype=VAGUE_PE; return GPR_FAIL;
+         }
+     }
+ 
+   .AssumeDescriptor;
+ 
+-    if (o == ME1__WD or ME2__WD or ME3__WD) { pronoun_word = o; pronoun_obj = player; }
++	PT_HandleMeWords__(o);
+ 
+     allow_plurals = true;
+-    desc_wn = wn;
++	pt_return=false;
++	return wn;
++];
++[PT_HandleMeWords__ o;
++	if (o==ME1__WD or ME2__WD or ME3__WD){ pronoun_word = o; pronoun_obj = player; }
++];
++[PT_LoopStart__ token_allows_multiple l;
++	pt_return=true;
+ 
+-  .TryAgain;
+ 
+     ! First, we parse any descriptive words (like "the", "five" or "every"):
+     l = Descriptors(token_allows_multiple);
+-    if (l ~= 0) { etype = l; return GPR_FAIL; }
++    if (l~=0) { etype=l; return GPR_FAIL; }
++	pt_return=false;
++];
++[PT_ObjectName__
++	token and_parity desc_wn token_allows_multiple l i j k o single_object;
++	pt_return=true;
+ 
+   .TryAgain2;
+ 
+@@ -2856,13 +2899,14 @@
+     ! In either case below we use NounDomain, giving it the token number as
+     ! context, and two places to look: among the actor's possessions, and in the
+     ! present location.  (Note that the order depends on which is likeliest.)
+-    if (token ~= HELD_TOKEN) {
+-        i = multiple_object-->0;
+-        #Ifdef DEBUG;
+-        if (parser_trace >= 3) print "  [Calling NounDomain on location and actor]^";
+-        #Endif; ! DEBUG
+-        l = NounDomain(actors_location, actor, token);
+-        if (l == REPARSE_CODE) return l;                  ! Reparse after Q&A
++		if (token ~= HELD_TOKEN){
++		   i=multiple_object-->0;
++			#ifdef DEBUG;
++			if (parser_trace>=3)
++				print "  [Calling NounDomain on location and actor]^";
++			#endif;
++			l=NounDomain(actors_location, actor, token);
++			if (l==REPARSE_CODE) return l;
+ 
+         if (indef_wanted == 100 && l == 0 && number_matched == 0)
+             l = 1;  ! ReviseMulti if TAKE ALL FROM empty container
+@@ -2871,7 +2915,7 @@
+             if (best_etype==MULTI_PE) best_etype=STUCK_PE;
+             multiflag = true;
+         }
+-        if (l == 0) {
++			if (l==0) {
+             if (indef_possambig) {
+                 saved_ml = match_length;
+                 ResetDescriptors();
+@@ -2880,35 +2924,36 @@
+             }
+             if ((etype ~=TOOFEW_PE && etype ~= VAGUE_PE) && (multiflag || etype ~= MULTI_PE))
+                 etype = CantSee();
+-            jump FailToken;
++				pt_return=-1; return;
+         } ! Choose best error
+ 
+-        #Ifdef DEBUG;
+-        if (parser_trace >= 3) {
+-            if (l > 1) print "  [NounDomain returned ", (the) l, "]^";
++			#ifdef DEBUG;
++			if (parser_trace>=3)
++			{   if (l>1) print "  [ND returned ", (the) l, "]^";
+             else {
+-                print "  [NounDomain appended to the multiple object list:^";
+-                k = multiple_object-->0;
+-                for (j=i+1 : j<=k : j++)
++					print "  [ND appended to the multiple object list:^";
++					k=multiple_object-->0;
++					for (j=i+1:j<=k:j++)
+                     print "  Entry ", j, ": ", (The) multiple_object-->j,
+                           " (", multiple_object-->j, ")^";
+                 print "  List now has size ", k, "]^";
+             }
+         }
+-        #Endif; ! DEBUG
++			#endif;
++			if (l==1) {
++				if (~~pt_many_flag)
++					pt_many_flag = true;
+ 
+-        if (l == 1) {
+-            if (~~many_flag) many_flag = true;
+             else {                                ! Merge with earlier ones
+-                k = multiple_object-->0;            ! (with either parity)
++					k=multiple_object-->0;
+                 multiple_object-->0 = i;
+-                for (j=i+1 : j<=k : j++) {
++					for (j=i+1:j<=k:j++) {
+                     if (and_parity) MultiAdd(multiple_object-->j);
+                     else            MultiSub(multiple_object-->j);
+                 }
+-                #Ifdef DEBUG;
+-                if (parser_trace >= 3) print "  [Merging ", k-i, " new objects to the ", i, " old ones]^";
+-                #Endif; ! DEBUG
++					#ifdef DEBUG;
++					if (parser_trace>=3) print "  [Merging ", k-i, " new objects to the ", i, " old ones]^";
++					#endif;
+             }
+         }
+         else {
+@@ -2926,32 +2971,36 @@
+                 jump TryAgain2;
+             }
+ 
+-            if (token == CREATURE_TOKEN && CreatureTest(l) == 0) {
+-                etype = ANIMA_PE;
+-                jump FailToken;
++				if (token==CREATURE_TOKEN && CreatureTest(l)==0){
++					etype=ANIMA_PE;
++					pt_return=-1;
++					return;
+             } !  Animation is required
+ 
+-            if (~~many_flag) single_object = l;
+-            else {
++				if (~~pt_many_flag)
++					single_object = l;
++				else{
+                 if (and_parity) MultiAdd(l); else MultiSub(l);
+-                #Ifdef DEBUG;
+-                if (parser_trace >= 3) print "  [Combining ", (the) l, " with list]^";
+-                #Endif; ! DEBUG
++					#ifdef DEBUG;
++					if (parser_trace>=3) print "  [Combining ", (the) l, " with list]^";
++					#endif;
+             }
+         }
+ 
+-    } else {
++		}
++		else{
++			l=NounDomain(actor,actors_location,token);
++			if (l==REPARSE_CODE) return GPR_REPARSE;
++			if (l==0){
+     ! Case 2: token is "held" (which fortunately can't take multiple objects)
+     ! and may generate an implicit take
+-        l = NounDomain(actor,actors_location,token);       ! Same as above...
+-        if (l == REPARSE_CODE) return GPR_REPARSE;
+-        if (l == 0) {
+             if (indef_possambig) {
+                 ResetDescriptors();
+                 wn = desc_wn;
+                 jump TryAgain2;
+             }
+-            etype = CantSee(); jump FailToken;            ! Choose best error
++				etype=CantSee();
++				pt_return=-1; return;
+         }
+ 
+         ! ...until it produces something not held by the actor.  Then an implicit
+@@ -2968,18 +3017,18 @@
+         ! take then read, but take has no effect, so read becomes take then read...
+         ! Anyway for now all we do is record the number of the object to take.
+ 
+-        o = parent(l);
++			o=parent(l);
++			if (o~=actor) {
++				if (notheld_mode==1) {
++					saved_oops=oops_from;
++					etype=NOTHELD_PE;
++					pt_return=-1; return;
+ 
+-        if (o ~= actor) {
+-            if (notheld_mode == 1) {
+-                saved_oops = oops_from;
+-                etype = NOTHELD_PE;
+-                jump FailToken;
+             }
+             not_holding = l;
+-            #Ifdef DEBUG;
+-            if (parser_trace >= 3) print "  [Allowing object ", (the) l, " for now]^";
+-            #Endif; ! DEBUG
++				#ifdef DEBUG;
++				if (parser_trace>=3) print "  [Allowing object ", (the) l, " for now]^";
++				#endif;
+         }
+         single_object = l;
+     } ! end of if (token ~= HELD_TOKEN) else
+@@ -2998,40 +3047,45 @@
+     ! "and", "but" and so on?  If so, create a multiple-object list if we
+     ! haven't already (and are allowed to).
+ 
++		return single_object;
++];
++[PT_Connectives__ and_parity token_allows_multiple single_object o k;
++	pt_return=false;
+   .NextInList;
+ 
+-    o = NextWord();
++    o=NextWord();
++    if (o==AND1__WD or AND2__WD or AND3__WD or BUT1__WD or BUT2__WD or BUT3__WD or comma_word) {
++	    #ifdef DEBUG;
++        if (parser_trace>=3) print "  [Read connective '", (address) o, "']^";
++        #endif;
++		k=NextWord();
+ 
+-    if (o == AND1__WD or AND2__WD or AND3__WD or BUT1__WD or BUT2__WD or BUT3__WD or comma_word) {
+ 
+-        #Ifdef DEBUG;
+-        if (parser_trace >= 3) print "  [Read connective '", (address) o, "']^";
+-        #Endif; ! DEBUG
+ 
+-        k = NextWord();
+         if (k ~= AND1__WD) wn--;  ! allow Serial commas in input
+         if (k > 0 && (k->#dict_par1) & (DICT_NOUN+DICT_VERB) == DICT_VERB) {
+             wn--; ! player meant 'THEN'
+-            jump PassToken;
++			return and_parity;
+         }
+         if (~~token_allows_multiple) {
+-            if (multiflag) jump PassToken; ! give UPTO_PE error
++			if (multiflag) return and_parity;
+             etype=MULTI_PE;
+-            jump FailToken;
++			pt_return=-1; return and_parity;
+         }
+ 
+-        if (o == BUT1__WD or BUT2__WD or BUT3__WD) and_parity = 1-and_parity;
++        if (o==BUT1__WD or BUT2__WD or BUT3__WD) and_parity = 1-and_parity;
++        if (~~pt_many_flag) {
+ 
+-        if (~~many_flag) {
+             multiple_object-->0 = 1;
+             multiple_object-->1 = single_object;
+-            many_flag = true;
+-            #Ifdef DEBUG;
+-            if (parser_trace >= 3) print "  [Making new list from ", (the) single_object, "]^";
+-            #Endif; ! DEBUG
++            pt_many_flag = true;
++            #ifdef DEBUG;
++            if (parser_trace>=3) print "  [Making new list from ", (the) single_object, "]^";
++            #endif;
+         }
+         dont_infer = true; inferfrom=0;           ! Don't print (inferences)
+-        jump ObjectList;                          ! And back around
++		pt_return=-2;
++		return and_parity;
+     }
+ 
+     wn--;   ! Word marker back to first not-understood word
+@@ -3044,30 +3098,36 @@
+ 
+     ! Happy or unhappy endings:
+ 
+-  .PassToken;
++	return and_parity;
++];
++[PT_PassToken__ single_object token;
++	pt_return=false;
++    if (pt_many_flag) {
+ 
+-    if (many_flag) {
+         single_object = GPR_MULTIPLE;
+         multi_context = token;
+     }
+     else {
+-        if (indef_mode == 1 && indef_type & PLURAL_BIT ~= 0) {
+-            if (indef_wanted < 100 && indef_wanted > 1) {
+-                multi_had = 1; multi_wanted = indef_wanted;
+-                etype = TOOFEW_PE;
+-                jump FailToken;
++		if (indef_mode==1 && indef_type & PLURAL_BIT ~= 0) {
++			if (indef_wanted<100 && indef_wanted>1) {
++				multi_had=1; multi_wanted=indef_wanted;
++                etype=TOOFEW_PE;
++				pt_return=-1;
++				return single_object;
+             }
+         }
+     }
+     return single_object;
+ 
+-  .FailToken;
++];
++[PT_FailToken__ desc_wn
++	prev_indef_wanted;
++    if (allow_plurals && indef_guess_p==1){
+ 
+     ! If we were only guessing about it being a plural, try again but only
+     ! allowing singulars (so that words like "six" are not swallowed up as
+     ! Descriptors)
+ 
+-    if (allow_plurals && indef_guess_p == 1) {
+         #Ifdef DEBUG;
+         if (parser_trace >= 4) print "   [Retrying singulars after failure ", etype, "]^";
+         #Endif;
+@@ -3074,12 +3134,11 @@
+         prev_indef_wanted = indef_wanted;
+         allow_plurals = false;
+         wn = desc_wn;
+-        jump TryAgain;
++		return -3;
+     }
+ 
+     if ((indef_wanted > 0 || prev_indef_wanted > 0) && (~~multiflag)) etype = MULTI_PE;
+ 
+-    return GPR_FAIL;
+ 
+ ]; ! end of ParseToken__
+ 

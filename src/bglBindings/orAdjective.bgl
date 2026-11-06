@@ -30,4 +30,7 @@ extern object orAdjective {
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+// the hooks this extension's I6 answers
+#include "_orHookInformLibrary"
+#include "_orHookStandardLibrary"
 #includeI6 "orAdjective";

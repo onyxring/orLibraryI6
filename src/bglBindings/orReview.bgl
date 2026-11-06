@@ -8,7 +8,6 @@
 #once
 #include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
 // dependency bindings — orReview.h has no orLibrary #includes of its own.
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // The REVIEW actions — register the names so before()/react_before() can intercept them. Review is the
 // no-noun form (reprint the room); ReviewObj re-examines a noun. (ReviewObj is also referenced from
@@ -20,4 +19,8 @@ extern verb ReviewObj { }
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+// the hooks this extension's I6 answers
+#include "_orHookInformLibrary"
+#include "_orHookStandardLibrary"
+#include "_orHookVerbs"
 #includeI6 "orReview";

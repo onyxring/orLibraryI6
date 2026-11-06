@@ -1,0 +1,15 @@
+//===================================================================================================
+// bindings/_orHookWriteList.bgl — Beguile binding for orLibrary's _orHookWriteList hook.
+//---------------------------------------------------------------------------------------------------
+// orLibrary's the list-count hooks are Beguile's <extensions/stdlib/hooks/writeList>, which merges them into the
+// library rather than replacing its routines; orLibrary's I6 copy is kept out. Every binding whose I6
+// brings in _orHookWriteList includes this file.
+//===================================================================================================
+#once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include <extensions/stdlib/hooks/writeList>
+
+// Ahead of every orLibrary include: a hook whose _STAGE is above the last library stage skips itself.
+#emitfirst {
+    Constant orHookWriteList_STAGE 99; #ifdef orHookWriteList_STAGE; #endif;
+}

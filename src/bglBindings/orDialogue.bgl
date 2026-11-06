@@ -19,7 +19,6 @@
 #include "orStylePrintRules"
 #include "orUtilArray"
 #include "_orInfExt"
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 extern class orTopic : object {
     string short_name;              // the topic's printed name
@@ -57,4 +56,7 @@ extern bool isDialogueAction(var act);
 // separate `#include "orDialogue";` in an #i6 island. The beguiler resolves it (via includePaths)
 // to an absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+// the hooks this extension's I6 answers
+#include "_orHookInformLibrary"
+#include "_orHookParser"
 #includeI6 "orDialogue";

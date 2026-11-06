@@ -11,7 +11,6 @@
 // declarations (types, members, properties, globals) are available transitively.
 #include "orUtilMapPathFinder"
 #include "orPlayerCommandQueue"
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // The GO-TO action — register the name so before()/react_before() can intercept it (##gotoLocation).
 extern verb gotoLocation { }
@@ -23,4 +22,8 @@ extern bool orPathFinderAvoidUnvisitedLocations;
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+// the hooks this extension's I6 answers
+#include "_orHookKeyboard"
+#include "_orHookStandardLibrary"
+#include "_orHookVerbs"
 #includeI6 "orGotoLocation";

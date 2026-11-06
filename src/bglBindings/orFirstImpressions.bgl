@@ -10,7 +10,6 @@
 // dependency bindings — mirror orFirstImpressions.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "_orInfExt"
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // Shown only on the first examine, before (preImpression) and after (postImpression) the object's own
 // description. Each is a string, or a routine that prints. Both honour orPrint markup if it is loaded.
@@ -20,4 +19,8 @@ extern property postImpression;
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+// the hooks this extension's I6 answers
+#include "_orHookInformLibrary"
+#include "_orHookStandardLibrary"
+#include "_orHookVerbs"
 #includeI6 "orFirstImpressions";

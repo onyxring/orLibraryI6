@@ -11,7 +11,6 @@
 // dependency bindings — mirror orNameable.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "_orInfExt"
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // The NAME / UNNAME actions (also reached via "call"/"dub"/"refer to … as …") — register the names so
 // before()/react_before() can intercept them.
@@ -28,4 +27,5 @@ extern class orNameable : object {
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+#include "_orHookInformLibrary"   // hooks this extension's I6 answers
 #includeI6 "orNameable";

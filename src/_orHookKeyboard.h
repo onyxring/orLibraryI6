@@ -102,6 +102,10 @@ property individual ext_keyboardHandleOops;
 				L__M(##Miscellany,10);
 				jump FreshInput;
 			}
+			!FOR REVIEW: the library jumps to .DoOops here; without these two lines OOPS never runs
+			!(the Beguile binding's orHooks.patch restores them):
+			!w = a_table-->1;
+			!if (w == OOPS1__WD or OOPS2__WD or OOPS3__WD) jump DoOops;
 		}
 
 		retval = LibraryExtensions.RunWhile(ext_keyboardHandleComment, false, a_buffer, a_table); !--return true to interrupt standard library's default behavior

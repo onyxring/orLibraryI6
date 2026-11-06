@@ -10,7 +10,6 @@
 // dependency bindings — mirror orCantGoOdd.h's orLibrary #includes so nested extern
 // declarations (types, members, properties, globals) are available transitively.
 #include "_orInfExt"
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // Per-room message for a blocked up/down/in/out move (a string, or a routine that prints it). When
 // set and non-zero, it is used instead of the default "It is not possible to go that way."
@@ -19,4 +18,7 @@ extern property cant_go_odd;
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+// the hooks this extension's I6 answers
+#include "_orHookInformLibrary"
+#include "_orHookVerbs"
 #includeI6 "orCantGoOdd";

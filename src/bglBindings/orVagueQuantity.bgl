@@ -11,7 +11,6 @@
 // declarations (types, members, properties, globals) are available transitively.
 #include "_orInfExt"
 #include "orUtilArray"
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // orVagueQuantity.h `property individual vagueQuantity;` — a multi-value list describing how a pile of
 // like objects is named at each count threshold: {N1, "phrase1", N2, "phrase2", …, useLastFlag}.
@@ -20,4 +19,8 @@ extern property vagueQuantity;
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+// the hooks this extension's I6 answers
+#include "_orHookInformLibrary"
+#include "_orHookWriteAfterEntry"
+#include "_orHookWriteList"
 #includeI6 "orVagueQuantity";

@@ -13,14 +13,16 @@
 #include "orUtilArray"
 #include "orUtilRef"
 #include "orBetterChoice"
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // Backdrop-DSL sentinels used in a room's `backdrops` property array (a heterogeneous
 // `array<var>` of dict-words + description strings + these sentinels/handlers, one entry per
 // backdrop, terminated by bdEnd): bdEnd (0) ends an entry; bdDefault (-1) marks the catch-all.
-extern const int bdEnd;      // 0 — ends a backdrop's entry in the `backdrops` array
-extern const int bdDefault;  // -1 — marks the catch-all backdrop entry
-extern const int bdDescr;    // 1 — introduces a description string for the current entry
+extern const int bdEnd;        // 0 — ends a backdrop's entry in the `backdrops` array
+extern const int bdDefault;    // -1 — marks the catch-all backdrop entry
+//FOR REVIEW [B-03] bdDescr doesn't introduce a description: it follows the entry's one text, used for both. Replaces the next 1 line:
+//    extern const int bdDescr;      // 1 — after an entry's only text: use it as both the description and the reply
+extern const int bdDescr;      // 1 — introduces a description string for the current entry
+extern const int bdRedirected; // 2 — returned by an entry's routine that ran another action
 
 // The backdrop object type (I6 `class orBackdrop has scenery`). A game declares a standalone
 // backdrop as `orBackdrop name { array<var> backdrops = {…}; }`; `found_in` may be an object
@@ -42,4 +44,5 @@ extern object orBackdropEngine {
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+#include "_orHookStandardLibrary"   // hooks this extension's I6 answers
 #includeI6 "orBackdrop";

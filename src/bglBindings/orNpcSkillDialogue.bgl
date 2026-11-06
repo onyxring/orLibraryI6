@@ -11,7 +11,6 @@
 // declarations (types, members, properties, globals) are available transitively.
 #include "orNpc"
 #include "orDialogue"
-#include "_orHookInformLibrary"   // this extension's I6 brings in _orHookInformLibrary: its play-loop setup must run
 
 // When false (the default), topics an NPC raises are queued as a pending question (shown via the
 // dialogue menu) rather than answered immediately.
@@ -30,4 +29,5 @@ extern class orNPCSkillDialogue : object {
 // Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
 // absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
 // binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+#include "_orHookParser"   // hooks this extension's I6 answers
 #includeI6 "orNpcSkillDialogue";

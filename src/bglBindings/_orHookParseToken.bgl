@@ -1,0 +1,18 @@
+//===================================================================================================
+// bindings/_orHookParseToken.bgl — Beguile binding for orLibrary's _orHookParseToken hook.
+//---------------------------------------------------------------------------------------------------
+// The hook splits the library's ParseToken__ into pieces (PT_Analyse__, PT_ObjectName__, …) that an
+// extension can replace. orHookParseToken.patch makes that change in the library itself, and the hook's
+// I6 file is kept out.
+//===================================================================================================
+#once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+
+#mergeI6 "orHookParseToken"
+
+#emitfirst {
+    Constant orHookParseToken_STAGE 99;      #ifdef orHookParseToken_STAGE; #endif;
+    Global pt_return;       ! 0: continue on, true: return the return value, -1: jump to FailToken,
+                            ! -2: jump to ObjectList, -3: jump to TryAgain
+    Global pt_many_flag;
+}

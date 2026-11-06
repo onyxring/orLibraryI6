@@ -1,0 +1,15 @@
+//===================================================================================================
+// bindings/_orHookParser.bgl — Beguile binding for orLibrary's _orHookParser hook.
+//---------------------------------------------------------------------------------------------------
+// orLibrary's the parser hooks are Beguile's <extensions/stdlib/hooks/parser>, which merges them into the
+// library rather than replacing its routines; orLibrary's I6 copy is kept out. Every binding whose I6
+// brings in _orHookParser includes this file.
+//===================================================================================================
+#once
+#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include <extensions/stdlib/hooks/parser>
+
+// Ahead of every orLibrary include: a hook whose _STAGE is above the last library stage skips itself.
+#emitfirst {
+    Constant orHookParser_STAGE 99; #ifdef orHookParser_STAGE; #endif;
+}

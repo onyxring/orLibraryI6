@@ -102,6 +102,9 @@ global pt_many_flag;
 !  **** (D) ****
 	single_object=PT_ObjectName__(token,and_parity, desc_wn, token_allows_multiple);
 		!if(pt_return==true) return single_object;
+		!FOR REVIEW: PT_ObjectName__ returns REPARSE_CODE when a question is answered with a new command;
+		!dropping it here makes that command the answer. The Beguile binding's orHookParseToken.patch adds:
+		!if(single_object == REPARSE_CODE) return single_object;
 		if(pt_return==-1) jump FailToken;
 !  **** (E) ****
 	and_parity=PT_Connectives__(and_parity,token_allows_multiple,single_object);

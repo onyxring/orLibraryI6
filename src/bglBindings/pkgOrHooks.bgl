@@ -1,18 +1,16 @@
 //===================================================================================================
-// bindings/pkgOrHooks.bgl — Beguile binding for orLibrary's pkgOrHooks extension.
+// bindings/pkgOrHooks.bgl — Beguile binding for orLibrary's hooks.
 //---------------------------------------------------------------------------------------------------
-// MAIN-HANDOFF WIRING (no author-facing types). This binding is the load-bearing bridge that lets the
-// orLibrary play-loop coexist with Beguile's own `main`: it pulls the pkgOrHooks I6 and adds the
-// `#startup` block below that runs `__orBeguileMainInit()` from bglInit. Nearly every other orLibrary
-// binding `#include`s this so a game can depend on any single binding and still boot correctly. See
-// the note above the #startup block for the full mechanism.
+// Every orLibrary hook, as pkgOrHooks.h has them: each one's binding merges its hooks into the library
+// (<extensions/stdlib/hooks/…>) rather than replacing the library's routines. ParseToken__'s split is
+// not a hook; orDistinctMeSelf, which needs it, includes _orHookParseToken itself.
 //===================================================================================================
 #once
 #include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#includeI6 "pkgOrHooks";
-
-#include "_orHookInformLibrary"   // the play-loop setup that must run from bglInit
+#include "_orHookInformLibrary"
+#include "_orHookKeyboard"
+#include "_orHookParser"
+#include "_orHookStandardLibrary"
+#include "_orHookVerbs"
+#include "_orHookWriteAfterEntry"
+#include "_orHookWriteList"
