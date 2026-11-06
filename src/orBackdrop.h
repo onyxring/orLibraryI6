@@ -61,14 +61,18 @@ Constant bdDescr	1;
 	property individual backdrops3;
 
 	!--an ever present object, which interjects itself if the player is referencing dictionary words listed in the location's backdrops property
+	!--Beguile moves a Z-machine member array over 31 elements out of its property, leaving a pointer to a table
+	!  in that one word.  Follow it, so a Beguile room can write one `backdrops` of any size.
+	[ _bdGet obj prop n; if(obj.#prop==WORDSIZE) return util.orArray.get(obj.prop, n); return util.orArray.get(obj,prop,n); ];
+	[ _bdSize obj prop; if(obj.#prop==WORDSIZE) return util.orArray.getSize(obj.prop,0); return util.orArray.getSize(obj,prop); ];
 	object orBackdropEngine has scenery proper talkable !--talkable, because people may try to talk to backdrops
 		private _getEndPos[obj
 					i;
 				i=self._usedPos;
 				if(i<0) return bdDefault;
 
-				for(:i<util.orArray.getSize(obj,self._usedProperty):i++){
-					if(util.orArray.get(obj,self._usedProperty, i)==bdEnd) return i;
+				for(:i<_bdSize(obj,self._usedProperty):i++){
+				if(_bdGet(obj,self._usedProperty, i)==bdEnd) return i;
 				}
 				return bdDefault;
 			]
@@ -76,14 +80,14 @@ Constant bdDescr	1;
 					i;
 				i=self._getEndPos(obj)-2;  !description is 2 before the end marker
 				if(i<1) return bdDefault; !--malformed, we expect at least one dict word to proceed the description
-				if(util.orArray.get(obj,self._usedProperty, i)==bdDefault) return bdDefault;
+				if(_bdGet(obj,self._usedProperty, i)==bdDefault) return bdDefault;
 				return i;
 			]
 		,	_getIgnoreMsgPos[obj i;
 				i=self._getEndPos(obj)-1; !ignore message is 1 before end marker
 				if(i<2) return bdDefault; !--malformed, we expect at least one dict word and a description to proceed the ignore msg
-				if(util.orArray.get(obj,self._usedProperty, i)==bdDescr) i--;
-				if(util.orArray.get(obj,self._usedProperty, i)==bdDefault) return bdDefault;
+				if(_bdGet(obj,self._usedProperty, i)==bdDescr) i--;
+				if(_bdGet(obj,self._usedProperty, i)==bdDefault) return bdDefault;
 				return i;
 			]
 
@@ -99,7 +103,7 @@ Constant bdDescr	1;
 					rtrue;
 				}
 				!---at this point i should point to the index of the message to print
-				e=util.orArray.get(obj,self._usedProperty,i);
+				e=_bdGet(obj,self._usedProperty,i);
 
 				switch(metaclass(e)){
 		#ifdef orString;
@@ -124,7 +128,7 @@ Constant bdDescr	1;
 		,	_sayDescription[obj; return self._printResponse(obj,true);  ]
 		,	getKeyword[loc;
 				if(loc~=0 && self._usedObject~=loc) return 0; 	
-				return util.orArray.get(self._usedObject,self._usedProperty, self._usedPos);
+				return _bdGet(self._usedObject,self._usedProperty, self._usedPos);
 			]
 		,	short_name "your surroundings"
 		,	found_in [;rtrue;] !-always present
@@ -167,23 +171,23 @@ Constant bdDescr	1;
 				if(wrd==0) return 0; !no word to match, so return 0
 
 				if(obj provides backdrops){
-					for(pos=0:pos<util.orArray.getSize(obj, backdrops):pos++){
-						if(util.orArray.get(obj,backdrops,pos)==wrd) util.orArray.append(self, resultList, self._posToEntryId(obj, backdrops, pos));
+					for(pos=0:pos<_bdSize(obj, backdrops):pos++){
+					if(_bdGet(obj,backdrops,pos)==wrd) util.orArray.append(self, resultList, self._posToEntryId(obj, backdrops, pos));
 					}
 				}
 				if(obj provides backdrops1){
-					for(pos=0:pos<util.orArray.getSize(obj, backdrops1):pos++){
-						if(util.orArray.get(obj,backdrops1,pos)==wrd) util.orArray.append(self, resultList, self._posToEntryId(obj, backdrops1, pos));
+					for(pos=0:pos<_bdSize(obj, backdrops1):pos++){
+					if(_bdGet(obj,backdrops1,pos)==wrd) util.orArray.append(self, resultList, self._posToEntryId(obj, backdrops1, pos));
 					}
 				}
 				if(obj provides backdrops2){
-					for(pos=0:pos<util.orArray.getSize(obj, backdrops2):pos++){
-						if(util.orArray.get(obj,backdrops2,pos)==wrd) util.orArray.append(self, resultList, self._posToEntryId(obj, backdrops2, pos));
+					for(pos=0:pos<_bdSize(obj, backdrops2):pos++){
+					if(_bdGet(obj,backdrops2,pos)==wrd) util.orArray.append(self, resultList, self._posToEntryId(obj, backdrops2, pos));
 					}
 				}
 				if(obj provides backdrops3){
-					for(pos=0:pos<util.orArray.getSize(obj, backdrops3):pos++){
-						if(util.orArray.get(obj,backdrops3,pos)==wrd) util.orArray.append(self, resultList, self._posToEntryId(obj, backdrops3, pos));
+					for(pos=0:pos<_bdSize(obj, backdrops3):pos++){
+					if(_bdGet(obj,backdrops3,pos)==wrd) util.orArray.append(self, resultList, self._posToEntryId(obj, backdrops3, pos));
 					}
 				}
 				return util.orArray.getLength(self,resultList);
@@ -192,7 +196,7 @@ Constant bdDescr	1;
 		,	_posToEntryId[obj prop pos
 					retval;
 				for(:pos>=0:pos--){ !we start at the given word and look backwards
-					if(util.orArray.get(obj, prop, pos)==bdEnd){
+					if(_bdGet(obj, prop, pos)==bdEnd){
 						pos=pos+1;
 						break;
 					}
@@ -204,7 +208,7 @@ Constant bdDescr	1;
 					backdrops2: retval=3;
 					backdrops3: retval=4;
 				}
-				return (retval*100)+pos;
+				return (retval*1000)+pos;
 			]
 		with _foundList 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 		,	_seedList  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 !a list used to capture possible matches
@@ -273,13 +277,13 @@ Constant bdDescr	1;
 			!save the property and pos here
 			retval=util.orArray.get(self,_seedList,0); !note: it is possible that more than one match was returned; just ignore these and return the first match since its as good as any of the others.
 
-			switch(retval/100){
+			switch(retval/1000){
 				1:	orBackdropEngine._usedProperty=backdrops;
 				2:	orBackdropEngine._usedProperty=backdrops1;
 				3:	orBackdropEngine._usedProperty=backdrops2;
 				4:	orBackdropEngine._usedProperty=backdrops3;
 			}
-			orBackdropEngine._usedPos=retval % 100;
+			orBackdropEngine._usedPos=retval % 1000;
 			orBackdropEngine._usedObject = obj;
 
 			return wn-saveWn-1;
