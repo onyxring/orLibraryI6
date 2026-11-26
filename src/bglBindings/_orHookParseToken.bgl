@@ -1,15 +1,15 @@
-//===================================================================================================
-// bindings/_orHookParseToken.bgl — Beguile binding for orLibrary's _orHookParseToken hook.
-//---------------------------------------------------------------------------------------------------
-// The hook splits the library's ParseToken__ into pieces (PT_Analyse__, PT_ObjectName__, …) that an
-// extension can replace. orHookParseToken.patch makes that change in the library itself, and the hook's
-// I6 file is kept out.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    _orHookParseToken.bgl - Bindings for orLibrary's _orHookParseToken hook
+    Lets orLibrary's extensions replace the steps the parser takes to read one token.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include "_orHookBanner"
 
 #mergeI6 "orHookParseToken"
 
+// Keep orLibrary's own copy of the hook out and declare the globals its users share
 #emitfirst {
     Constant orHookParseToken_STAGE 99;      #ifdef orHookParseToken_STAGE; #endif;
     Global pt_return;       ! 0: continue on, true: return the return value, -1: jump to FailToken,

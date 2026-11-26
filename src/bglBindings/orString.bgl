@@ -1,23 +1,13 @@
-//===================================================================================================
-// bindings/orString.bgl — Beguile binding for orLibrary's orString extension.
-//---------------------------------------------------------------------------------------------------
-// DEFERRED (type bindings pending). Including this binding pulls in the I6 extension (#includeI6
-// below), so the orString pool/type is staged and a game can reach it via #i6. The full orString
-// class (~60 methods: get/set, search, and the many transform helpers that return new orStrings) is
-// intentionally left unbound: Beguile's native <string> extension covers the same ground and is the
-// preferred choice for new code, and orLibrary strings are usually consumed via `util.orStr`
-// (bound in orUtilStr.bgl — new/format/trim/areEqual/print). Author the class here incrementally if a
-// game needs to hold and mutate orString objects directly.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orString.bgl - Bindings for orLibrary's orString extension
+    Brings in orLibrary's string objects for the extensions that use them.
+    Beguile code reaches them through util.orStr.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orString.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "_orInfExt"
 #include "orUtilBuf"
 #include "orUtilStr"
-
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "orString";

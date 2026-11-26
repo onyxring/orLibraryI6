@@ -1,19 +1,13 @@
-//===================================================================================================
-// bindings/orPrefixSuffix.bgl — Beguile binding for orLibrary's orPrefixSuffix extension.
-//---------------------------------------------------------------------------------------------------
-// NO AUTHOR-FACING API. Including this binding pulls in the I6 extension (#includeI6 below), whose
-// effect is entirely automatic: it strips the trailing period from common title abbreviations
-// (Mr., Mrs., Dr., Col., …) as the player's input is parsed. Nothing to expose — including the
-// binding is all a game needs.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orPrefixSuffix.bgl - Bindings for orLibrary's orPrefixSuffix extension
+    The player can type titles with their periods (Mr., Mrs., Dr., Col., …).
+    Including the file is all a game needs.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orPrefixSuffix.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "_orInfExt"
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orPrefixSuffix";

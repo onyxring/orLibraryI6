@@ -1,31 +1,21 @@
-//===================================================================================================
-// bindings/orNameable.bgl — Beguile binding for orLibrary's orNameable extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orNameable lets the player give an object a custom name ("NAME rock AS
-// pebble" / "CALL …"); the object then answers to that name too, shown in parentheses after its own.
-// Subclass `orNameable` to make an object renameable.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orNameable.bgl - Bindings for orLibrary's orNameable extension
+    Objects the player can name (NAME ROCK AS PEBBLE); a named object answers
+    to its new name too.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orNameable.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "_orInfExt"
 
-// The NAME / UNNAME actions (also reached via "call"/"dub"/"refer to … as …") — register the names so
-// before()/react_before() can intercept them.
-extern verb Name { }
-extern verb Unname { }
+extern verb Name { }     /// The action of giving an object a name.
+extern verb Unname { }   /// The action of taking a given name away.
 
-// Base class for a renameable object. The player-supplied name is stored/managed by the engine (in
-// the object's custom_name buffer); `customArticle` is the article printed with it — 'a', 'an', 'the',
-// or 0 for none. Add name/short_name/description as usual.
+/// An object the player can name.
 extern class orNameable : object {
-    int customArticle;
+    int customArticle;   /// The article printed with the given name, or 0 for none.
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orNameable";

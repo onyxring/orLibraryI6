@@ -1,25 +1,20 @@
-//===================================================================================================
-// bindings/_orHookBanner.bgl — Beguile binding for orLibrary's _orHookBanner framework extension.
-//---------------------------------------------------------------------------------------------------
-// _orHookBanner.h is the extension the framework includes in every orLibrary build; it replaces the
-// standard library's Banner to add orLibrary's version line. Under Beguile the banner is Beguile's:
-// this binding keeps the I6 extension out and adds the orLibrary line on top of the standard-
-// library binding's banner. Every orLibrary binding includes this file, so any one of them brings it.
-//
-// No `#includeI6`: this binding stands in for the I6 extension.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    _orHookBanner.bgl - Bindings for orLibrary's _orHookBanner hook
+    Adds orLibrary's version line to the game's banner. Every orLibrary binding includes it.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-// Keep the framework from including the I6 extension (#orExtensionFramework); hoisted ahead of #orParser.
+// Keep orLibrary's own copy of the hook out
 #emitfirst {
     Constant orLib_suppress_forced_banner_hook;
 }
-// The banner this extends must be declared first; otherwise it would replace this one instead.
 #include <bindings/i6StandardLibrary>
 
-// orLibrary's version stamps (_#version.h).
-extern string orLibVersion;
-extern string orLibDateStamp;
+extern string orLibVersion;     /// The orLibrary's version number.
+extern string orLibDateStamp;   /// The date of this orLibrary version.
 
+// Add orLibrary's version line to the banner
 replace void Banner(){
     replaced();
     print($"{bgl.printRules.italics}Using{bgl.printRules.roman} orLibrary v{orLibVersion} ({orLibDateStamp})^");

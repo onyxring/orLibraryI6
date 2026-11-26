@@ -1,17 +1,13 @@
-//===================================================================================================
-// bindings/orDistinctRead.bgl — Beguile binding for orLibrary's orDistinctRead extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orDistinctRead makes READ a distinct action (not a synonym for EXAMINE):
-// `READ <obj>` runs obj.readDescription (a string or routine) instead of its description.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orDistinctRead.bgl - Bindings for orLibrary's orDistinctRead extension
+    READ becomes its own action, no longer a synonym for EXAMINE.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include "_orHookBanner"
 
-extern verb Read { }                  // the distinct READ action (orDistinctRead `Extend "read" replace … -> Read`)
-extern property readDescription;   // per-object READ text (string or routine); falls back to description if == description
+extern verb Read { }               /// Reading something.
+extern property readDescription;   /// An object's text when read: a string or a routine; set it to `description` to examine instead.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "orDistinctRead";

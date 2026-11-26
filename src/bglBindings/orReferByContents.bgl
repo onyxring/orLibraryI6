@@ -1,27 +1,19 @@
-//===================================================================================================
-// bindings/orReferByContents.bgl — Beguile binding for orLibrary's orReferByContents extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orReferByContents lets a container be referred to by the words of the things
-// inside it (e.g. "TAKE WATER" when a glass of water is what's actually held). Subclass it and tune
-// which actions this applies to.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orReferByContents.bgl - Bindings for orLibrary's orReferByContents extension
+    A container the player can refer to by what is inside it: TAKE WATER for a
+    glass of water.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orReferByContents.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orUtilParser"
 
-// Base class for a container whose contents lend it their names. `referActions` lists the actions the
-// content-referencing applies to (defaults to take/drop/insert); `ignoreActions` lists actions to
-// exclude. Each is a list of action references (e.g. {take, drop, insert}).
+/// A container that answers to the names of its contents.
 extern class orReferByContents : object {
-    array<var> referActions;
-    array<var> ignoreActions;
+    array<var> referActions;    /// The actions this applies to; take, drop and insert by default.
+    array<var> ignoreActions;   /// The actions this never applies to.
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orReferByContents";

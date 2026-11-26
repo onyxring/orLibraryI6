@@ -1,46 +1,34 @@
-//===================================================================================================
-// bindings/orRemoteLook.bgl — Beguile binding for orLibrary's orRemoteLook extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orRemoteLook makes "LOOK <direction>" a real action: a room can describe
-// what is seen in each compass direction (`<dir>_look`), describe itself when viewed from an adjacent
-// room (`remoteDescription`), and supply "can't see that way" fallbacks.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orRemoteLook.bgl - Bindings for orLibrary's orRemoteLook extension
+    LOOK in a direction: a room says what is seen each way, and how it looks
+    from the room next door.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orRemoteLook.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orUtilMap"
 
-// The LOOK-<direction> action — register the name so before()/react_before() can intercept it.
-extern verb LookDirection { }
+extern verb LookDirection { }   /// The action of looking in a direction.
 
-// Per-direction "what you see looking that way" text on the current room (string or routine). When
-// non-zero it is printed; otherwise the adjacent room's `remoteDescription` is consulted.
-extern property n_look;
-extern property s_look;
-extern property e_look;
-extern property w_look;
-extern property ne_look;
-extern property nw_look;
-extern property se_look;
-extern property sw_look;
-extern property u_look;
-extern property d_look;
-extern property in_look;
-extern property out_look;
+//-- Properties ------------------------------------------
+extern property n_look;     /// What is seen looking north from this room: a string or a routine.
+extern property s_look;     /// What is seen looking south.
+extern property e_look;     /// What is seen looking east.
+extern property w_look;     /// What is seen looking west.
+extern property ne_look;    /// What is seen looking northeast.
+extern property nw_look;    /// What is seen looking northwest.
+extern property se_look;    /// What is seen looking southeast.
+extern property sw_look;    /// What is seen looking southwest.
+extern property u_look;     /// What is seen looking up.
+extern property d_look;     /// What is seen looking down.
+extern property in_look;    /// What is seen looking in.
+extern property out_look;   /// What is seen looking out.
 
-// Set on a room to describe it when viewed remotely from an adjacent room (string or routine).
-extern property remoteDescription;
-// Set on a door to describe it when looked through from its closed side (string or routine).
-extern property remoteClosed;
-// Fallbacks when looking a direction with nothing to see: cant_look for the compass directions,
-// cant_look_alt for the vertical/in-out directions (each a string or routine).
-extern property cant_look;
-extern property cant_look_alt;
+extern property remoteDescription;   /// How a room looks from an adjacent room: a string or a routine.
+extern property remoteClosed;        /// On a door, shown when the player looks its way while it is closed: a string or a routine.
+extern property cant_look;           /// Shown when there is nothing to see in a compass direction: a string or a routine.
+extern property cant_look_alt;       /// Shown when there is nothing to see up, down, in or out: a string or a routine.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orRemoteLook";

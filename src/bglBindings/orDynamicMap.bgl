@@ -1,40 +1,32 @@
-//===================================================================================================
-// bindings/orDynamicMap.bgl — Beguile binding for orLibrary's orDynamicMap extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orDynamicMap wires a chain of rooms together on the fly as the player
-// explores: declare an `orDynamicMap` with a `found_in` list of rooms, and each new direction taken
-// links the next room in the list, so the map "unfolds" during play.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orDynamicMap.bgl - Bindings for orLibrary's orDynamicMap extension
+    A map that links its rooms together as the player explores, so each new
+    direction taken leads to the next room in a list.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orDynamicMap.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orUtilMap"
 
-// What to do when the room a new link points back from already has that return direction occupied.
-extern const int ALLOW_UNIDIRECTIONAL_PATH;   // 0 — create a one-way link, leave the return alone
-extern const int OVERWRITE_RETURN_PATH;        // 1 — overwrite the existing return link
-extern const int DISALLOW;                     // 2 — refuse the move (no link created)
+//-- Constants -------------------------------------------
+extern const int ALLOW_UNIDIRECTIONAL_PATH;   /// For `handleAllocatedReturn`: make a one-way link and leave the way back alone.
+extern const int OVERWRITE_RETURN_PATH;       /// For `handleAllocatedReturn`: replace the link already on the way back.
+extern const int DISALLOW;                    /// For `handleAllocatedReturn`: refuse the move and make no link.
 
-// Convenience base class for the rooms an orDynamicMap chains: `has light` and every direction plus
-// cant_go pre-declared to 0, so the map is free to fill them in. Add name/description as usual.
+//-- Classes ---------------------------------------------
+/// A lit room with every exit left open for an `orDynamicMap` to fill in.
 extern class orDynamicMapRoom : object {
-    // `cant_go` message (string or routine) propagated from the orDynamicMap if this room leaves it 0.
-    string cant_go;
+    string cant_go;   /// The message for a blocked direction; the map's own is used when this is unset.
 }
 
-// The dynamic-map controller. Set `found_in` to the ordered list of rooms to unfold (the first must
-// be reachable at the start); the object itself is placed in that starting room.
+/// A map that unfolds during play: each new direction taken links the next room in `found_in`.
 extern class orDynamicMap : object {
-    rawArray<object> found_in;      // the rooms to chain, in unfold order
-    string        cant_go;       // default blocked-direction message propagated to chained rooms
-    bool          complete;      // set true once every found_in room has been linked (read-only)
-    int           handleAllocatedReturn;   // one of ALLOW_UNIDIRECTIONAL_PATH / OVERWRITE_RETURN_PATH / DISALLOW
+    rawArray<object> found_in;                /// The rooms to link, in the order they unfold; the first is where play starts.
+    string           cant_go;                 /// The blocked-direction message given to the linked rooms.
+    bool             complete;                /// True once every room in `found_in` has been linked.
+    int              handleAllocatedReturn;   /// What to do when the way back from a new link is already taken.
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orDynamicMap";

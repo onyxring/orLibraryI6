@@ -1,59 +1,50 @@
-//===================================================================================================
-// bindings/orPronoun.bgl — Beguile binding for orLibrary's orPronoun (_orPronoun_English) print rules.
-//---------------------------------------------------------------------------------------------------
-// A collection of pronoun / possessive / copula print-rule emitters. Each prints the appropriate
-// English form for an object and is meant to splice into a `print(...)` or an interpolated string:
-//
-//     print($"You try to balance {the(noun)} on the statue, but {i(noun)} fall{sIfNotPlural(noun)}…");
-//     print($"{cThe(actor)} {am(actor)} watching {me(noun)}.");
-//
-// Forms: subject (i), object (me), possessive-adjective (my), possessive-pronoun (mine), reflexive
-// (myself); each with a Capitalized start-of-sentence variant (c…) and a "the <name> OR pronoun"
-// variant (the…) and its capitalized form (cThe…). Plus the tense-aware copula (am / was / is / …)
-// and a few subject+copula compounds. The article emitters the()/a()/cThe()/cA() live in the core
-// (`__beguileCore`), since they use the I6 standard-library print rules; these pronoun forms are
-// orLibrary-specific, so they live here.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orPronoun.bgl - Bindings for orLibrary's English pronoun print rules
+    Pronouns, possessives and forms of to be that agree with an object, for use
+    in print statements and interpolated strings:
+        print($"{cThe(actor)} {am(actor)} watching {me(noun)}.");
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include "_orHookBanner"
 
-// ── Subject / object / possessive / reflexive ────────────────────────────────
-emitter void i(object o)      { print (I)$o; }        // I / we / you / they / it / she / he
-emitter void me(object o)     { print (Me)$o; }       // me / us / you / them / it / her / him
-emitter void my(object o)     { print (My)$o; }       // my / our / your / their / its / her / his
-emitter void mine(object o)   { print (Mine)$o; }     // mine / ours / yours / theirs / its / hers / his
-emitter void myself(object o) { print (Myself)$o; }   // myself / ourselves / … / itself / herself / himself
+//-- Pronouns --------------------------------------------
+emitter void i(object o)      { print (I)$o; }        /// Print the subject pronoun: I, we, you, they, it, she, he.
+emitter void me(object o)     { print (Me)$o; }       /// Print the object pronoun: me, us, you, them, it, her, him.
+emitter void my(object o)     { print (My)$o; }       /// Print the possessive adjective: my, our, your, their, its, her, his.
+emitter void mine(object o)   { print (Mine)$o; }     /// Print the possessive pronoun: mine, ours, yours, theirs, its, hers, his.
+emitter void myself(object o) { print (Myself)$o; }   /// Print the reflexive pronoun: myself, ourselves, itself, herself, himself.
 
-// Capitalized (start-of-sentence) forms
-emitter void cI(object o)      { print (CI)$o; }
-emitter void cMe(object o)     { print (CMe)$o; }
-emitter void cMy(object o)     { print (CMy)$o; }
-emitter void cMine(object o)   { print (CMine)$o; }
-emitter void cMyself(object o) { print (CMyself)$o; }
+//-- Capitalized pronouns --------------------------------
+emitter void cI(object o)      { print (CI)$o; }        /// Print the subject pronoun, capitalized.
+emitter void cMe(object o)     { print (CMe)$o; }       /// Print the object pronoun, capitalized.
+emitter void cMy(object o)     { print (CMy)$o; }       /// Print the possessive adjective, capitalized.
+emitter void cMine(object o)   { print (CMine)$o; }     /// Print the possessive pronoun, capitalized.
+emitter void cMyself(object o) { print (CMyself)$o; }   /// Print the reflexive pronoun, capitalized.
 
-// "the <name>" for a specific object, or the matching pronoun for the player/narrator
-emitter void theI(object o)      { print (TheI)$o; }
-emitter void theMe(object o)     { print (TheMe)$o; }
-emitter void theMy(object o)     { print (TheMy)$o; }     // appends "'s" for named objects
-emitter void theMine(object o)   { print (TheMine)$o; }   // appends "'s" for named objects
-emitter void theMyself(object o) { print (TheMyself)$o; }
+//-- Name or pronoun -------------------------------------
+emitter void theI(object o)      { print (TheI)$o; }        /// Print "the" and the name, or the subject pronoun for the player.
+emitter void theMe(object o)     { print (TheMe)$o; }       /// Print "the" and the name, or the object pronoun for the player.
+emitter void theMy(object o)     { print (TheMy)$o; }       /// Print "the" and the name with 's, or the possessive adjective for the player.
+emitter void theMine(object o)   { print (TheMine)$o; }     /// Print "the" and the name with 's, or the possessive pronoun for the player.
+emitter void theMyself(object o) { print (TheMyself)$o; }   /// Print "the" and the name, or the reflexive pronoun for the player.
 
-// Capitalized the-or-pronoun forms
-emitter void cTheI(object o)      { print (CTheI)$o; }
-emitter void cTheMe(object o)     { print (CTheMe)$o; }
-emitter void cTheMy(object o)     { print (CTheMy)$o; }
-emitter void cTheMine(object o)   { print (CTheMine)$o; }
-emitter void cTheMyself(object o) { print (CTheMyself)$o; }
+//-- Capitalized name or pronoun -------------------------
+emitter void cTheI(object o)      { print (CTheI)$o; }        /// Print `theI`, capitalized.
+emitter void cTheMe(object o)     { print (CTheMe)$o; }       /// Print `theMe`, capitalized.
+emitter void cTheMy(object o)     { print (CTheMy)$o; }       /// Print `theMy`, capitalized.
+emitter void cTheMine(object o)   { print (CTheMine)$o; }     /// Print `theMine`, capitalized.
+emitter void cTheMyself(object o) { print (CTheMyself)$o; }   /// Print `theMyself`, capitalized.
 
-// ── Copula: was / am / will / were / are / is (tense- and person-aware) ───────
-emitter void am(object o)  { print (Am)$o; }
-emitter void cAm(object o) { print (CAm)$o; }
+//-- To be -----------------------------------------------
+emitter void am(object o)  { print (Am)$o; }    /// Print the form of to be that agrees with the object and tense: am, is, are, was, were, will.
+emitter void cAm(object o) { print (CAm)$o; }   /// Print `am`, capitalized.
 
-// Subject + copula compounds ("I am" / "the guard is" / …)
-emitter void iAm(object o)     { print (IAm)$o; }
-emitter void cIAm(object o)    { print (CIAm)$o; }
-emitter void theIAm(object o)  { print (TheIAm)$o; }
-emitter void cTheIAm(object o) { print (CTheIAm)$o; }
+//-- Subject with to be ----------------------------------
+emitter void iAm(object o)     { print (IAm)$o; }       /// Print the subject pronoun and its form of to be: "I am".
+emitter void cIAm(object o)    { print (CIAm)$o; }      /// Print `iAm`, capitalized.
+emitter void theIAm(object o)  { print (TheIAm)$o; }    /// Print the name or pronoun and its form of to be: "the guard is".
+emitter void cTheIAm(object o) { print (CTheIAm)$o; }   /// Print `theIAm`, capitalized.
 
-// Pull in the actual orLibrary I6 extension (the print-rule routines). Resolved via includePaths.
 #includeI6 "_orPronoun_English";

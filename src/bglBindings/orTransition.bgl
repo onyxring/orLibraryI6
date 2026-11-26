@@ -1,25 +1,15 @@
-//===================================================================================================
-// bindings/orTransition.bgl — Beguile binding for orLibrary's orTransition extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. Type bindings are authored incrementally as the orLibrary port moves
-// forward; the orTransition() routine itself is bound below.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orTransition.bgl - Bindings for orLibrary's orTransition extension
+    A pause that divides the parts of a story: centered text, a prompt, a keypress.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orTransition.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orCenter"
 #include "orUtilUi"
-
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orTransition";
 
-// orTransition() is a special effect that divides story parts: it prints a blank separation, an
-// optional centered `text`, then an optional centered `prompt` (default "Press any key to continue")
-// and waits for a keypress, erasing the main window afterward unless `skipErase` is true. All three
-// arguments are optional; the common call is the bare orTransition().
+/// Print the centered `text` and `prompt` (by default "Press any key to continue"), wait for a key, then clear the main window unless `skipErase` is true.
 extern void orTransition(string text = 0, string prompt = 0, bool skipErase = false);

@@ -1,20 +1,14 @@
-//===================================================================================================
-// bindings/orStylePrintRules.bgl — Beguile binding for orLibrary's orStylePrintRules extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orStylePrintRules provides three little print helpers that emit a run of
-// styled text and then restore the roman/normal style.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orStylePrintRules.bgl - Bindings for orLibrary's orStylePrintRules extension
+    Print a string or an object's name in a text style, then return to plain text.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — orStylePrintRules.h has no orLibrary #includes of its own.
+#include "_orHookBanner"
 
-// Print `o` (a string or an object printed by its short_name) in the given style, then restore roman.
-extern void italics(var o);     // underline / italic
-extern void strong(var o);      // bold
-extern void highlight(var o);   // reverse-video (header style)
+extern void italics(var o);     /// Print a string or an object's name in italics.
+extern void strong(var o);      /// Print a string or an object's name in bold.
+extern void highlight(var o);   /// Print a string or an object's name in reverse video.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "orStylePrintRules";

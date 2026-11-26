@@ -1,25 +1,15 @@
-//===================================================================================================
-// bindings/orReview.bgl — Beguile binding for orLibrary's orReview extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orReview adds a meta "REVIEW" verb that reprints the current room ("review")
-// or re-examines an object ("review <noun>") WITHOUT consuming a turn — handy after a state change.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orReview.bgl - Bindings for orLibrary's orReview extension
+    A REVIEW verb that describes the room or an object again without taking a turn.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — orReview.h has no orLibrary #includes of its own.
+#include "_orHookBanner"
 
-// The REVIEW actions — register the names so before()/react_before() can intercept them. Review is the
-// no-noun form (reprint the room); ReviewObj re-examines a noun. (ReviewObj is also referenced from
-// the orDialogue binding, which re-prints an object's description on a state change; a duplicate
-// `extern verb` is harmless.)
-extern verb Review { }
-extern verb ReviewObj { }
+extern verb Review { }      /// The action of describing the room again.
+extern verb ReviewObj { }   /// The action of describing an object again.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookInformLibrary"
 #include "_orHookStandardLibrary"
 #include "_orHookVerbs"

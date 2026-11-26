@@ -1,19 +1,13 @@
-//===================================================================================================
-// bindings/orPrintConjugate.bgl — Beguile binding for orLibrary's orPrintConjugate extension.
-//---------------------------------------------------------------------------------------------------
-// NO DIRECT AUTHOR-FACING API. Including this binding pulls in the I6 extension (#includeI6 below),
-// which is a language dispatcher: it wires up orPrint's verb-conjugation markup (present/past tense
-// agreement for the current actor) by pulling the English conjugation tables. Authors use it through
-// orPrint's `$…;` markup, not by calling anything here — so there is nothing to `extern`-declare.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orPrintConjugate.bgl - Bindings for orLibrary's orPrintConjugate extension
+    Verb conjugation in orPrint markup, agreeing with the current actor and
+    tense. Including the file is all a game needs.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orPrintConjugate.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orPrint"
 #include "orUtilArray"
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "orPrintConjugate";

@@ -1,22 +1,15 @@
-//===================================================================================================
-// bindings/orImplicitCommands.bgl — Beguile binding for orLibrary's orImplicitCommands extension.
-//---------------------------------------------------------------------------------------------------
-// NO AUTHOR-FACING API. Including this binding pulls in the I6 extension (#includeI6 below), whose
-// effect is automatic: implicit prerequisite actions (implicit take/close/unlock/disrobe) are turned
-// into real queued commands via orPlayerCommandQueue, so each advances the turn and is announced,
-// rather than happening silently. Nothing to expose — including the binding is all a game needs.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orImplicitCommands.bgl - Bindings for orLibrary's orImplicitCommands extension
+    Implicit actions (take, close, unlock, disrobe) run as real commands: each
+    takes a turn and is announced. Including the file is all a game needs.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orImplicitCommands.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "_orInfExt"
 #include "orPlayerCommandQueue"
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookKeyboard"
 #include "_orHookParser"
 #include "_orHookStandardLibrary"

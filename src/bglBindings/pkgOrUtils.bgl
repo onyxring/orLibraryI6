@@ -1,16 +1,11 @@
-//===================================================================================================
-// bindings/pkgOrUtils.bgl — Beguile binding for orLibrary's pkgOrUtils extension.
-//---------------------------------------------------------------------------------------------------
-// BUNDLE. This is an aggregator: including it pulls in the whole orLibrary "util" set (orUtilArray /
-// Buf / Char / LoopArray / Map / MapPathFinder / Num / Parser / Ref / Str / Ui) plus the matching I6
-// (#includeI6 at the bottom). It declares no types of its own — each `#include`d binding supplies its
-// own extern surface (the `util.*` facades), so one `#include "bglBindings/pkgOrUtils"` gives a game
-// the whole util toolkit.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    pkgOrUtils.bgl - Bindings for orLibrary's pkgOrUtils package
+    Every orLibrary utility in one include: the whole of util.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror pkgOrUtils.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orUtilArray"
 #include "orUtilBuf"
 #include "orUtilChar"
@@ -22,8 +17,4 @@
 #include "orUtilRef"
 #include "orUtilStr"
 #include "orUtilUi"
-
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "pkgOrUtils";

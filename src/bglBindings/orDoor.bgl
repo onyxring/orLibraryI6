@@ -1,28 +1,19 @@
-//===================================================================================================
-// bindings/orDoor.bgl — Beguile binding for orLibrary's orDoor extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. The orDoor type is bound at the bottom.
-//===================================================================================================
-#once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orDoor.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
-#include "_orInfExt"
+/* -----------------------------------------------------------------------------
+    orDoor.bgl - Bindings for orLibrary's orDoor extension
+    A door between two rooms that works out its own direction and destination.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
+#once
+#include "_orHookBanner"
+#include "_orInfExt"
+#include "_orHookInformLibrary"
 #includeI6 "orDoor";
 
-// The orDoor type (I6 `class orDoor has static door openable scenery`). A simple two-room door: set
-// `found_in = {roomA, roomB}` and the class computes `door_to`/`door_dir` automatically, so a room's
-// direction exit can point straight at the door. Add `name`/`short_name`/`description` and attribute
-// overrides (`{!open, locked}`, etc.) as needed; `before()`/`after()` intercept actions like any object.
+/// A door between the two rooms in `found_in`; a room's exit can name the door itself.
 extern class orDoor : object {
-    rawArray<object>         found_in;     // the two rooms the door connects (drives door_to/door_dir)
-    rawArray<dictionaryWord> name;
-    string                short_name;   // printed name
-    string                description;  // examine text (string, or override with a `bool description()` routine)
+    rawArray<object>         found_in;      /// The two rooms the door connects.
+    rawArray<dictionaryWord> name;          /// The words the player can call it.
+    string                   short_name;    /// Its printed name.
+    string                   description;   /// The text shown when it is examined.
 }

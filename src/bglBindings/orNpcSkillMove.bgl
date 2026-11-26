@@ -1,41 +1,35 @@
-//===================================================================================================
-// bindings/orNpcSkillMove.bgl — Beguile binding for orLibrary's orNpcSkillMove extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orNpcSkillMove is an orNpc skill that walks a character along a path, follows
-// a target, or wanders — driving movement each turn according to a movePattern.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orNpcSkillMove.bgl - Bindings for orLibrary's orNpcSkillMove extension
+    A skill that moves a character: along a path, after a target, or at random.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orNpcSkillMove.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orNpc"
 #include "orUtilRef"
 #include "orUtilMapPathFinder"
 
-// movePattern values — what happens at the end of movePath:
-extern const int MOVE_PATTERN_REVERSE;   // 0 — walk back along the path
-extern const int MOVE_PATTERN_REPEAT;    // 1 — loop back to the start
-extern const int MOVE_PATTERN_SINGLE;    // 2 — walk it once, then stop
-extern const int MOVE_PATTERN_HALT;      // 3 — don't move
+//-- Constants -------------------------------------------
+extern const int MOVE_PATTERN_REVERSE;   /// At the end of the path, walk back along it.
+extern const int MOVE_PATTERN_REPEAT;    /// At the end of the path, start again from the beginning.
+extern const int MOVE_PATTERN_SINGLE;    /// Walk the path once, then stop.
+extern const int MOVE_PATTERN_HALT;      /// Don't move.
 
-// Movement configuration (set on the moving NPC / its move skill):
-extern property movePath;          // ordered list of rooms to visit
-extern property moveArrived;       // routine called when a waypoint is reached
-extern property followTarget;      // an object to move toward when it's in an adjacent room
-extern property moveTargetFound;   // routine called when a followed target is caught up with
+//-- Properties ------------------------------------------
+extern property movePath;          /// The rooms to visit, in order.
+extern property moveArrived;       /// A routine called when a room on the path is reached.
+extern property followTarget;      /// An object to move toward when it is in an adjacent room.
+extern property moveTargetFound;   /// A routine called when a followed target is caught up with.
 
-// The move skill itself.
+//-- Classes ---------------------------------------------
+/// The move skill.
 extern class orNpcSkillMove : object {
-    int    movePattern;      // one of MOVE_PATTERN_* (default MOVE_PATTERN_REVERSE)
-    ref object lastLocation;     // the room the NPC was in before its last move (read-only)
-    bool   moveDoesWander;   // wander randomly when there's no path/target (default true)
-    // Move the NPC one step in `dir` (a compass direction object), running a Go action.
-    emitter void moveInDirection(object dir) { $self.moveInDirection($dir) }
+    int        movePattern;      /// One of the `MOVE_PATTERN_` constants; `MOVE_PATTERN_REVERSE` by default.
+    ref object lastLocation;     /// The room the character was in before its last move.
+    bool       moveDoesWander;   /// True (the default) to wander at random when there is no path or target.
+    emitter void moveInDirection(object dir) { $self.moveInDirection($dir) }   /// Move the character one step in a compass direction.
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orNpcSkillMove";

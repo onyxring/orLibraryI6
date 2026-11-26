@@ -1,28 +1,18 @@
-//===================================================================================================
-// bindings/orGotoLocation.bgl — Beguile binding for orLibrary's orGotoLocation extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orGotoLocation adds a "GO TO <room>" verb that path-finds from the player's
-// location to a named room and queues the movement commands to walk there.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orGotoLocation.bgl - Bindings for orLibrary's orGotoLocation extension
+    A GO TO verb that finds the way to a named room and walks the player there.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orGotoLocation.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orUtilMapPathFinder"
 #include "orPlayerCommandQueue"
 
-// The GO-TO action — register the name so before()/react_before() can intercept it (##gotoLocation).
-extern verb gotoLocation { }
+extern verb gotoLocation { }   /// The action of going to a named room.
 
-// When true (the default), only rooms the player has already visited (beenSeen) are in scope for
-// "go to"; set false to allow travelling to any room on the map.
-extern bool orPathFinderAvoidUnvisitedLocations;
+extern bool orPathFinderAvoidUnvisitedLocations;   /// True (the default) to offer only rooms the player has visited; false to allow any room.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookKeyboard"
 #include "_orHookStandardLibrary"
 #include "_orHookVerbs"

@@ -1,48 +1,37 @@
-//===================================================================================================
-// bindings/orBackdrop.bgl — Beguile binding for orLibrary's orBackdrop extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orBackdrop is a keyword-driven scenery system: a room lists backdrops in a
-// `backdrops` property array, and the engine resolves the keyword the player referenced.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orBackdrop.bgl - Bindings for orLibrary's orBackdrop extension
+    Scenery by keyword: a room or backdrop object lists its scenery in a `backdrops`
+    array, and the player's words pick the entry that answers.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orBackdrop.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "_orInfExt"
 #include "orUtilArray"
 #include "orUtilRef"
 #include "orBetterChoice"
 
-// Backdrop-DSL sentinels used in a room's `backdrops` property array (a heterogeneous
-// `array<var>` of dict-words + description strings + these sentinels/handlers, one entry per
-// backdrop, terminated by bdEnd): bdEnd (0) ends an entry; bdDefault (-1) marks the catch-all.
-extern const int bdEnd;        // 0 — ends a backdrop's entry in the `backdrops` array
-extern const int bdDefault;    // -1 — marks the catch-all backdrop entry
+//-- Constants ------------------------------------------
+extern const int bdEnd;          /// Ends an entry in a `backdrops` array.
+extern const int bdDefault;      /// Marks the catch-all entry.
 //FOR REVIEW [B-03] bdDescr doesn't introduce a description: it follows the entry's one text, used for both. Replaces the next 1 line:
 //    extern const int bdDescr;      // 1 — after an entry's only text: use it as both the description and the reply
-extern const int bdDescr;      // 1 — introduces a description string for the current entry
-extern const int bdRedirected; // 2 — returned by an entry's routine that ran another action
+extern const int bdDescr;        /// Introduces a description string for the current entry.
+extern const int bdRedirected;   /// Returned by an entry's routine that ran another action.
 
-// The backdrop object type (I6 `class orBackdrop has scenery`). A game declares a standalone
-// backdrop as `orBackdrop name { array<var> backdrops = {…}; }`; `found_in` may be an object
-// list, or a `bool found_in()` method deciding scope dynamically, and `react_before()` can
-// intercept actions. Entries whose text is a routine reference or an inline handler use lambdas.
+//-- Classes ------------------------------------------
+/// A set of scenery entries that can float between rooms; give it a `backdrops` array.
 extern class orBackdrop : object {
-    rawArray<object> found_in;   // rooms this backdrop floats in (multi-room scope); omit for a single `parent =` room
+    rawArray<object> found_in;   /// The rooms it floats in; omit for a single room set as its parent.
 }
 
-// The engine object behind orBackdrop. `getKeyword(loc)` returns the dictionary word the player
-// referenced for the backdrop currently being resolved (0 if `loc` is given and isn't the matched
-// object) — used inside a backdrop's react_before to branch on which keyword was typed.
+//-- Objects ------------------------------------------
+/// The engine that resolves the player's words to a backdrop entry.
 extern object orBackdropEngine {
-    dictionaryWord getKeyword();
-    // Register an action that, when applied to a backdrop, prints its description (default: examine).
-    void registerDescriptionVerb(verb v);
+    dictionaryWord getKeyword();            /// The word the player used for the backdrop being resolved.
+    void registerDescriptionVerb(verb v);   /// Make an action print a backdrop's description, as examine does.
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookStandardLibrary"   // hooks this extension's I6 answers
+#include "_orHookStandardLibrary"
 #includeI6 "orBackdrop";

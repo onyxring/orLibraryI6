@@ -1,21 +1,10 @@
-//===================================================================================================
-// bindings/orUtilUiGlulx.bgl — Beguile binding for orLibrary's orUtilUiGlulx extension.
-//---------------------------------------------------------------------------------------------------
-// DEFERRED (type bindings pending). Including this binding pulls in the I6 extension (#includeI6
-// below), so a game can already depend on the binding alone and reach the Glulx UI surface via #i6.
-// The full Beguile surface — the styleDefinition builder, the _glulxWindow split/draw/resize tree,
-// the capability-query singletons, and the imageAlign/winType/styleType/justification/weight enum
-// objects — is large and Glulx-only, so it is intentionally left unbound for now; it will be authored
-// when a concrete Glulx-graphics game needs it. `util.orUi` (the portable UI surface) IS bound in
-// orUtilUi.bgl. Author types here incrementally (extend `_orUI` with the `glulx` sub-facade).
-//===================================================================================================
-#once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orUtilUiGlulx.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
-#include "orUtilUi"
+/* -----------------------------------------------------------------------------
+    orUtilUiGlulx.bgl - Bindings for orLibrary's orUtilUiGlulx extension
+    Brings in orLibrary's Glulx windows and text styles. Glulx only.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
+#once
+#include "_orHookBanner"
+#include "orUtilUi"
 #includeI6 "orUtilUiGlulx";

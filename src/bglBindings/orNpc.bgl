@@ -1,54 +1,44 @@
-//===================================================================================================
-// bindings/orNpc.bgl — Beguile binding for orLibrary's orNpc extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orNpc is a skill-driven NPC framework: subclass `orNpc` for a character, give
-// it `orNpcSkill`s, and a per-turn daemon picks and performs the highest-priority applicable skill.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orNpc.bgl - Bindings for orLibrary's orNpc extension
+    Characters driven by skills: each turn a character performs the
+    highest-priority skill that applies.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orNpc.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orUtilArray"
+#include "orUtilRef"
 
-// Optional per-NPC startup hook — define `void npcInit()` on your orNpc subclass to initialise it
-// (the framework calls each NPC's npcInit at game start). Declared `additive` in I6.
-extern property npcInit;
+//-- Properties ------------------------------------------
+extern property npcInit;   /// A routine on a character, run once at the start of the game.
 
-// An NPC character. Subclass and set isEnabled/priority; learn skills with learnSkill. `has animate`.
+//-- Classes ---------------------------------------------
+/// A character that acts each turn through the skills it has learned.
 extern class orNpc : object {
-    bool   isEnabled;    // is this NPC currently taking turns (default true)
-    int    priority;     // heartbeat ordering — higher-priority NPCs act first
-    var    doNothing;    // message (string or routine) printed when the NPC takes no action
-    int    npcId;        // framework-assigned id (read-only)
+    bool isEnabled;   /// True while the character takes turns.
+    int  priority;    /// Turn order: a higher-priority character acts first.
+    var  doNothing;   /// A string or routine shown when the character does nothing.
+    int  npcId;       /// The character's assigned id.
 
-    // Register a skill this NPC can perform (adds to its skills list).
-    emitter void   learnSkill(object skill)     { $self.learnSkill($skill) }
-    // The highest-priority applicable skill right now, or 0.
-    emitter object selectAction()               { ($self.selectAction()) }
-    // The priority the NPC assigns to a skill (defaults to the skill's defaultPriority).
-    emitter int    getSkillPriority(object skl) { ($self.getSkillPriority($skl)) }
-    // Run one turn of NPC behaviour (normally driven by the daemon; exposed for manual control).
-    emitter void   heartbeat()                  { $self.heartbeat() }
+    emitter void   learnSkill(object skill)     { $self.learnSkill($skill) }         /// Add a skill the character can perform.
+    emitter object selectAction()               { ($self.selectAction()) }           /// The highest-priority skill that applies now, or nothing.
+    emitter int    getSkillPriority(object skl) { ($self.getSkillPriority($skl)) }   /// The priority the character gives a skill; the skill's `defaultPriority` unless replaced.
+    emitter void   heartbeat()                  { $self.heartbeat() }                /// Run one turn of the character's behavior.
 }
 
-// A behaviour an NPC can perform. Subclass and provide the hooks below:
-//   bool appliesToCharacter(object npc)  — does this skill apply to that NPC? (scanned at startup)
-//   void perform(object npc)             — carry the skill out for npc
-//   canPerform                           — `true`, or a routine returning whether it can run now
+/// Something a character can do. A skill provides `bool appliesToCharacter(object npc)` and `void perform(object npc)`.
 extern class orNpcSkill : object {
-    int defaultPriority;   // priority used when several skills compete
-    var canPerform;        // bool, or a routine returning bool
+    int defaultPriority;   /// The priority used when several skills compete.
+    var canPerform;        /// True, or a routine that is true when the skill can run now.
 }
 
-// The controller object for the whole NPC system.
+//-- Objects ---------------------------------------------
+/// The controller of every character.
 extern object orNpcControl {
-    bool   areEnabled;         // master on/off switch for all NPC activity
-    object getById(int id);    // the orNpc with the given npcId, or 0
+    bool   areEnabled;        /// The master switch for all character activity.
+    object getById(int id);   /// The character with the given `npcId`, or nothing.
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orNpc";

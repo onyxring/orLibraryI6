@@ -1,36 +1,28 @@
-//===================================================================================================
-// bindings/orAdjective.bgl — Beguile binding for orLibrary's orAdjective extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orAdjective lets an object list words that should be treated as ADJECTIVES
-// (matched only alongside a noun) via its `adjective` property, and controls globally whether a bare
-// adjective can stand in for the noun (the `orAdjective.mode` setting).
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orAdjective.bgl - Bindings for orLibrary's orAdjective extension
+    An object lists words that are adjectives: they match only beside a noun, unless
+    the mode allows a bare adjective to stand for the object.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orAdjective.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orUtilParser"
 
-// Parser mode (set orAdjective.mode in your init):
-extern const int REQUIRE_NOUN;   // 0 — an adjective alone never matches; a noun word is required
-extern const int PREFER_NOUN;    // 1 — (default) a noun is preferred, but a bare adjective can match
+//-- Constants ------------------------------------------
+extern const int REQUIRE_NOUN;   /// A mode: an adjective alone never matches.
+extern const int PREFER_NOUN;    /// A mode, the default: a noun is preferred, but a bare adjective can match.
 
-// Per-object parser vocabulary. `adjective` lists dictionary words to treat as adjectives for the
-// object; `requireNoun` (a bool, or a routine returning one) overrides the global mode for this object.
-extern property adjective;
-extern property requireNoun;
+//-- Properties ------------------------------------------
+extern property adjective;     /// The words that are adjectives for this object.
+extern property requireNoun;   /// A bool, or a routine returning one, that overrides the mode for this object.
 
-// The extension's controller object. Set `orAdjective.mode = REQUIRE_NOUN` (usually in your init) to
-// change the global adjective-matching policy.
+//-- Objects ------------------------------------------
+/// The extension's settings.
 extern object orAdjective {
-    int mode;
+    int mode;   /// `REQUIRE_NOUN` or `PREFER_NOUN`, for every object.
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookInformLibrary"
 #include "_orHookStandardLibrary"
 #includeI6 "orAdjective";

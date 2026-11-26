@@ -1,25 +1,22 @@
-//===================================================================================================
-// bindings/_orHookInformLibrary.bgl — Beguile binding for orLibrary's _orHookInformLibrary hook.
-//---------------------------------------------------------------------------------------------------
-// orLibrary's play-loop hooks are Beguile's <extensions/stdlib/hooks/informLibrary>, which merges them
-// into the library rather than replacing InformLibrary; orLibrary's I6 copy is kept out. Every binding
-// whose I6 brings in _orHookInformLibrary includes this file.
-//
-// It also runs orLibrary's play-loop setup from bglInit: under Beguile the BLR owns `main`, and the
-// stdlib Main survives as `_oldmain`, which bglInit runs after the setup.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    _orHookInformLibrary.bgl - Bindings for orLibrary's _orHookInformLibrary hook
+    Gives orLibrary's extensions their play-loop hooks through Beguile's own hook extension,
+    and registers every orInfExt object when the game starts.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include "_orHookBanner"
 #include <extensions/stdlib/hooks/informLibrary>
 
-// Ahead of every orLibrary include: a hook whose _STAGE is above the last library stage skips itself.
+// Keep orLibrary's own copy of the hook out
 #emitfirst {
     Constant orHookInformLibrary_STAGE 99; #ifdef orHookInformLibrary_STAGE; #endif;
 }
 
-#includeI6 "_orInfExt";                  // orInfExt, which the hooks' users are
+#includeI6 "_orInfExt";
 
-// After the library, where orInfExt and LibraryExtensions are defined.
+// Register the orInfExt objects
 #emitlast {
     [ __orBeguileMainInit;
         #ifdef allocateInformExtensions;
@@ -28,6 +25,7 @@
     ];
 }
 
+// Run the registration when the game starts
 #startup {
     __orBeguileMainInit();
 }

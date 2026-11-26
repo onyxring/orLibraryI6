@@ -1,25 +1,16 @@
-//===================================================================================================
-// bindings/orFirstImpressions.bgl — Beguile binding for orLibrary's orFirstImpressions extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orFirstImpressions prints extra text the FIRST time an object (or room) is
-// examined — a `preImpression` before its description and a `postImpression` after — then never again.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orFirstImpressions.bgl - Bindings for orLibrary's orFirstImpressions extension
+    Extra text shown only the first time an object or room is examined.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orFirstImpressions.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "_orInfExt"
 
-// Shown only on the first examine, before (preImpression) and after (postImpression) the object's own
-// description. Each is a string, or a routine that prints. Both honour orPrint markup if it is loaded.
-extern property preImpression;
-extern property postImpression;
+extern property preImpression;    /// Shown before the description on the first examine: a string, or a routine that prints.
+extern property postImpression;   /// Shown after the description on the first examine: a string, or a routine that prints.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookInformLibrary"
 #include "_orHookStandardLibrary"
 #include "_orHookVerbs"

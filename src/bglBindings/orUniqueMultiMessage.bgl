@@ -1,19 +1,12 @@
-//===================================================================================================
-// bindings/orUniqueMultiMessage.bgl — Beguile binding for orLibrary's orUniqueMultiMessage extension.
-//---------------------------------------------------------------------------------------------------
-// NO AUTHOR-FACING API. Including this binding pulls in the I6 extension (#includeI6 below), whose
-// effect is entirely automatic: when one command acts on many objects, identical per-object library
-// messages are consolidated (e.g. "marbles: Removed." once rather than repeated). Nothing to expose —
-// including the binding is all a game needs.
-//===================================================================================================
-#once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orUniqueMultiMessage.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
-#include "orUtilBuf"
+/* -----------------------------------------------------------------------------
+    orUniqueMultiMessage.bgl - Bindings for orLibrary's orUniqueMultiMessage extension
+    When one command acts on many objects, identical replies are printed once
+    rather than once per object. Including it is all a game needs.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
+#once
+#include "_orHookBanner"
+#include "orUtilBuf"
+#include "_orHookInformLibrary"
 #includeI6 "orUniqueMultiMessage";

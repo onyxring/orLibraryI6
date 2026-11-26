@@ -1,47 +1,33 @@
-//===================================================================================================
-// bindings/orUtilRef.bgl — Beguile binding for orLibrary's orUtilRef extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. Provides `util.orRef` — runtime metaclass tests and the "resolve a property
-// that might be a value OR a routine" helpers (an enhanced valueOrRun). Hung off the shared `util`
-// object (I6 `util.orRef` → object `_orRef`).
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orUtilRef.bgl - Bindings for orLibrary's orUtilRef extension
+    util.orRef: tell what kind of thing a value is, and read or print a property
+    that may hold a value or a routine.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orUtilRef.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively. (orUtilNum reaches
-// the shared `_orUtil`/`util` type transitively, off which orRef is hung below.)
+#include "_orHookBanner"
 #include "orUtilNum"
-#include "_orUtil"   // declares _orUtil (the `util` object), which this binding extends
+#include "_orUtil"
 
-// util.orRef — reference/metaclass helpers (orUtilRef.h `object _orRef`).
+/// Value helpers, reached as `util.orRef`. Name a property with the `(property)` cast.
 extern class _orRef : object {
-    // metaclass tests. (isDictionaryWord is only reliable on Glulx — see orUtilRef.h for the Z-code
-    // caveat, where high-memory strings can overlap the dictionary address space.)
-    emitter bool isRoutine(var r)        { ($self.isRoutine($r)) }
-    emitter bool isString(var r)         { ($self.isString($r)) }
-    emitter bool isObject(var r)         { ($self.isObject($r)) }
-    emitter bool isDictionaryWord(var j) { ($self.isDictionaryWord($j)) }
+    emitter bool isRoutine(var r)        { ($self.isRoutine($r)) }          /// True when the value is a routine.
+    emitter bool isString(var r)         { ($self.isString($r)) }           /// True when the value is a string.
+    emitter bool isObject(var r)         { ($self.isObject($r)) }           /// True when the value is an object.
+    emitter bool isDictionaryWord(var j) { ($self.isDictionaryWord($j)) }   /// True when the value is a dictionary word; reliable on Glulx only.
 
-    // resolveValue: if `obj` is itself a routine, call it with (prop, params…); else if obj provides
-    // `prop`, return obj.prop (calling it with params… when it is a routine); otherwise return obj.
-    // Pass a bare member name via the (property) cast for `prop`.
-    emitter var resolveValue(var obj, property prop)                     { ($self.resolveValue($obj, $prop)) }
-    emitter var resolveValue(var obj, property prop, var p1)             { ($self.resolveValue($obj, $prop, $p1)) }
-    emitter var resolveValue(var obj, property prop, var p1, var p2)     { ($self.resolveValue($obj, $prop, $p1, $p2)) }
+    emitter var resolveValue(var obj, property prop)                     { ($self.resolveValue($obj, $prop)) }             /// The property's value, running it when it is a routine; `obj` itself when it lacks the property.
+    emitter var resolveValue(var obj, property prop, var p1)             { ($self.resolveValue($obj, $prop, $p1)) }        /// The same, passing one argument to a routine.
+    emitter var resolveValue(var obj, property prop, var p1, var p2)     { ($self.resolveValue($obj, $prop, $p1, $p2)) }   /// The same, passing two arguments to a routine.
 
-    // resolvePrint: like resolveValue, but a resolved string/value is PRINTED. Returns true once it
-    // has printed (false only for a 0/-1 obj).
-    emitter bool resolvePrint(var obj, property prop)                    { ($self.resolvePrint($obj, $prop)) }
-    emitter bool resolvePrint(var obj, property prop, var p1)            { ($self.resolvePrint($obj, $prop, $p1)) }
+    emitter bool resolvePrint(var obj, property prop)                    { ($self.resolvePrint($obj, $prop)) }             /// Print the property's value, running it when it is a routine; true once something printed.
+    emitter bool resolvePrint(var obj, property prop, var p1)            { ($self.resolvePrint($obj, $prop, $p1)) }        /// The same, passing one argument to a routine.
 }
-// Hang orRef off the shared `util` object (declared in _orUtil.bgl).
+// Add orRef to the util object
 extend class _orUtil {
     ref _orRef orRef;
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orUtilRef";

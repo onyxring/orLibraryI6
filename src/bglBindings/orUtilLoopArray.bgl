@@ -1,45 +1,28 @@
-//===================================================================================================
-// bindings/orUtilLoopArray.bgl — Beguile binding for orLibrary's util.orLoopArray helper.
-//---------------------------------------------------------------------------------------------------
-// `util.orLoopArray` (the I6 _orLoopArray object) cycles through a multi-value property or a global
-// loop-array, returning the next entry as a string. Mirrors orUtilLoopArray.h's
-// getNext(obj, prop, onceOnly):
-//   getNext(loopArray)           — a global loop-array (e.g. `array x table 0 "a" "b"`)
-//   getNext(obj, prop)           — obj's multi-value property `prop`
-//   getNext(obj, prop, onceOnly) — …with the once-only / repeat-last flag
-//
-// TYPE-INFO ONLY (no #includeI6): orUtilLoopArray is staged in by the orLibrary stack (via
-// myGameBaseline / the pkg includes), so this binding just exposes the Beguile types to call it.
-// Only the orLoopArray slice of `util` is bound — the rest of util.* is destined for the BLR and
-// stays in #i6 until then. (Folding this into the BLR later is fine; for now it's a member of the
-// I6-declared `util` object.)
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orUtilLoopArray.bgl - Bindings for orLibrary's orUtilLoopArray extension
+    util.orLoopArray: step through a list of texts, one each time it is asked.
+    Name an object's list with the (property) cast.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include "_orHookBanner"
 #include "_orUtil"
 
+/// Cycling lists of text, reached as `util.orLoopArray`.
 extern class _orLoopArray : object {
-    emitter string getNext(var loopArray)                           { ($self.getNext($loopArray)) }
-    emitter string getNext(object obj, property prop)               { ($self.getNext($obj, $prop)) }
-    emitter string getNext(object obj, property prop, var onceOnly) { ($self.getNext($obj, $prop, $onceOnly)) }
-    // getAny: like getNext but picks a random unused entry. isComplete: true once every entry
-    // has been used (the loop has cycled through all items).
-    emitter string getAny(object obj, property prop)                { ($self.getAny($obj, $prop)) }
-    emitter bool   isComplete(object obj, property prop)             { ($self.isComplete($obj, $prop)) }
+    emitter string getNext(var loopArray)                           { ($self.getNext($loopArray)) }                /// The next entry of a stand-alone list.
+    emitter string getNext(object obj, property prop)               { ($self.getNext($obj, $prop)) }               /// The next entry of an object's list.
+    emitter string getNext(object obj, property prop, var onceOnly) { ($self.getNext($obj, $prop, $onceOnly)) }    /// The next entry; `onceOnly` says what follows the last one.
+    emitter string getAny(object obj, property prop)                { ($self.getAny($obj, $prop)) }                /// An entry not yet used, picked at random.
+    emitter bool   isComplete(object obj, property prop)             { ($self.isComplete($obj, $prop)) }           /// True once every entry has been used.
 }
 
+// Add orLoopArray to the util object
 extend class _orUtil {
      ref _orLoopArray orLoopArray;
 }
 
-// dependency bindings — mirror orUtilLoopArray.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively. Included after
-// _orUtil is declared: they extend it, and reach this file again partway through the cycle.
 #include "orUtilArray"
 
-// onceOnly flag for getNext (orUtilLoopArray.h `constant repeatLast 2`).
-extern const int repeatLast;
-
-// Calling note: pass a MEMBER loop-array as its property name via the (property) cast —
-//   util.orLoopArray.getNext(self, (property)myLoopArray, repeatLast)
-// (a bare member reference resolves to its value, not the property name the I6 API wants).
+extern const int repeatLast;   /// As `onceOnly`: keep giving the last entry once the list is used up.

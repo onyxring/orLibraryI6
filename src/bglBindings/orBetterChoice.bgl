@@ -1,31 +1,20 @@
-//===================================================================================================
-// bindings/orBetterChoice.bgl — Beguile binding for orLibrary's orBetterChoice extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orBetterChoice improves parser disambiguation; an object can influence
-// whether it is chosen by providing a `chooseobject` routine that returns one of the FORCE_*/DEFER
-// codes (the FORCE_INCLUDE/FORCE_EXCLUDE/DEFER_CHOICE constants come from orUtilParser).
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orBetterChoice.bgl - Bindings for orLibrary's orBetterChoice extension
+    Better guesses when the player's words fit several objects. An object can steer
+    the choice with a `chooseobject` routine.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orBetterChoice.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively. (orUtilParser
-// declares FORCE_INCLUDE / FORCE_EXCLUDE / DEFER_CHOICE.)
+#include "_orHookBanner"
 #include "orUtilParser"
 #include "_orInfExt"
 
-// Per-object disambiguation hook: `int chooseobject(int code)` returning FORCE_INCLUDE / FORCE_EXCLUDE
-// to force the object in/out of the match, DEFER_CHOICE to fall through to the extension's own logic,
-// or FORCE_PARSER to abort the "better" logic entirely and use the standard parser default.
+/// An object's routine, `int chooseobject(int code)`, returning `FORCE_INCLUDE`, `FORCE_EXCLUDE`, `DEFER_CHOICE` or `FORCE_PARSER`.
 extern property chooseobject;
 
-// chooseobject return value: abandon orBetterChoice's logic and defer to the plain parser default.
-extern const int FORCE_PARSER;   // -1
+extern const int FORCE_PARSER;   /// Returned by `chooseobject`: leave the choice to the parser's own default.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookInformLibrary"
 #include "_orHookStandardLibrary"
 #includeI6 "orBetterChoice";

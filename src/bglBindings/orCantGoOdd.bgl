@@ -1,24 +1,15 @@
-//===================================================================================================
-// bindings/orCantGoOdd.bgl — Beguile binding for orLibrary's orCantGoOdd extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orCantGoOdd lets a room give a distinct "can't go that way" message for the
-// "odd" directions (up, down, in, out) via a `cant_go_odd` property, separate from `cant_go`.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orCantGoOdd.bgl - Bindings for orLibrary's orCantGoOdd extension
+    A room can give a separate message for blocked moves up, down, in and out.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orCantGoOdd.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "_orInfExt"
 
-// Per-room message for a blocked up/down/in/out move (a string, or a routine that prints it). When
-// set and non-zero, it is used instead of the default "It is not possible to go that way."
-extern property cant_go_odd;
+extern property cant_go_odd;   /// A room's message for a blocked move up, down, in or out: a string, or a routine that prints it.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookInformLibrary"
 #include "_orHookVerbs"
 #includeI6 "orCantGoOdd";

@@ -1,15 +1,11 @@
-//===================================================================================================
-// bindings/orDialogueMenu.bgl — Beguile binding for orLibrary's orDialogueMenu extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orDialogueMenu presents the topics the player can currently raise with an
-// NPC as a selectable orMenu, optionally auto-showing it before each prompt.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orDialogueMenu.bgl - Bindings for orLibrary's orDialogueMenu extension
+    Lists the topics the player can raise as a menu, shown before each prompt if wanted.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orDialogueMenu.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively. (orMenu declares the
-// base menu type this extends.)
+#include "_orHookBanner"
 #include "_orInfExt"
 #include "orUtilArray"
 #include "_orTopicPool"
@@ -17,33 +13,22 @@
 #include "orPlayerCommandQueue"
 #include "orUtilBuf"
 
-// When true (the default), the dialogue menu is shown automatically before each command prompt while
-// there are topics to raise.
-extern bool autoMenuSpeak;
+extern bool autoMenuSpeak;   /// True, the default, to show the menu before each prompt while there are topics to raise.
 
-// Choosing a topic from the menu queues a command: it is printed at the next prompt and parsed as if
-// typed. `commandText` overrides that command (default: "tell/ask <npc> about <topic>"), so it must be
-// one the parser understands. A string, or a routine that prints it.
-extern property commandText;
+extern property commandText;   /// A topic's command, queued when it is chosen: a string, or a routine that prints it.
 extend class orTopic {
-    string commandText;
-    string menuDisplay;   // the topic's text in the menu (default: its short_name)
+    string commandText;   /// The command queued when the topic is chosen; it must be one the parser understands.
+    string menuDisplay;   /// The topic's text in the menu; its `short_name` unless set.
 }
 
-// The dialogue-menu singleton (an orMenu). Rebuild it from the topics available to the player, then
-// show() it (from orMenu). Normally driven automatically, but exposed for manual control.
+/// The type of the dialogue menu.
 extern class _orDialogueMenu : orMenu {
-    // Repopulate the menu with the topics the player can raise with the current NPC; returns the count.
-    emitter int  initForDisplay()   { ($self.initForDisplay()) }
-    emitter void clear()            { $self.clear() }
-    emitter void add(object topic)  { $self.add($topic) }
+    emitter int  initForDisplay()   { ($self.initForDisplay()) }   /// Refill the menu with the topics the player can raise now; returns the count.
+    emitter void clear()            { $self.clear() }              /// Empty the menu.
+    emitter void add(object topic)  { $self.add($topic) }          /// Add a topic to the menu.
 }
-extern _orDialogueMenu orDialogueMenu;
+extern _orDialogueMenu orDialogueMenu;   /// The dialogue menu.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookKeyboard"
 #include "_orHookParser"
 #include "_orHookVerbs"

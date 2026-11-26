@@ -1,15 +1,14 @@
-//===================================================================================================
-// bindings/_orHookVerbs.bgl — Beguile binding for orLibrary's _orHookVerbs hook.
-//---------------------------------------------------------------------------------------------------
-// orLibrary's the verb hooks are Beguile's <extensions/stdlib/hooks/verbs>, which merges them into the
-// library rather than replacing its routines; orLibrary's I6 copy is kept out. Every binding whose I6
-// brings in _orHookVerbs includes this file.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    _orHookVerbs.bgl - Bindings for orLibrary's _orHookVerbs hook
+    Gives orLibrary's extensions their verb hooks through Beguile's own hook extension.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include "_orHookBanner"
 #include <extensions/stdlib/hooks/verbs>
 
-// Ahead of every orLibrary include: a hook whose _STAGE is above the last library stage skips itself.
+// Keep orLibrary's own copy of the hook out
 #emitfirst {
     Constant orHookVerbs_STAGE 99; #ifdef orHookVerbs_STAGE; #endif;
 }

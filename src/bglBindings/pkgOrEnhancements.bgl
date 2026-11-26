@@ -1,15 +1,11 @@
-//===================================================================================================
-// bindings/pkgOrEnhancements.bgl — Beguile binding for orLibrary's pkgOrEnhancements extension.
-//---------------------------------------------------------------------------------------------------
-// BUNDLE. This is an aggregator: including it pulls in the whole orLibrary "enhancements" set (the
-// gameplay extensions below) plus the matching I6 (#includeI6 at the bottom). It declares no types of
-// its own — each `#include`d binding supplies its own extern surface, so one `#include
-// "bglBindings/pkgOrEnhancements"` gives a game the lot.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    pkgOrEnhancements.bgl - Bindings for orLibrary's pkgOrEnhancements package
+    Every orLibrary gameplay extension in one include.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror pkgOrEnhancements.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orAdjective"
 #include "orBackdrop"
 #include "orBetterChoice"
@@ -35,8 +31,4 @@
 #include "orRecogName"
 #include "orReferByContents"
 #include "orMenu"
-
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "pkgOrEnhancements";

@@ -1,41 +1,30 @@
-//===================================================================================================
-// bindings/orStateDescriptors.bgl — Beguile binding for orLibrary's orStateDescriptors extension.
-//---------------------------------------------------------------------------------------------------
-// orStateDescriptors appends short state notes to an object's name during room-description and
-// inventory listings — e.g. "(closed)", "(worn)", "(providing light)". A game registers handler
-// routines that print a note for a given object; the engine runs them and formats the "( … )" clause.
-//
-// The engine object is the singleton `orStateDescriptors` (an `orRoutineList` in I6 — the only
-// instance). A handler is a routine `bool handler(object obj, bool suppress)` — it returns true if it
-// printed/would print a note; `suppress` is true on the counting pass (print nothing, just report).
-//
-//     bool waeOnBack(object obj, bool suppress) { … }
-//     orStateDescriptors.addInventoryHandler(waeOnBack);
-//     orStateDescriptors.suppressSingleItemWhich = 1;   // drop the "(which is …)" for a lone item
-//
-// All `extern` — orStateDescriptors (I6) provides the real definitions; this is type-info only.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orStateDescriptors.bgl - Bindings for orLibrary's orStateDescriptors extension
+    Notes after an object's name in room descriptions and inventories, such as
+    (closed) or (worn). A game adds its own with handler routines:
+        bool onBack(object obj, bool suppress) { … }
+        orStateDescriptors.addInventoryHandler(onBack);
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orStateDescriptors.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "_orInfExt"
 
-// The engine object's type. orStateDescriptors is the sole `orRoutineList` instance, so its
-// game-facing registration surface lives here. A handler is `bool handler(object obj, bool suppress)`.
+/// The type of `orStateDescriptors`. A handler returns true when it has a note for `obj`, and prints it unless `suppress` is true.
 extern class orRoutineList : object {
+    /// Add a handler for room descriptions.
     emitter void addRoomDescriptionHandler(func<bool, object, bool> handler)    { $self.addRoomDescriptionHandler($handler) }
+    /// Add a handler for inventories.
     emitter void addInventoryHandler(func<bool, object, bool> handler)          { $self.addInventoryHandler($handler) }
+    /// Remove a handler for room descriptions.
     emitter void removeRoomDescriptionHandler(func<bool, object, bool> handler) { $self.removeRoomDescriptionHandler($handler) }
+    /// Remove a handler for inventories.
     emitter void removeInventoryHandler(func<bool, object, bool> handler)       { $self.removeInventoryHandler($handler) }
-    int suppressSingleItemWhich;   // 1 = drop the "(which is …)" clause when only one item matches
+    int suppressSingleItemWhich;   /// Set to 1 to leave out "which is" when only one item is listed.
 }
-extern orRoutineList orStateDescriptors;
+extern orRoutineList orStateDescriptors;   /// The list of state-note handlers.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookInformLibrary"
 #include "_orHookWriteAfterEntry"
 #includeI6 "orStateDescriptors";

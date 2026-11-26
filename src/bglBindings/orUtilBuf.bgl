@@ -1,80 +1,68 @@
-//===================================================================================================
-// bindings/orUtilBuf.bgl — Beguile binding for orLibrary's orUtilBuf extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. Provides `util.orBuf` — string manipulation over orLibrary character buffers
-// (the hybrid length-prefixed buffers used by orString / orCenter / orMenu). Hung off the shared
-// `util` object (I6 `util.orBuf` → object `_orBuf`).
-//
-// CORE SUBSET. The most-used measure / compare / search / transform routines are bound here; buffer
-// arguments are typed `var` so a literal string, a raw character buffer, or an orString all pass. The
-// lower-level stream/pool plumbing (capture/release, lock/free, convertToSizedBuffer, …) stays in #i6
-// — and for new Beguile code the native <string>/<buf> extensions are usually the better choice.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orUtilBuf.bgl - Bindings for orLibrary's orUtilBuf extension
+    util.orBuf: measure, compare, search and edit orLibrary's character buffers.
+    A source argument can be a literal string, a buffer or an orLibrary string.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orUtilBuf.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orUtilNum"
 #include "orUtilChar"
-#include "_orUtil"   // declares _orUtil (the `util` object), which this binding extends
+#include "_orUtil"
 
-// util.orBuf — buffer/string helpers (orUtilBuf.h `object _orBuf`). `buf` is a mutable target buffer;
-// the "source" arguments accept a literal string, a buffer, or an orString.
+/// Character-buffer helpers, reached as `util.orBuf`.
 extern class _orBuf : object {
-    // fill/measure/resize
-    emitter void setFromLiteral(var buf, var stringVal)          { $self.setFromLiteral($buf, $stringVal) }
-    emitter void setFromBuffer(var buf, var source)              { $self.setFromBuffer($buf, $source) }
-    emitter int  getLength(var buf)                              { ($self.getLength($buf)) }
-    emitter void setLength(var buf, int newLength)               { $self.setLength($buf, $newLength) }
-    emitter int  getSize(var buf)                                { ($self.getSize($buf)) }       // allocated capacity, or -1
-    emitter bool isSized(var buf)                                { ($self.isSized($buf)) }
-    emitter void print(var buf)                                  { $self.print($buf) }
-    emitter void print(var buf, int len)                         { $self.print($buf, $len) }
+    //-- Fill, measure and print ---------------------------------------
+    emitter void setFromLiteral(var buf, var stringVal)          { $self.setFromLiteral($buf, $stringVal) }   /// Fill the buffer with a literal string's text.
+    emitter void setFromBuffer(var buf, var source)              { $self.setFromBuffer($buf, $source) }       /// Fill the buffer with another buffer's text.
+    emitter int  getLength(var buf)                              { ($self.getLength($buf)) }                  /// The number of characters in the text.
+    emitter void setLength(var buf, int newLength)               { $self.setLength($buf, $newLength) }        /// Set the number of characters in the text.
+    emitter int  getSize(var buf)                                { ($self.getSize($buf)) }                    /// The number of characters the buffer can hold, or -1 when it records no size.
+    emitter bool isSized(var buf)                                { ($self.isSized($buf)) }                    /// True when the buffer records its own size.
+    emitter void print(var buf)                                  { $self.print($buf) }                        /// Print the text.
+    emitter void print(var buf, int len)                         { $self.print($buf, $len) }                  /// Print the first `len` characters.
 
-    // per-character access
-    emitter char getChar(var buf, int pos)                       { ($self.getChar($buf, $pos)) }
-    emitter void setChar(var buf, int pos, char val)             { $self.setChar($buf, $pos, $val) }
+    //-- Single characters ---------------------------------------------
+    emitter char getChar(var buf, int pos)                       { ($self.getChar($buf, $pos)) }              /// The character at `pos`.
+    emitter void setChar(var buf, int pos, char val)             { $self.setChar($buf, $pos, $val) }          /// Store a character at `pos`.
 
-    // compare / search (caseInsensitive defaults to false; startingIndex to 0)
-    emitter bool equals(var buf1, var buf2)                      { ($self.equals($buf1, $buf2)) }
-    emitter bool equals(var buf1, var buf2, bool caseInsensitive){ ($self.equals($buf1, $buf2, $caseInsensitive)) }
-    emitter bool startsWith(var buf1, var buf2)                  { ($self.startsWith($buf1, $buf2)) }
-    emitter bool startsWith(var buf1, var buf2, bool caseInsensitive) { ($self.startsWith($buf1, $buf2, $caseInsensitive)) }
-    emitter bool endsWith(var buf1, var buf2)                    { ($self.endsWith($buf1, $buf2)) }
-    emitter bool endsWith(var buf1, var buf2, bool caseInsensitive)   { ($self.endsWith($buf1, $buf2, $caseInsensitive)) }
-    emitter int  indexOf(var buf, var searchText)               { ($self.indexOf($buf, $searchText)) }
-    emitter int  indexOf(var buf, var searchText, int startingIndex) { ($self.indexOf($buf, $searchText, $startingIndex)) }
+    //-- Compare and search --------------------------------------------
+    emitter bool equals(var buf1, var buf2)                      { ($self.equals($buf1, $buf2)) }             /// True when the two texts are the same.
+    emitter bool equals(var buf1, var buf2, bool caseInsensitive){ ($self.equals($buf1, $buf2, $caseInsensitive)) }   /// True when the two texts are the same, ignoring case on request.
+    emitter bool startsWith(var buf1, var buf2)                  { ($self.startsWith($buf1, $buf2)) }         /// True when the first text begins with the second.
+    emitter bool startsWith(var buf1, var buf2, bool caseInsensitive) { ($self.startsWith($buf1, $buf2, $caseInsensitive)) }   /// True when the first text begins with the second, ignoring case on request.
+    emitter bool endsWith(var buf1, var buf2)                    { ($self.endsWith($buf1, $buf2)) }           /// True when the first text ends with the second.
+    emitter bool endsWith(var buf1, var buf2, bool caseInsensitive)   { ($self.endsWith($buf1, $buf2, $caseInsensitive)) }   /// True when the first text ends with the second, ignoring case on request.
+    emitter int  indexOf(var buf, var searchText)               { ($self.indexOf($buf, $searchText)) }       /// The position of `searchText`, or -1.
+    emitter int  indexOf(var buf, var searchText, int startingIndex) { ($self.indexOf($buf, $searchText, $startingIndex)) }   /// The position of `searchText` at or after `startingIndex`, or -1.
 
-    // copy / substring into a destination buffer
-    emitter void copy(var toBuf, var fromBuf, int numCharsToCopy) { $self.copy($toBuf, $fromBuf, $numCharsToCopy) }
-    emitter void mid(var toBuf, var fromBuf, int fromPos, int numCharsToCopy) { $self.mid($toBuf, $fromBuf, $fromPos, $numCharsToCopy) }
-    emitter void left(var toBuf, var fromBuf, int numCharsToCopy)  { $self.left($toBuf, $fromBuf, $numCharsToCopy) }
-    emitter void right(var toBuf, var fromBuf, int numCharsToCopy) { $self.right($toBuf, $fromBuf, $numCharsToCopy) }
+    //-- Copy into another buffer --------------------------------------
+    emitter void copy(var toBuf, var fromBuf, int numCharsToCopy) { $self.copy($toBuf, $fromBuf, $numCharsToCopy) }   /// Copy characters from one buffer to another.
+    emitter void mid(var toBuf, var fromBuf, int fromPos, int numCharsToCopy) { $self.mid($toBuf, $fromBuf, $fromPos, $numCharsToCopy) }   /// Copy characters starting at `fromPos`.
+    emitter void left(var toBuf, var fromBuf, int numCharsToCopy)  { $self.left($toBuf, $fromBuf, $numCharsToCopy) }   /// Copy the first characters.
+    emitter void right(var toBuf, var fromBuf, int numCharsToCopy) { $self.right($toBuf, $fromBuf, $numCharsToCopy) }  /// Copy the last characters.
 
-    // in-place edit
-    emitter void insert(var toBuf, var fromBuf, int toPos)       { $self.insert($toBuf, $fromBuf, $toPos) }
-    emitter void prepend(var toBuf, var fromBuf)                 { $self.prepend($toBuf, $fromBuf) }
-    emitter void append(var toBuf, var fromBuf)                  { $self.append($toBuf, $fromBuf) }
-    emitter void delete(var buf, int pos, int count)            { $self.delete($buf, $pos, $count) }
-    emitter void replace(var buf, var searchText, var replaceText)    { $self.replace($buf, $searchText, $replaceText) }
-    emitter void replaceAll(var buf, var searchText, var replaceText) { $self.replaceAll($buf, $searchText, $replaceText) }
+    //-- Edit in place -------------------------------------------------
+    emitter void insert(var toBuf, var fromBuf, int toPos)       { $self.insert($toBuf, $fromBuf, $toPos) }   /// Insert text at `toPos`.
+    emitter void prepend(var toBuf, var fromBuf)                 { $self.prepend($toBuf, $fromBuf) }          /// Add text at the start.
+    emitter void append(var toBuf, var fromBuf)                  { $self.append($toBuf, $fromBuf) }           /// Add text at the end.
+    emitter void delete(var buf, int pos, int count)            { $self.delete($buf, $pos, $count) }         /// Remove `count` characters starting at `pos`.
+    emitter void replace(var buf, var searchText, var replaceText)    { $self.replace($buf, $searchText, $replaceText) }      /// Replace the first `searchText` with `replaceText`.
+    emitter void replaceAll(var buf, var searchText, var replaceText) { $self.replaceAll($buf, $searchText, $replaceText) }   /// Replace every `searchText` with `replaceText`.
 
-    // whole-buffer transforms (in place)
-    emitter void toUpper(var buf)   { $self.toUpper($buf) }
-    emitter void toLower(var buf)   { $self.toLower($buf) }
-    emitter void reverse(var buf)   { $self.reverse($buf) }
-    emitter void trimLeft(var buf)  { $self.trimLeft($buf) }
-    emitter void trimRight(var buf) { $self.trimRight($buf) }
-    emitter void trim(var buf)      { $self.trim($buf) }
+    //-- Change the whole text -----------------------------------------
+    emitter void toUpper(var buf)   { $self.toUpper($buf) }     /// Make every letter upper case.
+    emitter void toLower(var buf)   { $self.toLower($buf) }     /// Make every letter lower case.
+    emitter void reverse(var buf)   { $self.reverse($buf) }     /// Reverse the order of the characters.
+    emitter void trimLeft(var buf)  { $self.trimLeft($buf) }    /// Remove spaces from the start.
+    emitter void trimRight(var buf) { $self.trimRight($buf) }   /// Remove spaces from the end.
+    emitter void trim(var buf)      { $self.trim($buf) }        /// Remove spaces from both ends.
 }
-// Hang orBuf off the shared `util` object (declared in _orUtil.bgl).
+// Add orBuf to the util object
 extend class _orUtil {
     ref _orBuf orBuf;
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-#include "_orHookInformLibrary"   // hooks this extension's I6 answers
+#include "_orHookInformLibrary"
 #includeI6 "orUtilBuf";

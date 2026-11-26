@@ -1,25 +1,17 @@
-//===================================================================================================
-// bindings/orVagueQuantity.bgl — Beguile binding for orLibrary's orVagueQuantity extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orVagueQuantity names a pile of like objects vaguely ("a few coins", "a
-// couple of rocks") based on how many there are, via each object's `vagueQuantity` property.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orVagueQuantity.bgl - Bindings for orLibrary's orVagueQuantity extension
+    Names a pile of like objects by roughly how many there are: "a few coins",
+    "a couple of rocks".
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orVagueQuantity.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "_orInfExt"
 #include "orUtilArray"
 
-// orVagueQuantity.h `property individual vagueQuantity;` — a multi-value list describing how a pile of
-// like objects is named at each count threshold: {N1, "phrase1", N2, "phrase2", …, useLastFlag}.
-extern property vagueQuantity;
+extern property vagueQuantity;   /// How a pile is named at each count: `{count, "phrase", count, "phrase", …}`.
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookInformLibrary"
 #include "_orHookWriteAfterEntry"
 #include "_orHookWriteList"

@@ -1,21 +1,15 @@
-//===================================================================================================
-// bindings/orGibberish.bgl — Beguile binding for orLibrary's orGibberish extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orGibberish prints a random, pronounceable nonsense word — handy for alien
-// speech, spell names, and the like.
-//===================================================================================================
-#once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — orGibberish.h has no orLibrary #includes of its own.
+/* -----------------------------------------------------------------------------
+    orGibberish.bgl - Bindings for orLibrary's orGibberish extension
+    Random, pronounceable nonsense words, for alien speech, spell names and the like.
 
-// The generator object. printWord prints one random pronounceable word built from `numVowels` vowel
-// sounds (higher → longer word).
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
+#once
+#include "_orHookBanner"
+
+/// The nonsense-word generator.
 extern object orGibberish {
-    void printWord(int numVowels);
+    void printWord(int numVowels);   /// Print one random word of `numVowels` vowel sounds; more makes a longer word.
 }
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
 #includeI6 "orGibberish";

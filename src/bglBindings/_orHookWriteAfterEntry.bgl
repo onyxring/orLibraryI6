@@ -1,15 +1,14 @@
-//===================================================================================================
-// bindings/_orHookWriteAfterEntry.bgl — Beguile binding for orLibrary's _orHookWriteAfterEntry hook.
-//---------------------------------------------------------------------------------------------------
-// orLibrary's the list-entry hooks are Beguile's <extensions/stdlib/hooks/writeAfterEntry>, which merges them into the
-// library rather than replacing its routines; orLibrary's I6 copy is kept out. Every binding whose I6
-// brings in _orHookWriteAfterEntry includes this file.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    _orHookWriteAfterEntry.bgl - Bindings for orLibrary's _orHookWriteAfterEntry hook
+    Gives orLibrary's extensions their list-entry hooks through Beguile's own hook extension.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
+#include "_orHookBanner"
 #include <extensions/stdlib/hooks/writeAfterEntry>
 
-// Ahead of every orLibrary include: a hook whose _STAGE is above the last library stage skips itself.
+// Keep orLibrary's own copy of the hook out
 #emitfirst {
     Constant orHookWriteAfterEntry_STAGE 99; #ifdef orHookWriteAfterEntry_STAGE; #endif;
 }

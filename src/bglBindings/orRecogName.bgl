@@ -1,28 +1,20 @@
-//===================================================================================================
-// bindings/orRecogName.bgl — Beguile binding for orLibrary's orRecogName extension.
-//---------------------------------------------------------------------------------------------------
-// Including this binding pulls in the I6 extension (#includeI6 below), so a game can depend on the
-// Beguile binding alone. orRecogName lets the parser match an object by the words in its printed
-// short_name (not just its `name` dictionary words). Give an object `noRecogName` to opt it out.
-//===================================================================================================
+/* -----------------------------------------------------------------------------
+    orRecogName.bgl - Bindings for orLibrary's orRecogName extension
+    The player can refer to an object by the words of its printed name, not
+    only its name words.
+
+    Created by Jim Fisher (OnyxRing). Public domain, like the orLibrary it binds.
+   -----------------------------------------------------------------------------*/
 #once
-#include "_orHookBanner"   // Beguile's banner, with orLibrary's line (every orLibrary binding carries it)
-// dependency bindings — mirror orRecogName.h's orLibrary #includes so nested extern
-// declarations (types, members, properties, globals) are available transitively.
+#include "_orHookBanner"
 #include "orUtilBuf"
 #include "_orInfExt"
 
-// Put on an object to exclude it from short_name matching.
-extern attribute noRecogName;
+extern attribute noRecogName;   /// The object is not matched by the words of its printed name.
 
-// Test whether the input word at `wordnumber` (a word-stream index) appears in `obj`'s printed
-// short_name. Returns 1 (match) or -1 (no match) — callable from a custom parse_name.
+/// Test the typed word at `wordnumber` against the object's printed name: 1 when it is there, -1 when not. For use in a `parse_name`.
 extern int MatchAgainstShortName(object obj, int wordnumber);
 
-// Pull in the actual orLibrary I6 extension. The beguiler resolves it (via includePaths) to an
-// absolute path and expands that into the transpiled .inf; the shared artifact is this .bgl
-// binding, not the intermediate I6. (Raw @"..." stays as an escape hatch for verbatim emission.)
-// the hooks this extension's I6 answers
 #include "_orHookInformLibrary"
 #include "_orHookStandardLibrary"
 #includeI6 "orRecogName";
