@@ -65,6 +65,9 @@ Constant        orDialogueMenu_STAGE  0;
       class orMenu
       with childMenuItems 0 0 0 0 0 0 0 0 0 0 0 0
       ,  itemWindowId 0
+      ,  queuedAction 0
+      ,  queuedTalkingTo 0
+      ,  queuedTopic 0
       ,  initForDisplay[
                t talkingTo top;
             self.clear();
@@ -86,6 +89,9 @@ Constant        orDialogueMenu_STAGE  0;
 
       talkingTo=act.getNoun();
       top=act.getSecond();
+      orDialogueMenu.queuedAction=act.getAction();
+      orDialogueMenu.queuedTalkingTo=talkingTo;
+      orDialogueMenu.queuedTopic=top;
 
       if(top provides commandText) {
          util.orRef.resolvePrint(top, commandText, act, top, talkingTo);
@@ -123,7 +129,16 @@ Constant        orDialogueMenu_STAGE  0;
    orInfExt with ext_handleMenuResult[selected talkingTo;
       util.orui.activateMain();
    	if(selected ofclass orTopic) queuePlayerTopic(selected);
-	];
+	]
+   ,  ext_playLoopRewriteParsedCommands[;
+      if(orDialogueMenu.queuedAction==0) rfalse;
+      action=inputobjs-->0=orDialogueMenu.queuedAction;
+      inputobjs-->1=2;
+      inputobjs-->2=orDialogueMenu.queuedTalkingTo;
+      inputobjs-->3=orDialogueMenu.queuedTopic;
+      orDialogueMenu.queuedAction=0;
+      rfalse;
+   ];
 #endif; !--After VERBLIB
 !======================================================================================
 ! AFTER Grammar

@@ -56,21 +56,21 @@ Constant        orTopicPool_STAGE  0;
 				relTop=util.orArray.get(top,relatedTopics,t);
 				if(relTop.isAppropriateFor(c1,c2)){
 					if(c1==player){
-						if(util.orArray.find(playerDialoguePool,relTop)==-1) util.orArray.prepend(playerDialoguePool,relTop);
+						if(util.orArray.find(playerDialoguePool,relTop)==-1) util.orArray.insert(playerDialoguePool,0,relTop);
 					}
 					else{
 						if(c1 provides dialoguePool){
-							if(util.orArray.find(c1, dialoguePool, relTop)==-1) util.orArray.prepend(c1,dialoguePool,relTop);
+							if(util.orArray.find(c1, dialoguePool, relTop)==-1) util.orArray.insert(c1,dialoguePool,0,relTop);
 						}
 					}
 				}
 				if(c2==0) continue;
 				if(relTop.isAppropriateFor(c2,c1)){
 					if(c2==player){
-						if(util.orArray.find(playerDialoguePool,relTop)==-1) util.orArray.prepend(playerDialoguePool,relTop);
+						if(util.orArray.find(playerDialoguePool,relTop)==-1) util.orArray.insert(playerDialoguePool,0,relTop);
 					}else {
 						if(c2 provides dialoguePool){
-							if(util.orArray.find(c2, dialoguePool, relTop)==-1) util.orArray.prepend(c2,dialoguePool,relTop);
+							if(util.orArray.find(c2, dialoguePool, relTop)==-1) util.orArray.insert(c2,dialoguePool,0,relTop);
 						}
 					}
 				}

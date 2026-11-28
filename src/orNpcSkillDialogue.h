@@ -61,15 +61,25 @@ Constant        orNPCSkillDialogue_STAGE  0;
 		,  canPerform[npc
                i count;
             for(i=0:i<util.orArray.getLength(npc, dialoguePool):i++){
-               if(util.orArray.get(npc, dialoguePool).isAppropriateFor(npc, player)) 
+               if(util.orArray.get(npc, dialoguePool, i).isAppropriateFor(npc, player)) 
                   count++;
             }
             return (count>0);
          ]
       ,  perform[npc 
-               r;
+               r i n;
 
-            r=util.orArray.get(npc, dialoguePool,random(util.orArray.getLength(npc, dialoguePool))-1);
+            for(i=0:i<util.orArray.getLength(npc, dialoguePool):i++){
+               if(util.orArray.get(npc, dialoguePool, i).isAppropriateFor(npc, player)) n++;
+            }
+            n=random(n);
+            for(i=0:i<util.orArray.getLength(npc, dialoguePool):i++){
+               r=util.orArray.get(npc, dialoguePool, i);
+               if(r.isAppropriateFor(npc, player)){
+                  n--;
+                  if(n==0) break;
+               }
+            }
             util.orArray.removeValue(npc, dialoguePool,r);
             new_line;
             if(r.isKnownBy(npc))
@@ -88,6 +98,11 @@ with priority 15 !--run after other stuff has had a chance to run
          actor.pendingQuestion=top;
          rtrue;
       }
+      rfalse;
+]
+,  ext_topicTold[top actor talkingTo;
+      actor=actor;
+      if(talkingTo provides pendingQuestion && talkingTo.pendingQuestion==top) talkingTo.pendingQuestion=0;
       rfalse;
 ];
 

@@ -246,7 +246,7 @@ orTopic drac_t with knownBy dracula; 	!orLib: orTopics must be "known" by charac
 	orTopic -> d_mother_t "mother" 
 		with name 'mother'
 		,	quip 	"~What about your mother?  What does she do?~" 																						!orLib: quips can come in pairs. If there are two, then the first is used when someone ASKs about the topic.  In this case, Medusa would ask Dracula about his mother.
-					"~My mother's the president of Securities Bank and Trust over in Milhelm.~^^I used to live in Milhelm. I know where that bank is." 	!	The second quip is used when the character is about TELLing the topic.  Here, Dracula is telling about his mother.  
+					"~My mother's the president of Securities Bank and Trust over in Milhelm.~^^~I used to live in Milhelm,~ she says. ~I know where that bank is.~" 	!	The second quip is used when the character is about TELLing the topic.  Here, Dracula is telling about his mother.  
 																																						!	The two are not always linked.  Dracula might offer up the topic of his mother without being asked about here.
 		,	menuDisplay "My mother's the president of"	!orLib: when topics are listed as options in the menu, this is the text displayed.  If not defined, the printed name is used instead (in this case "mother").
 		,	relatedTopics m_familydoeswell_t			!orLib: generally, relatedTopics are added to the topic pools of both characters if appropriate, so a character might tell the other about it, if they know of it, or they can ask about it if they don't.
@@ -279,7 +279,7 @@ orTopic drac_t with knownBy dracula; 	!orLib: orTopics must be "known" by charac
 	orTopic -> d_lawyer_t "Harvard" 
 		with quip "~So you want to be an actor?~^^You shake your head at this." 
 			"~I only took theater as an elective. I'll be transferring to Harvard Law after next year.~^^~A lawyer! You're taking this bloodsucking theme a little far aren't you?~^^~Hey, not all lawyers are bad!~^^~Okay.~ She rolls her eyes, unconvinced."
-		,	name 'lawyer'
+		,	name 'lawyer' 'harvard'
 		,	menuDisplay "I only took theater as an elective."
 		,	RelatedTopics m_major_t m_lawyer_t 
 	;
@@ -349,7 +349,7 @@ orTopic drac_t with knownBy dracula; 	!orLib: orTopics must be "known" by charac
 	orTopic -> d_cousingarden_t "cousin's garden" 
 		with quip "~I have a cousin who grows a flower garden for a living,~ you say.^^~For a living?~^^~Uh-hmm.  He has a big green house and supplies flower shops around his town with their inventory.~^^~Hmmm,~ she thinks for a moment, then: ~I never really thought about where floral shops get what they sell.  Flowers don't live very long.~"
 		,	menuDisplay "I have a cousin who grows a flower garden"
-		,	name 'cousin'
+		,	name 'cousin' 'cousin^s' 'garden' 'flower'
 	;
 	orTopic -> d_capitalpunishment_t "death penalty"
 		with quip "~You don't agree with our position?~ she asks, knowing the answer already from your expression."
@@ -384,7 +384,7 @@ orTopic medus_t with knownBy medusa;
 	orTopic -> m_accountant_t "accounting" 
 		with quip "~You want to be an accountant? Math has just never been my thing.~^^She nods." "~I want to be a CPA.  I've been fascinated with numbers most of my life. I think I find comfort in the clear-cut, logical rules.~"
 		,	menuDisplay "You want to be an accountant?"
-		,	name 'accountant'
+		,	name 'accountant' 'accounting'
 	;
 	orTopic -> m_familydoeswell_t "Milhelm" 
 		with quip "~Milhelm is an expensive area of town. Your family must live pretty comfortably.~^^~We do okay. My father's a workaholic.~"
@@ -457,7 +457,7 @@ orTopic medus_t with knownBy medusa;
 [Initialise;
 	ChangePlayer(dracula);
 
-	medusa.takeNoticeOfTopic(m_costume_t); 	!orLib: playerTakeNoticeOfTopic places a topic in the player's topic pool.  So Dracula might start off by asking about her costume 
+	playerTakeNoticeOfTopic(m_costume_t); 	!orLib: playerTakeNoticeOfTopic places a topic in the player's topic pool.  So Dracula might start off by asking about her costume 
 
 	!orLib: the only print patter we haven't seen so far in the below text is $numbText:1, which prints out the name of the number passed in via the first paramter
 	orPrint("^^^^It took you a little time to get your vampire costume together, so you're running late for Gary's party. But now you've arrived, on the ground floor of his high-rise apartment building. $i;Better late than never.$n^^The elevator chimes softly as it opens and you step into the mirrored interior.  For a moment, you struggle to remember Gary's floor number.  $i;Oh, yeah... $numbText:1.$n You reach out and push the button.  The doors begin to close but stop suddenly as a slender hand appears.  With another chime, the doors open again revealing a beautiful, red-headed young woman dressed in a toga.^^You recognize her from campus although you do not actually know her.  For a moment you almost do not see the red rubber snakes entwined with her long red curls.  She steps into the elevator and reaches for a button, but stops, apparently seeing it already lit.^^$i;It seems$n, you think as the doors close and the elevator begins to move, $i;this ~Medusa~ is going to same costume party I am.$n;^^^",FLOOR_COUNT);
@@ -482,14 +482,20 @@ extend 'talk' replace
 	* -> sayRandomTopic
 	* 'to' animate -> sayRandomTopic !accept "Talk to girl" even though it isn't all that meaningful in this example.  There's only one other person to talk to.
 ;
+extend 't' first
+	* -> sayRandomTopic
+	* 'to' animate -> sayRandomTopic
+;
 
 [sayRandomTopicSub
-		num topic; 
+		num topic talkingTo;
 	num=orDialogueMenu.initForDisplay();
 	if(num==0) "You can think of nothing to talk about.";
 	num=random(num)-1;
 	topic=util.orArray.get(orDialogueMenu,childMenuItems,num); 
-	queuePlayerTopic(topic);
+	talkingTo=ResolveActorTalkingTo();
+	if(topic.isKnownBy(player)) <<tellTopic talkingTo topic>>;
+	<<askTopic talkingTo topic>>;
 ];
 !---------------------------------------------------------------------------------------------------
 end;
