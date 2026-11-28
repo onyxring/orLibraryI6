@@ -173,14 +173,16 @@ Constant        orMenu_STAGE  0;
 				}
 				style roman;
 			]
-		,	_resizeHeader[currentMenu s;
+		,	_resizeHeader[currentMenu s h;
 				if(self._rootMenu.itemWindowId~=0) return; !--the items have their own window, so the status line keeps its size
 				if(self.displayStyle==orMenuFullScreen)
 					s = _orMenuFullScreenStatusHeight;
 				else
 					s = self._startingStatusHeight;
 
-				util.orUI.setStatusHeight(s + self.getNumberOfVisibleChildren(currentMenu));
+				h = s + self.getNumberOfVisibleChildren(currentMenu);
+				if(h==2) h=3;
+				util.orUI.setStatusHeight(h);
 			]
 		,	_renderItems[currentMenu o t;
 				if(self._rootMenu.itemWindowId==0){

@@ -47,6 +47,7 @@
 !---------------------------------------------------------------------------------------------------
 ! 2002.04.14	0100	Initial release for ORLibrary 1.
 ! 2026.02.08	0200	Updated to the 2.0 version of the orLibrary.
+! 2026.11.27	0201	Dialogue chains, topic menus and centering fixed; the ride is now 17 floors.
 !--------------------------------------------------------------------------------------------------
 !Includes
 !orLib: These are all the orLibrary extensions explicitly included; however most of these also
@@ -61,12 +62,12 @@
 #include "orUtilLoopArray";		!Provides the ability to loop over several options without repeating them
 !--------------------------------------------------------------------------------------------------
 !Constants
-Release	200;
+Release	201;
 Constant DEBUG true;
 Constant Story "Medusa";
 Constant Headline "^An Example in NPC Conversations^Copyright (c) 2002 - 2026: Jim Fisher^";
 Constant DIALECT_US;		
-Constant FLOOR_COUNT 20;				!change this to make the conversation go longer (or shorter)
+Constant FLOOR_COUNT 17;				!change this to make the conversation go longer (or shorter)
 
 Constant orStringDefaultSize 1100;		!orLib: I use orPrint to format some pretty long strings (>1K),
 										!	lets make sure we've sized orStrings to handle this.  
@@ -166,6 +167,7 @@ orNpc medusa "woman" elevator 	!orLib: the orNpc class is the foundation for NPC
 	,	description "Beautiful, just as the Greek myths describe her. Her toga accentuates her curves, not unpleasantly. A dozen or so thin rubber snakes, painted red to blend almost unnoticeably with her long curls, bounce around her head and face as she moves. Her blue eyes glint in the dim lighting of the elevator."
 	,	add_to_scope toga hair snakes
 	,	initial "A slender, red-headed young woman, dressed as Medusa, stands beside you."
+	,	dialoguePool 0 0 0 0 0 0 0 0 0 0
 	,	uncomfortableSilence 0 																		!orLib: Here we define a "loopArray", where the first value is used to track which elements have been previously returned. This is used in the doNothing routine below.
 			"There is a brief moment of uncomfortable silence."										!	LoopArrays don't have to be strings, its up to the code useing it to interpret values.
 			"The woman turns to the mirror for a moment and arranges her snakes."
@@ -233,7 +235,7 @@ orMenu HelpSys "Medusa"; 	!orLib: orMenus are defined in a hierarchy of objects.
 		orMenu ->-> "Talk" with description "As discussed in ~NPC Conversations,~ each character in the game has a pool of potential conversation topics.  For the player character, these are normally displayed in the conversation menu; however, a topic from this pool can also be selected at random with the TALK command which is issued in the following format:^^     TALK TO GIRL^^TALK and TELL both share the same abbreviation (~T~) as well as the ability to infer to whom the player is speaking.  As such:^^     T^^Is the same as ~TALK TO GIRL~ (about some random topic) which is different than:^^     T COSTUME^^which means ~TELL GIRL ABOUT COSTUME~.";
 		orMenu ->-> "MenuSpeak" with description "The MenuSpeak command (abbreviated MS) turns on the conversation menu if there are conversation topics to display.  This is useful when the conversation menu has been exited or AutoMenuSpeak has been turned off.";
 		orMenu ->-> "AutoMenuSpeak" with description "The AutoMenuSpeak command (or AMS for short) is used to turn the automatic conversation menu on or off with the following syntax:^^     AMS ON^^Or^^     AMS OFF^^By default it is ON.";
-	orMenu -> "About the Author" with description "Jim Fisher, also known as OnyxRing, is the author of a handful of Interactive Fiction titles.~";
+	orMenu -> "About the Author" with description "Jim Fisher, also known as OnyxRing, is the author of a handful of Interactive Fiction titles.";
 	orMenu -> "About the ~orLibrary~" with description "The orLibrary, or the ~OnyxRing Library,~ is a framework of extensions to Inform 6's standard library.  It contains a spectrum of usable entries which do everything from centering wrapped text to enabling NPCs to walk around and talk with one another.^^If you are an Inform author and are interested in finding out more of the orLibrary, point your browser to: github.com/onyxring/orLibraryI6.";
 
 !---------------------------------------------------------------------------------------------------
@@ -457,7 +459,7 @@ orTopic medus_t with knownBy medusa;
 [Initialise;
 	ChangePlayer(dracula);
 
-	playerTakeNoticeOfTopic(m_costume_t); 	!orLib: playerTakeNoticeOfTopic places a topic in the player's topic pool.  So Dracula might start off by asking about her costume 
+	medusa.takeNoticeOfTopic(m_costume_t); 	!orLib: playerTakeNoticeOfTopic places a topic in the player's topic pool.  So Dracula might start off by asking about her costume 
 
 	!orLib: the only print patter we haven't seen so far in the below text is $numbText:1, which prints out the name of the number passed in via the first paramter
 	orPrint("^^^^It took you a little time to get your vampire costume together, so you're running late for Gary's party. But now you've arrived, on the ground floor of his high-rise apartment building. $i;Better late than never.$n^^The elevator chimes softly as it opens and you step into the mirrored interior.  For a moment, you struggle to remember Gary's floor number.  $i;Oh, yeah... $numbText:1.$n You reach out and push the button.  The doors begin to close but stop suddenly as a slender hand appears.  With another chime, the doors open again revealing a beautiful, red-headed young woman dressed in a toga.^^You recognize her from campus although you do not actually know her.  For a moment you almost do not see the red rubber snakes entwined with her long red curls.  She steps into the elevator and reaches for a button, but stops, apparently seeing it already lit.^^$i;It seems$n, you think as the doors close and the elevator begins to move, $i;this ~Medusa~ is going to same costume party I am.$n;^^^",FLOOR_COUNT);

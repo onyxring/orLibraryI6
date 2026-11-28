@@ -66,6 +66,8 @@ Constant        orCenter_STAGE  0;
 	system_file;
 
 	Array cursPos buffer 10;
+	Global _orcWidth; Global _orcMaxWidth; Global _orcHighlight; Global _orcLeftAlign;
+	Global _orcFrame; Global _orcSubIndent; Global _orcPadding;
 
 	#ifndef orTempBuffer;
 		array _orTmpBuffer8000 buffer 8000;
@@ -96,15 +98,14 @@ Constant        orCenter_STAGE  0;
 	!						2 - print the postfix
 	!	subIndent	- indents the text by adding additional spaces to the left; primariliy used by the orInset routine
 	[orCenter text maxwidth highlight leftAlign prefixPostFixCallback subIndent 
-			padding width markerstart markerend o i offset len includeBreakingChar;
+			padding width o c start lineEnd nextStart end len;
 
 		orTempBuffer=util.orBuf.convertToSizedBuffer(orTempBuffer,8000);
 		
 		if(prefixPostFixCallback~=0) padding = prefixPostFixCallback(0)/2;
 		font off; !fixed width
-		width=util.orUI.getCurrentWidth(); !--the window this prints to, which isn't always the status line
-		width=width-2;							!subtract a little from the width (keep the left-most and right-most column blank)
-		if(maxwidth==0 || maxwidth>width) maxwidth=width;		!default maxwidth of line to the width of the display if it is not defined or too large to display
+		width=util.orUI.getCurrentWidth();
+		if(maxwidth==0 || maxwidth>width-2) maxwidth=width-2;	!keep the left-most and right-most column blank
 
 			util.orBuf.capture(orTempBuffer);
 
@@ -112,7 +113,7 @@ Constant        orCenter_STAGE  0;
 				string:
 					print (string)text;		!print text in array
 				routine:
-					if(text()) maxwidth=width;
+					if(text()) maxwidth=width-2;
 				object:
 #ifdef orString;
 					if(text ofclass orString)
@@ -128,52 +129,67 @@ Constant        orCenter_STAGE  0;
 		util.orBuf.release();
 
 		len=util.orBuf.getLength(orTempBuffer);
-
-		for(markerend=markerstart=o=WORDSIZE:o<=(len+WORDSIZE):o++){
-			if(orTempBuffer->o=='?' or '/' or '-' or ':' or ' ' or 10 or 13 ) markerend=o;					!adjust pointer to end-of-line in increments of whole words
-			if(orTempBuffer->o==10 or 13 || o==(len+WORDSIZE)|| o-markerstart>maxwidth)			!dump the captured line if 1)found carriage return, 2)finished parsing input, or 3) reached max size of screen
-			{
-				if(orTempBuffer->markerend == '?' or '/' or '-' or ':') { !cases where we allow breaks and still want to print the character
-					includeBreakingChar=true;
-					markerend=markerend+1;
-				}
-				else includeBreakingChar=false;
-
-				if(o==(len+WORDSIZE)) markerend=o;				!--if we have finished parsing the input, then the character pointed to by o is not necessarily a space or return.  Go ahead and include it in the output
-				if(leftAlign==false)
-					offset=(width/2)-((markerend-markerstart)/2);	!--GLULX note: These /2 are correct.  They do NOT represent WORDSIZE, but calculate the half way point
-				else
-					offset=(width+2-maxwidth)/4; !TODO not sure about this formula, but if the /4 is set to /2 like above, it creates wordwrap issues
-
-				if(highlight==HIGHLIGHT_ALL) style reverse;
-				font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued
-
-				if(markerstart==WORDSIZE)
-					spaces offset-padding;
-				else
-					spaces offset+subIndent-padding;
-
-				if(highlight> NO_HIGHLIGHT) style reverse;
-				font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued
-
-				
-				if(prefixPostFixCallback~=0) prefixPostFixCallback(1);
-				for(i=markerstart:i<markerend:i++) print (char) orTempBuffer->i;	!print every character from startmark to just prior to endmark (so as not to print ending space or carriage return)
-				if(prefixPostFixCallback~=0) prefixPostFixCallback(2);
-
-				if(highlight~=HIGHLIGHT_ALL) style roman;
-				font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued
-
-				new_line;												!next line
-
-				if(includeBreakingChar==false)
-					markerend=markerstart=markerend+1;							!skip the return or the space for the next run (so that it doesn't get appended to the front of the next lfine)
-				else
-					markerend=markerstart=markerend;
+		_orcWidth=width; _orcMaxWidth=maxwidth; _orcHighlight=highlight; _orcLeftAlign=leftAlign;
+		_orcFrame=prefixPostFixCallback; _orcSubIndent=subIndent; _orcPadding=padding;
+		start=WORDSIZE;
+		end=len+WORDSIZE;
+		lineEnd=-1;
+		for(o=start:o<=end:o++){
+			if(o==end) c=10; else c=orTempBuffer->o;
+			if(c==10 or 13){
+				_orCenterLine(start, o);
+				start=o+1;
+				lineEnd=-1;
+				continue;
 			}
+			if(o-start>=maxwidth){ !--character o doesn't fit on this line
+				if(c==' '){
+					_orCenterLine(start, o);
+					start=o+1;
+					lineEnd=-1;
+					continue;
+				}
+				if(lineEnd>start){
+					_orCenterLine(start, lineEnd);
+					start=nextStart;
+				}
+				else{ !--a word longer than the line: split it
+					_orCenterLine(start, o);
+					start=o;
+				}
+				lineEnd=-1;
+			}
+			if(c==' '){ lineEnd=o; nextStart=o+1; }
+			if(c=='?' or '/' or '-' or ':'){ lineEnd=o+1; nextStart=o+1; }
 		}
 		if(highlight>NO_HIGHLIGHT) style roman; !-- if we highlighted the text, turn it off
 		font on; !restore variable-width font
+	];
+
+	[_orCenterLine start end
+			offset i;
+		if(_orcLeftAlign==false)
+			offset=(_orcWidth-(end-start))/2;
+		else
+			offset=(_orcWidth-_orcMaxWidth)/2;
+		if(start~=WORDSIZE) offset=offset+_orcSubIndent;
+
+		if(_orcHighlight==HIGHLIGHT_ALL) style reverse;
+		font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued
+
+		spaces offset-_orcPadding;
+
+		if(_orcHighlight> NO_HIGHLIGHT) style reverse;
+		font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued
+
+		if(_orcFrame~=0) _orcFrame(1);
+		for(i=start:i<end:i++) print (char) orTempBuffer->i;
+		if(_orcFrame~=0) _orcFrame(2);
+
+		if(_orcHighlight~=HIGHLIGHT_ALL) style roman;
+		font off; !GLULX interpreters turn variable-width fonts back on when a style command is issued
+
+		new_line;
 	];
 #endif; !--center_bgl
 #endif; !--After VERBLIB

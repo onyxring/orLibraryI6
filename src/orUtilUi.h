@@ -70,6 +70,7 @@ Constant        orUtilUI_STAGE  0;
             s=glk_stream_get_current();
             for(w=glk_window_iterate(0,0):w~=0:w=glk_window_iterate(w,0))
                if(glk_window_get_stream(w)==s){
+                  if(glk_window_get_type(w)~=wintype_TextGrid) break; !--a text buffer measures in proportional units; use the status line's fixed-width columns
                   glk_window_get_size(w, gg_arguments, 0);
                   return gg_arguments-->0;
                }
